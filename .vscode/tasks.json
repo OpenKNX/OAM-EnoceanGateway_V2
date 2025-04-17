@@ -1,0 +1,102 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+            "label": "Build SAMD",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "develop_SAMD"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+		{
+            "label": "Build RP2040",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "develop_RP2040"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Upload JLINK SAMD",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "upload_JLINK_SAMD",
+                "upload"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Upload JLINK RP2040",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "upload_JLINK_RP2040",
+                "upload"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Upload USB SAMD",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "upload_USB_SAMD",
+                "upload"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Upload USB RP2040",
+            "type": "shell",
+            "command": "scripts/OpenKNX-Build.ps1",
+            "args": [
+                "upload_USB_RP2040",
+                "upload"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenKNXproducer",
+            "type": "shell",
+            "command": "~/bin/OpenKNXproducer.exe",
+            "args": [
+                "create",
+                "--Debug",
+                "--HeaderFileName=include/knxprod.h",
+                "src/EnoceanGateway"
+            ],
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "label": "Buid-Release",
+            "type": "shell",
+            "command": "scripts/Build-Release.ps1",
+            "args": [],
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "label": "Resolve platformio.ini",
+            "type": "shell",
+            "command": "~/.platformio/penv/Scripts/pio",
+            "args": [
+                "project",
+                "config",
+                ">platformio.ini.full.txt"
+            ],
+            "problemMatcher": [],
+            "group": "test"
+        }
+	]
+}

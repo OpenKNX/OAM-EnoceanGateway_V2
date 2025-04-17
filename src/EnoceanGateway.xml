@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="../../Organization/knxprod-support/knx_project_20/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<KNX xmlns="http://knx.org/xml/project/20" xmlns:op="http://github.com/OpenKNX/OpenKNXproducer">
+  
+  <op:ETS ProductName="Enocean-Gateway 2.0"
+    OpenKnxId="0xA2"
+    ApplicationNumber="0x01"
+    ApplicationVersion="0.1"
+    ReplacesVersions="0.0"
+    ApplicationRevision="0"
+    ApplicationName="KNX-Enocean-Gateway"
+    BuildSuffix="-Dev"
+    BuildSuffixText=" (dev)"
+    BusCurrent="10"
+    SerialNumber="EnoceanGatewayV2"
+    OrderNumber="SmartMF-EnoceanGateway"
+  />
+
+  <op:define prefix="BASE" 
+            share="../lib/OGM-Common/src/Common.share.xml"
+            ModuleType="1" />
+
+  <op:define prefix="UCT"
+    share="../../OFM-ConfigTransfer/src/ConfigTransfer.share.xml"
+    noConfigTransfer="true"
+    ModuleType="99">
+    <op:verify File="../../OFM-ConfigTransfer/library.json" ModuleVersion="0.2" />
+  </op:define>
+
+  <op:define prefix="ENO"
+    share="EnoceanGateway.share.xml"
+    template="EnoceanGateway.templ.xml"
+    NumChannels="30"
+    KoOffset="20"
+    ModuleType="2">
+    <op:verify File="../library.json" ModuleVersion="2.0" /> 
+  </op:define>
+
+  <op:define prefix="LOG"
+    share="../lib/OFM-LogicModule/src/Logikmodul.share.xml"
+    template="../lib/OFM-LogicModule/src/Logikmodul.templ.xml"
+    NumChannels="50"
+    KoOffset="320"
+    ModuleType="1">
+    <op:verify File="../lib/OFM-LogicModule/library.json" ModuleVersion="3.5" /> 
+  </op:define>
+
+  <!-- <generate base="MyApplication.xml" /> -->
+  <generate />
+
+</KNX>
