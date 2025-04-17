@@ -1,0 +1,54 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../OFM-LogicModule"
+        },
+        {
+			"path": "../OGM-Common"
+		},
+        {
+            "path": "../knx"
+		},
+        {
+            "path": "../OFM-FileTransferModule"
+        },
+        {
+            "path": "../OFM-UsbExchange"
+        },
+        {
+			"path": "../OFM-ConfigTransfer"
+		}
+    ],
+    "settings": {
+        "files.associations": {
+            "*.json": "jsonc",
+            "array": "cpp",
+            "deque": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "vector": "cpp",
+            "string_view": "cpp",
+            "initializer_list": "cpp",
+            "xiosbase": "cpp",
+            "*.cppbak": "cpp",
+            "cstdint": "cpp",
+            "cmath": "cpp",
+            "ctime": "cpp",
+            "*.tcc": "cpp",
+            "chrono": "cpp",
+            "functional": "cpp",
+            "istream": "cpp",
+            "ostream": "cpp",
+            "ratio": "cpp",
+            "tuple": "cpp",
+            "type_traits": "cpp",
+            "utility": "cpp",
+            "variant": "cpp",
+            "optional": "cpp",
+            "system_error": "cpp"
+        }
+    }
+}
