@@ -11,12 +11,12 @@
   <op:config name="%ENO_NumChannelsDefault%" value="5" />
 
   <op:ETS
-    OpenKnxId="0xAF"
-    ApplicationNumber="255"
-    ApplicationVersion="1.0"
-    ReplacesVersions="0.6 0.5 0.4 0.3 0.2 0.1 0.0"
+    OpenKnxId="0xA2"
+    ApplicationNumber="0x01"
+    ApplicationVersion="0.2"
+    ReplacesVersions="0.1"
     ApplicationRevision="0"
-    ProductName="ENO_TestApp"
+    ProductName="Enocean-Gateway 2.0"
     BusCurrent="10"
     BuildSuffix=""
     BuildSuffixText=""
