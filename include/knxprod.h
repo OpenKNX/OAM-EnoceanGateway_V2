@@ -13,14 +13,14 @@
 #define ETS_ModuleId_UCT 2
 #define ETS_ModuleId_ENO 3
 #define ETS_ModuleId_LOG 4
-#define MAIN_FirmwareName "ENO_TestApp"
-#define MAIN_OpenKnxId 0xAF
-#define MAIN_ApplicationNumber 255
-#define MAIN_ApplicationVersion 16
+#define MAIN_FirmwareName "Enocean-Gateway 2.0"
+#define MAIN_OpenKnxId 0xA2
+#define MAIN_ApplicationNumber 1
+#define MAIN_ApplicationVersion 2
 #define MAIN_ApplicationEncoding iso-8859-15
 #define MAIN_ParameterSize 6141
 #define MAIN_MaxKoNumber 439
-#define MAIN_OrderNumber "ENO-TESTAPP"
+#define MAIN_OrderNumber "MFKnxEno"
 #define BASE_ModuleVersion 25
 #define UCT_ModuleVersion 5
 #define ENO_ModuleVersion 16

@@ -21,7 +21,7 @@
     BuildSuffix=""
     BuildSuffixText=""
     MediumTypes="MT-0 MT-5"
-    OrderNumber="ENO-TESTAPP" />
+    OrderNumber="MFKnxEno" />
 
   <op:define prefix="BASE" ModuleType="10"
     share="../lib/OGM-Common/src/Common.share.xml">
