@@ -28,12 +28,20 @@
 ../OGM-Common/scripts/setup/reusable/Build-Release-Preprocess.ps1 $args[0]
 if (!$?) { exit 1 }
 
-# # build firmware based on generated headerfile for SAMD
-# ../OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_EnoceanGateway_SAMD EnoceanGateway_SAMD bin
-# if (!$?) { exit 1 }
+# build firmware based on generated headerfile for SAMD
+lib/OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_SAMD firmware-SAMD bin
+if (!$?) { exit 1 }
 
-# build firmware based on generated headerfile for RP2040
-../OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_EnoceanGateway_RP2040 EnoceanGateway_RP2040 uf2
+# build firmware for PiPico-BCU-Connector
+lib/OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_PiPico_BCU_Connector firmware-PiPico-BCU-Connector uf2
+if (!$?) { exit 1 }
+
+# build firmware for Masifi-Sensor_Breakout
+lib/OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_MASIFI_SENSOR_BREAKOUT firmware-Masifi-Sensor_Breakout uf2
+if (!$?) { exit 1 }
+
+# build firmware based on generated headerfile for ESP32
+../OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_ESP32 firmware-ESP32 bin
 if (!$?) { exit 1 }
 
 # execute generic post-build steps

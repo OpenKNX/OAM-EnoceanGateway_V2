@@ -1,0 +1,513 @@
+<title>EnOcean-Modul – Code-Dokumentation</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1d23;
+    --muted: #5b6270;
+    --card-bg: #f6f7f9;
+    --border: #e2e5ea;
+    --code-bg: #eef0f3;
+    --accent: #2f6fed;
+    --ok-bg: #e3f6ea; --ok-fg: #146c3f;
+    --warn-bg: #fdeee0; --warn-fg: #9a4b06;
+    --dead-bg: #fbe7e9; --dead-fg: #9c2a35;
+    --link: #2f6fed;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --fg: #e7e9ee;
+      --muted: #9aa1ad;
+      --card-bg: #1c1f26;
+      --border: #2a2e37;
+      --code-bg: #22262f;
+      --accent: #6fa2ff;
+      --ok-bg: #0f2b1c; --ok-fg: #6fd39a;
+      --warn-bg: #2c2010; --warn-fg: #f0a95e;
+      --dead-bg: #2c1418; --dead-fg: #f0808c;
+      --link: #6fa2ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 6rem;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 0.25rem; }
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 3rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+  h3 { font-size: 1.1rem; margin-top: 1.75rem; }
+  h4 { font-size: 1rem; margin-top: 1.25rem; color: var(--muted); }
+  p { max-width: 74ch; }
+  .subtitle { color: var(--muted); margin-top: 0; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    display: block;
+    overflow-x: auto;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.92em;
+  }
+  th { background: var(--card-bg); }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-left: 0.4rem;
+  }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+  .pill.dead { background: var(--dead-bg); color: var(--dead-fg); }
+  nav.toc {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+  nav.toc h2 { margin: 0 0 0.5rem; padding: 0; border: none; font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; }
+  nav.toc li { break-inside: avoid; margin-bottom: 0.3rem; }
+  nav.toc a, a { color: var(--link); text-decoration: none; }
+  nav.toc a:hover, a:hover { text-decoration: underline; }
+  .file-path { color: var(--muted); font-size: 0.85em; }
+  details.group {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 1rem 0;
+    padding: 0.1rem 1.1rem 0.6rem;
+    background: var(--card-bg);
+  }
+  details.group summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.7rem 0;
+  }
+  ul, ol { max-width: 74ch; }
+  hr.section-end { border: none; border-top: 1px dashed var(--border); margin: 2.5rem 0; }
+  .meta-note {
+    font-size: 0.85em;
+    color: var(--muted);
+    border-left: 3px solid var(--border);
+    padding-left: 0.8rem;
+    margin: 1rem 0;
+  }
+</style>
+
+<h1>EnOcean-Modul – Code-Dokumentation</h1>
+<p class="subtitle">OAM-EnoceanNEU · OpenKNX-Firmware für RP2040 · generiert aus einer Analyse des aktuellen Quellstands in <code>src/</code></p>
+
+<div class="meta-note">
+Diese Seite fasst Aufbau, Verantwortlichkeiten und bekannte Lücken der EnOcean-Firmware zusammen. Sie ersetzt keine Codelektüre, sondern dient als Einstieg und Nachschlagewerk. Alle Zeilenangaben beziehen sich auf den Stand zum Erstellungszeitpunkt und können sich mit künftigen Änderungen verschieben.
+</div>
+
+<nav class="toc">
+  <h2>Inhalt</h2>
+  <ol>
+    <li><a href="#ueberblick">Überblick &amp; Architektur</a></li>
+    <li><a href="#empfangspfad">Empfangspfad – Wiring-Status</a></li>
+    <li><a href="#main">main.cpp</a></li>
+    <li><a href="#enoceanmodule">EnoceanModule.h / .cpp</a></li>
+    <li><a href="#enoceanchannel">EnoceanChannel.h / .cpp</a></li>
+    <li><a href="#structs">EnoceanStructs.h / EnoceanProfils.h</a></li>
+    <li><a href="#1bs">1BS_Telegram.h</a></li>
+    <li><a href="#rps">RPS_Telegram.h</a></li>
+    <li><a href="#4bs">4BS_Telegram.h</a></li>
+    <li><a href="#vld">VLD_Telegram.h</a></li>
+    <li><a href="#todos">Offene Punkte &amp; bekannte Bugs (gesamt)</a></li>
+  </ol>
+</nav>
+
+<h2 id="ueberblick">Überblick &amp; Architektur</h2>
+<p>
+Die Firmware implementiert ein KNX/EnOcean-Gateway auf Basis des <strong>OpenKNX-Frameworks</strong> (<code>OpenKNX::Module</code>, <code>OpenKNX::Channel</code>). Sie kommuniziert über UART mit einem EnOcean-Funktransceiver nach dem <strong>ESP3-Seriennprotokoll</strong> und bildet empfangene Funktelegramme auf KNX-Gruppenobjekte ab. <code>main.cpp</code> registriert <code>EnoceanModule</code> beim zentralen <code>openknx</code>-Objekt; <code>EnoceanModule</code> besitzt ein Array von <code>EnoceanChannel</code>-Instanzen (eine pro konfiguriertem KNX-Kanal in der ETS), liest per Statemachine (<code>uart_getPacket()</code>) Bytes vom Transceiver und reicht vollständige Pakete an jeden Kanal weiter (<code>check_Eno_ID()</code>), der wiederum – abhängig vom EnOcean-Telegrammtyp (RORG) – an eine profilspezifische Handler-Funktion (<code>handle_1BS()</code>, <code>handle_RPS()</code>, <code>handle_4BS()</code>, <code>handle_VLD()</code>) dispatcht, die die Rohbytes interpretiert und auf KNX-Gruppenobjekte schreibt.
+</p>
+<div class="card">
+<strong>Datenfluss (Empfang):</strong>
+<pre><code>UART-Bytes
+  → EnoceanModule::uart_getPacket()      (ESP3-Statemachine, CRC8-Prüfung)
+  → EnoceanModule::getEnOceanMSG()       (nur bei ENOCEAN_OK, RORG == ERP1)
+  → für jeden Kanal: EnoceanChannel::check_Eno_ID()
+        (RORG-Filter + Sender-ID-Vergleich gegen ParamENO_CHId0..7)
+  → handle_1BS() / handle_RPS() / handle_4BS() / handle_VLD()
+        (EEP-spezifische Auswertung, Cast auf Bitfeld-Structs aus EnoceanStructs.h)
+  → knx.getGroupObject(firstComObj + N).value(...) bzw. KoENO_GO_BASE__N...</code></pre>
+</div>
+
+<h2 id="empfangspfad">Empfangspfad – Wiring-Status</h2>
+<p>Nicht jeder in den Headern implementierte Handler ist auch tatsächlich aus <code>EnoceanChannel::check_Eno_ID()</code> erreichbar. Aktueller Stand:</p>
+<table>
+  <tr><th>RORG</th><th>Handler-Datei</th><th>Include in EnoceanChannel.cpp</th><th>Aufruf verdrahtet?</th><th>Status</th></tr>
+  <tr><td>1BS (D5)</td><td><code>1BS_Telegram.h</code></td><td>aktiv</td><td><code>handle_1BS(pPacket, _channelIndex)</code></td><td><span class="pill ok">aktiv</span></td></tr>
+  <tr><td>RPS (F6)</td><td><code>RPS_Telegram.h</code></td><td>auskommentiert</td><td>auskommentiert</td><td><span class="pill dead">tot</span></td></tr>
+  <tr><td>4BS (A5)</td><td><code>4BS_Telegram.h</code></td><td>auskommentiert</td><td>auskommentiert, Aufruf referenziert zudem nicht mehr existierende Variablen</td><td><span class="pill dead">tot</span></td></tr>
+  <tr><td>VLD (D2)</td><td><code>VLD_Telegram.h</code></td><td>auskommentiert</td><td>auskommentiert, Signatur passt nicht mehr</td><td><span class="pill dead">tot</span></td></tr>
+  <tr><td>Rocker</td><td>(kein eigener Case aktiv)</td><td>–</td><td>kompletter <code>case</code>-Block auskommentiert</td><td><span class="pill dead">tot</span></td></tr>
+</table>
+<p>Zusätzlich gilt: <code>check_Eno_ID()</code> hat aktuell <strong>keinen einzigen <code>return true</code></strong> im gesamten Code – die Funktion liefert also unabhängig vom Ausgang immer <code>false</code> zurück. Ein Aufrufer kann den Rückgabewert damit derzeit nicht nutzen, um „Paket wurde behandelt“ zu erkennen (siehe <a href="#enoceanchannel">EnoceanChannel</a>).</p>
+
+<hr class="section-end">
+
+<h2 id="main">main.cpp</h2>
+<p><span class="file-path">src/main.cpp</span> ist der Top-Level-Einstiegspunkt der Firmware (Arduino-Sketch-Pattern <code>setup()</code>/<code>loop()</code>, plus <code>setup1()</code>/<code>loop1()</code> für den zweiten RP2040-Core). Die Datei registriert die OpenKNX-Module (<code>openknxLogic</code>, <code>openknxEnoceanModule</code>, unter RP2040 zusätzlich <code>openknxUsbExchangeModule</code> und <code>openknxFileTransferModule</code>) beim <code>openknx</code>-Framework-Objekt und delegiert den Programmablauf dorthin.</p>
+
+<h3>Funktionen</h3>
+<ul>
+  <li><code>void setup()</code> (Z. 26–131) – registriert Module über <code>openknx.addModule(id, ref)</code> mit festen Prioritäts-IDs (1 = Logic, 2 = Enocean, 8 = UsbExchange, 9 = FileTransfer), ruft <code>openknx.setup()</code> auf und registriert danach bedingt Short-/Double-/Long-Click-Handler für bis zu drei Funktionstasten (Test-Flags + LEDs).</li>
+  <li><code>void loop()</code> (Z. 133–142) – setzt alle 10 s einen Debug-Timer (<code>_debugCore0</code>, ohne weitere Wirkung) und ruft <code>openknx.loop()</code> auf.</li>
+  <li><code>void setup1()</code> / <code>void loop1()</code> (Z. 144–155, nur <code>OPENKNX_DUALCORE</code>) – delegieren nur an <code>openknx.setup1()</code> / <code>openknx.loop1()</code>.</li>
+</ul>
+
+<h3>Globale Variablen</h3>
+<p><code>_debugCore0</code>/<code>_debugCore1</code> (Z. 14–15, werden gesetzt aber nie gelesen), <code>func1test/func2test/func3test</code> (Z. 17–19, Testzustände für Tasten/LEDs), <code>core1_separate_stack = true</code> (Z. 20, in diesem Repo sonst nicht referenziert).</p>
+
+<h3>Auffälligkeiten</h3>
+<ul>
+  <li>Reste eines älteren CC1101-basierten HF-Ansatzes vollständig auskommentiert (Z. 5, 22–24) – nicht mehr relevant für die UART/ESP3-Anbindung.</li>
+  <li>Der komplette Button/LED-Testblock (Z. 40–130) wirkt wie unveränderter Boilerplate aus der OpenKNX-Modulvorlage ohne Bezug zur EnOcean-Funktionalität.</li>
+  <li><code>_debugCore0</code>/<code>_debugCore1</code> ohne sichtbaren Effekt (nirgends ausgelesen/geloggt).</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="enoceanmodule">EnoceanModule.h / EnoceanModule.cpp</h2>
+<p><span class="file-path">src/EnoceanModule.h</span>, <span class="file-path">src/EnoceanModule.cpp</span> — Bindeglied zwischen dem EnOcean-Funkmodul (UART/ESP3) und dem KNX-Bus. Der Header definiert sämtliche ESP3-Protokollkonstanten (Statuscodes, RORG-/Telegrammtypen, Kommando-IDs, Rocker-Bitmuster) sowie Zustände und Datenstruktur der Paket-Empfangs-Statemachine; die <code>.cpp</code> implementiert CRC8, die Empfangs-Statemachine, den Paketversand, den Modul-Lebenszyklus und das initiale Auslesen der Transceiver-Base-ID.</p>
+
+<h3>Zentrale Konstanten &amp; Typen (Header)</h3>
+<table>
+  <tr><th>Kategorie</th><th>Werte</th><th>Bedeutung</th></tr>
+  <tr><td>Statuscodes</td><td><code>ENOCEAN_OK</code>(0), <code>ENOCEAN_OUT_OF_RANGE</code>(21), <code>ENOCEAN_NOT_VALID_CHKSUM</code>(7), <code>ENOCEAN_NO_RX_TEL</code>(6), <code>ENOCEAN_NEW_RX_BYTE</code>(3)</td><td>Rückgabewerte von <code>uart_getPacket</code>/<code>uart_sendPacket</code></td></tr>
+  <tr><td>RORG (Empfang)</td><td><code>u8RORG_1BS</code>(0xD5), <code>u8RORG_RPS</code>(0xF6), <code>u8RORG_VLD</code>(0xD2), <code>u8RORG_4BS</code>(0xA5), <code>u8RORG_Rocker</code>(0xFA)</td><td>EnOcean-Telegrammklassen</td></tr>
+  <tr><td>Pakettyp</td><td><code>u8RADIO_ERP1</code>(0x01), <code>u8RESPONSE</code>(0x02)</td><td>ESP3-Pakettyp-Byte</td></tr>
+  <tr><td>Common Commands</td><td><code>u8CO_WR_IDBASE</code>, <code>u8CO_RD_IDBASE</code>, <code>u8CO_WR_REPEATER</code>, <code>u8CO_RD_REPEATER</code></td><td>ESP3-Kommandos an den Transceiver</td></tr>
+  <tr><td>Puffer/Rahmen</td><td><code>BASEID_BYTES</code>=4, <code>DATBUF_SZ</code>=100, <code>SER_SYNCH_CODE</code>=0x55, <code>SER_HEADER_NR_BYTES</code>=4</td><td>ESP3-Rahmenkonstanten</td></tr>
+</table>
+
+<p><code>enum STATES_GET_PACKET_</code> (Header Z. 99–111) – Zustände der Empfangs-Statemachine: <code>GET_SYNC_STATE</code> → <code>GET_HEADER_STATE</code> → <code>CHECK_CRC8H_STATE</code> → <code>GET_DATA_STATE</code> → <code>CHECK_CRC8D_STATE</code>.</p>
+
+<p><code>struct PACKET_SERIAL_TYPE_</code> (Header Z. 114–124): <code>u16DataLength</code>, <code>u8OptionLength</code>, <code>u8Type</code>, <code>u8DataBuffer</code> (Zeiger).
+<span class="pill warn">Gotcha</span> Die ersten drei Felder werden in <code>uart_getPacket</code>/<code>uart_sendPacket</code> per <code>uint8_t* u8Raw = (uint8_t*)pPacket</code> als 4-Byte-Rohpuffer behandelt (inkl. Byte-Swap für Big-Endian-Wire-Format). Das setzt voraus, dass der Compiler zwischen diesen Feldern kein Padding einfügt – es gibt weder <code>packed</code>-Attribut noch <code>static_assert</code>, die das absichern.</p>
+
+<h3>Wichtige Methoden</h3>
+<ul>
+  <li><code>uint8_t uart_getPacket(PACKET_SERIAL_TYPE_ *pPacket, uint16_t u16BufferLength)</code> (.cpp Z. 336–533) — Kernstück: byteweise ESP3-Statemachine.
+    <ul>
+      <li><code>GET_SYNC_STATE</code>: wartet auf <code>0x55</code>.</li>
+      <li><code>GET_HEADER_STATE</code>: kopiert 4 Header-Bytes, tauscht Datenlängen-Bytes (Wire-Format → <code>uint16_t</code>).</li>
+      <li><code>CHECK_CRC8H_STATE</code>: prüft Header-CRC8, versucht bei Fehler Resynchronisation über ein eingebettetes Sync-Byte; bei Länge 0 → <code>ENOCEAN_OUT_OF_RANGE</code>.</li>
+      <li><code>GET_DATA_STATE</code>: kopiert Daten-/Optionsbytes (nur wenn Platz im Puffer, sonst wird trotzdem weitergezählt).</li>
+      <li><code>CHECK_CRC8D_STATE</code>: prüft Daten-CRC8 → <code>ENOCEAN_OK</code>, <code>ENOCEAN_NOT_VALID_CHKSUM</code> oder <code>ENOCEAN_OUT_OF_RANGE</code>.</li>
+      <li>Rückgabe am Funktionsende: <code>ENOCEAN_NO_RX_TEL</code> (State wieder <code>GET_SYNC_STATE</code>) oder <code>ENOCEAN_NEW_RX_BYTE</code> (Paket unvollständig).</li>
+    </ul>
+    <span class="pill warn">Gotcha</span> Der geplante Inter-Byte-Timeout ist als <code>// TODO</code> markiert (Z. 355) und nicht implementiert. Die Member <code>u8CRC</code>/<code>u8RxByte</code>/<code>u16Count</code> aus dem Header werden durch lokale/<code>static</code> Variablen gleichen Namens verdeckt – funktioniert nur, weil es eine einzige globale Instanz gibt.
+  </li>
+  <li><code>uint8_t uart_sendPacket(PACKET_SERIAL_TYPE_ *pPacket)</code> (.cpp Z. 535–577) — sendet Sync-Byte, Header (Rohspeicher-Cast), Header-CRC8, Daten/Options-Bytes inkl. Daten-CRC8. <span class="pill warn">Gotcha</span> Busy-Wait ohne Timeout beim seriellen Schreiben (<code>while(_serial-&gt;write(...)!=1);</code>).</li>
+  <li><code>void begin()</code> (.cpp Z. 162–219) — Init-Guard, setzt Puffer, <code>delay(2000)</code>, liest Base-ID. Base-ID-Vergleich/-Neuschreiben und Repeater-Funktion sind komplett auskommentiert (Z. 177–197, 204–216).</li>
+  <li><code>void readBaseId(uint8_t *fui8_BaseID_p)</code> (.cpp Z. 221–281) — sendet Common-Command <code>u8CO_RD_IDBASE</code> und wartet. <span class="pill warn">Risiko</span> <code>while (u8RetVal == ENOCEAN_NO_RX_TEL) { u8RetVal = uart_getPacket(...); }</code> ist eine blockierende Schleife <strong>ohne Timeout</strong> — antwortet der Transceiver nie, hängt <code>setup()</code> permanent.</li>
+  <li><code>void getEnOceanMSG(uint8_t u8RetVal, PACKET_SERIAL_TYPE_ *f_Pkt_st)</code> (.cpp Z. 579–701) — nur bei <code>ENOCEAN_OK</code> aktiv. Iteriert für <code>u8Type == u8RADIO_ERP1</code> über alle konfigurierten Kanäle und ruft <code>_channels[i]-&gt;check_Eno_ID(f_Pkt_st)</code> auf; das Ergebnis landet in <code>packetWasHandled</code>, dessen Auswertung unter dem nirgends definierten Makro <code>KDEBUG_handled</code> steckt (toter Code).</li>
+  <li><code>void setupChannels()</code> (.cpp Z. 66–73) — erzeugt <code>ParamENO_VisibleChannels</code> <code>EnoceanChannel</code>-Instanzen per <code>new</code> (nie <code>delete</code>t — für ein Embedded-Singleton unkritisch).</li>
+  <li><code>void loop(bool configured)</code> (.cpp Z. 104–127) — bei <code>configured &amp;&amp; ParamENO_VisibleChannels&gt;0</code>: Round-Robin über Kanäle via <code>openknx.freeLoopIterate(...)</code>, pro Iteration <code>task()</code> (ein Telegramm empfangen/verarbeiten) + <code>_channels[_currentChannel]-&gt;loop()</code>.</li>
+  <li><code>void processInputKo(GroupObject &amp;ko)</code> (.cpp Z. 283–287) — leerer Stub, KNX→EnOcean-Rückweg fehlt vollständig.</li>
+  <li><code>bool processCommand(...)</code> (.cpp Z. 294–312) — <span class="pill dead">Bug</span> prüft <code>cmd.substr(0,5) == "Enocean"</code>; <code>substr(0,5)</code> liefert max. 5 Zeichen und kann nie gleich dem 7-Zeichen-String sein — die Bedingung ist strukturell unerfüllbar, der Debug-Ausgabeblock darunter ist unerreichbarer Code.</li>
+  <li><code>void registerUsbExchangeCallbacks()</code> (.cpp Z. 316–333) — implementiert, aber an keiner Stelle aufgerufen (toter Code).</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="enoceanchannel">EnoceanChannel.h / EnoceanChannel.cpp</h2>
+<p><span class="file-path">src/EnoceanChannel.h</span>, <span class="file-path">src/EnoceanChannel.cpp</span> — repräsentiert genau einen konfigurierten EnOcean-Kanal (<code>class EnoceanChannel : public OpenKNX::Channel</code>). <code>EnoceanModule</code> hält ein Array dieser Instanzen, eine pro über ETS/knxprod konfiguriertem KNX-Kanal.</p>
+
+<h3>Forward-Declaration von PACKET_SERIAL_TYPE_</h3>
+<p>Im Header steht nur <code>struct PACKET_SERIAL_TYPE_;</code> statt eines vollen Includes von <code>EnoceanModule.h</code> — <code>EnoceanModule.h</code> inkludiert bereits <code>EnoceanChannel.h</code>, ein Include in umgekehrter Richtung würde einen zirkulären Include erzeugen. Da <code>check_Eno_ID()</code> im Header nur einen Zeiger referenziert, reicht die Forward-Declaration; die volle Definition kommt über <code>#include "EnoceanModule.h"</code> in der <code>.cpp</code>.</p>
+
+<h3>Methoden</h3>
+<ul>
+  <li><code>EnoceanChannel(uint8_t index)</code> — setzt nur <code>_channelIndex = index</code> (geerbt von <code>OpenKNX::Channel</code>).</li>
+  <li><code>name()</code> — liefert für alle Instanzen immer den festen String <code>"EnoceanChannel"</code>, ohne Kanalindex.</li>
+  <li><code>setup()</code> — nur Logging, keine fachliche Initialisierung.</li>
+  <li><code>loop()</code> — No-Op (Dummy).</li>
+  <li><code>bool check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket)</code> — zentrale Methode, siehe unten.</li>
+</ul>
+
+<h3>check_Eno_ID() im Detail</h3>
+<ol>
+  <li><strong>ID-Rekonstruktion aus Nibbles</strong> (bei jedem Aufruf neu berechnet, nicht einmalig in <code>setup()</code>):
+    <pre><code>deviceId_Arr[0] = (ParamENO_CHId0 &lt;&lt; 4) | ParamENO_CHId1;
+deviceId_Arr[1] = (ParamENO_CHId2 &lt;&lt; 4) | ParamENO_CHId3;
+deviceId_Arr[2] = (ParamENO_CHId4 &lt;&lt; 4) | ParamENO_CHId5;
+deviceId_Arr[3] = (ParamENO_CHId6 &lt;&lt; 4) | ParamENO_CHId7;</code></pre>
+  </li>
+  <li><strong>Grober RORG-Filter</strong>: Pakete, deren RORG-Byte nicht dem konfigurierten <code>ParamENO_CHProfilSelection</code> entspricht, werden verworfen — außer bei <code>u8RORG_Rocker</code>-Konfiguration (Sonderfall übersprungen).</li>
+  <li><strong>Dispatch per <code>switch(ParamENO_CHProfilSelection)</code></strong>, mit Sender-ID-Vergleich an profilabhängigen Byte-Offsets:</li>
+</ol>
+<table>
+  <tr><th>RORG-Fall</th><th>ID-Offset in u8DataBuffer</th><th>Handler-Aufruf</th></tr>
+  <tr><td><code>u8RORG_1BS</code></td><td>[2..5]</td><td><span class="pill ok">aktiv</span> <code>handle_1BS(pPacket, _channelIndex)</code></td></tr>
+  <tr><td><code>u8RORG_RPS</code></td><td>[2..5]</td><td><span class="pill dead">auskommentiert</span> <code>handle_RPS(...)</code></td></tr>
+  <tr><td><code>u8RORG_4BS</code></td><td>[5..8]</td><td><span class="pill dead">auskommentiert</span>, veraltete Signatur (<code>profil</code>, <code>profil2nd</code> etc. existieren nicht mehr)</td></tr>
+  <tr><td><code>u8RORG_VLD</code></td><td>[u16DataLength-5 .. u16DataLength-2]</td><td><span class="pill dead">auskommentiert</span> <code>handle_VLD(...)</code></td></tr>
+  <tr><td><code>u8RORG_Rocker</code></td><td>[2..5], wie 1BS/RPS</td><td><span class="pill dead">kompletter case-Block auskommentiert</span></td></tr>
+</table>
+<p>In allen aktiven Vergleichen gilt: passt die extrahierte Sender-ID nicht zu <code>deviceId_Arr</code>, wird sofort <code>return false;</code> ausgeführt. Nach dem <code>switch</code> fällt die Ausführung in <strong>jedem</strong> Fall — auch im 1BS-Erfolgsfall — auf das abschließende <code>return false;</code> durch. Es existiert kein <code>return true</code> im gesamten Code.</p>
+
+<h3>Unvollständiges &amp; Auffälligkeiten</h3>
+<ul>
+  <li><code>check_Eno_ID()</code> liefert faktisch immer <code>false</code> — ein offener <code>// TODO</code>-Kommentar dazu steht bereits im Code, obwohl der ID-Vergleich selbst schon implementiert ist.</li>
+  <li>Rocker-Case (auskommentiert) referenziert nicht mehr existierende Bezeichner (<code>unionMSG</code>, <code>union2</code>, <code>firstParameter</code>) — klar Legacy-Code aus einer älteren Codebasis.</li>
+  <li><code>deviceId_Arr</code> wird bei jedem eingehenden Paket neu berechnet statt einmalig — funktional unschädlich, aber unnötiger wiederholter Aufwand.</li>
+  <li><code>name()</code> liefert für alle Kanäle denselben String — für Diagnose bei mehreren aktiven Kanälen wenig aussagekräftig.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="structs">EnoceanStructs.h / EnoceanProfils.h</h2>
+<p><span class="file-path">src/EnoceanStructs.h</span> (705 Zeilen) definiert C-Structs, die byteweise über die Rohdaten eines empfangenen Telegramms gelegt werden (ein Struct pro EEP, i. d. R. Bitfeld-Substruct für Statusbytes + feste Sender-ID/Status-Bytes). <span class="file-path">src/EnoceanProfils.h</span> (225 Zeilen) enthält ausschließlich <code>#define</code>-Konstanten (keine echten <code>enum</code>s) für KO-Indizes, Teach-in-Codes, Wippen-Bezeichner und vor allem die vollständige Liste der unterstützten EEP-Profilcodes als frei vergebene Integer-IDs (nicht die echten EnOcean-Hex-Codes).</p>
+
+<h3>Struct-Familien</h3>
+<table>
+  <tr><th>Familie</th><th>Beispiele</th><th>Beschreibung</th></tr>
+  <tr><td>1BS (D5-00-01)</td><td><code>ONEBS_TEL_DATA_TYPE</code>, <code>ONEBS_TELEGRAM_TYPE</code></td><td>1 Bit Kontaktstatus + 7 NA</td></tr>
+  <tr><td>RPS (F6-xx)</td><td><code>RPS_TEL_DATA_TYPE</code>, <code>RPS_F6_10_00/01_DATA_TYPE</code></td><td>Wippen-Aktionen, Fenstergriff-Zustände</td></tr>
+  <tr><td>4BS (A5-xx)</td><td><code>FOURBS_A5_06_01</code> (Helligkeit), <code>FOURBS_A5_07_xx</code> (PIR), <code>FOURBS_A5_12_01</code> (Zähler), <code>FOURBS_A5_20_xx</code> (HLK-Aktoren)</td><td>Sensor-/Aktor-Telegramme, meist lineare Skalierung</td></tr>
+  <tr><td>VLD (D2-xx)</td><td><code>VLD_D2_01_*</code> (Dimm-/Schaltaktor), <code>VLD_D2_06_*</code> (Multisensor Fenstergriff), <code>VLD_D2_14_*</code> (Multisensor mehrbytig)</td><td>größte, heterogenste Gruppe; teils mehrere Bytes für einen Messwert</td></tr>
+  <tr><td>Rocker-Statemachine</td><td><code>enum RockerStates { idle, checkShortLong, waitShortRelease, waitLongRelease }</code></td><td>Kurz-/Langtasten-Erkennung</td></tr>
+</table>
+
+<h3>Bitfeld-Muster (Beispiel)</h3>
+<p>Bitfelder werden LSB-zuerst deklariert, aber im Kommentar in EnOcean-typischer „DB_BIT hoch-niedrig“-Notation beschrieben (Bit-Reihenfolge gespiegelt zur EnOcean-Spezifikation, plattform-/compilerabhängig):</p>
+<pre><code>struct RPS_TEL_DATA_TYPE
+{
+  uint8_t SA : 1; // (DB_BIT 0)   No 2nd action; 1: Valid second action
+  uint8_t R2 : 3; // (DB_BIT 3-2) Rocker second action.
+  uint8_t EB : 1; // (DB_BIT 4)   Released; 1: Pressed
+  uint8_t R1 : 3; // (DB_BIT 7-5) Rocker first action.
+};</code></pre>
+
+<h3>Auffälligkeiten</h3>
+<ul>
+  <li>Uneinheitliche Namenskonvention (PascalCase / lowerCamel / Kürzel), teils Tippfehler (<code>Na</code> vs. <code>NA</code>).</li>
+  <li>Kommentare wie <code>// good?</code> / <code>// Good</code> deuten auf unsicher verifizierte Bitlayouts hin.</li>
+  <li>Ein Kommentarfehler: <code>BA : 7; // (DB_BIT 0-3)</code> — Kommentar passt nicht zur Bitbreite.</li>
+  <li>Zwei inkompatible Bit-Layouts für dasselbe Profil D2-06 (<code>_Date_TYPE_*</code> vs. <code>_50_TYPE_*</code>).</li>
+  <li><code>EnoceanProfils.h</code> enthält trotz Namensgebung <strong>kein einziges echtes <code>enum</code></strong>, nur <code>#define</code>-Makros.</li>
+  <li>Profil-ID-Vergabe ist nicht durchgängig fortlaufend (Sprünge bei <code>_V2</code>-Varianten) — deutet auf nachträglich angeflickte Sonderfälle hin.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="1bs">1BS_Telegram.h <span class="pill ok">aktiv verdrahtet</span></h2>
+<p><span class="file-path">src/1BS_Telegram.h</span> (61 Zeilen) — Payload-Interpreter für 1BS-Telegramme (RORG D5), aufgerufen aus <code>EnoceanChannel::check_Eno_ID()</code>, nachdem dort RORG-Typ und Sender-ID bereits geprüft wurden. Einziger implementierter Fall: <code>case D5_00_01</code> (Kontakt-/Fenstersensor).</p>
+<pre><code>void handle_1BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
+{
+  switch (ParamENO_CHProfilSelection1BS)
+  {
+  case D5_00_01:
+    l1bsTlg_p = (ONEBS_TELEGRAM_TYPE *)&amp;(f_Pkt_st-&gt;u8DataBuffer[1]);
+    KoENO_GO_BASE__3.valueNoSend(l1bsTlg_p-&gt;u81bsTelData.State, DPT_Bool);
+    KoENO_GO_BASE__3.objectWritten();
+    break;
+  }
+}</code></pre>
+<p>Der Kontaktstatus (Bit 0 von Byte 1) wird 1:1 als <code>DPT_Bool</code> ohne Invertierung/Umrechnung übernommen. Ein umfangreicherer, auskommentierter Codeblock (Z. 32–47) zeigt eine ursprünglich geplante, über <code>ENO_CHWindowcloseValue</code>/<code>Shift</code> invertierbare Logik (analog zu <code>F6_10_00</code> in RPS_Telegram.h) — diese ist aktuell nicht aktiv; stattdessen wird der Rohwert ungefiltert geschrieben. <code>_channelIndex</code> wird als Parameter benötigt, weil das Makro <code>ENO_ParamCalcIndex</code> in <code>knxprod.h</code> eine Variable genau dieses Namens im Aufruferscope erwartet.</p>
+
+<hr class="section-end">
+
+<h2 id="rps">RPS_Telegram.h <span class="pill dead">nicht verdrahtet</span></h2>
+<p><span class="file-path">src/RPS_Telegram.h</span> (1277 Zeilen) — Payload-Interpreter für RPS-Telegramme (RORG F6, Wipptaster/Fenstergriffe). <strong>Der komplette Inhalt ist aktuell toter Code:</strong> sowohl der Include in <code>EnoceanChannel.cpp</code> als auch der Aufruf von <code>handle_RPS(pPacket, _channelIndex)</code> sind auskommentiert.</p>
+
+<h3>Definierte Funktionen</h3>
+<table>
+  <tr><th>Funktion</th><th>Zweck</th></tr>
+  <tr><td><code>shortSend_DPT1</code></td><td>DPT1-Wert auf Gruppenobjekt schreiben</td></tr>
+  <tr><td><code>SendDPT3_007</code> / <code>stopDim</code></td><td>Dimmen Start/Stop (DPT 3.007)</td></tr>
+  <tr><td><code>shortSend_Szene</code></td><td>Szenenaufruf (DPT 17)</td></tr>
+  <tr><td><code>longStop</code>, <code>longPress</code>, <code>shortPress</code></td><td>Wippen-/Tasterlogik für lange/kurze Betätigung je Wippe A/B/C</td></tr>
+  <tr><td><code>release_Button</code></td><td>Aktion beim Loslassen, abhängig von parametrierter „Funktion“ (1–7)</td></tr>
+  <tr><td><code>handle_RPS_Rocker</code></td><td>Kontakt-Wippe: Pressed/Release → DPT1</td></tr>
+  <tr><td><code>handle_F6_02_03</code></td><td>Rocker-Rohwert (0x30/0x10/0x70/0x50) → 2× DPT1</td></tr>
+  <tr><td><code>handle_F6_05_0x</code></td><td>Alarm-/Detektorprofile (Rauch/Wasser/Batterie)</td></tr>
+  <tr><td><code>handle_RPS</code></td><td>Haupt-Dispatcher über EEP-Profil</td></tr>
+</table>
+
+<h3>EEP-Profil-Switch in handle_RPS()</h3>
+<ul>
+  <li><code>F6_02_01/02/03</code> → Rocker/Button-Profile → <code>handle_F6_02_03()</code></li>
+  <li><code>F6_03_01/02</code> → nur Debug-Ausgabe, keine Verarbeitung</li>
+  <li><code>F6_05_00/01/02</code> → Alarm-/Detektor-Profile → <code>handle_F6_05_0x()</code></li>
+  <li><code>F6_10_00</code> → Fenstergriff-Kontakt, Cast auf <code>RPS_F6_10_00_TYPE</code> (4-Bit-STATE)</li>
+  <li><code>F6_10_01</code> → Fenstergriff-Kontakt Variante 2, Cast auf <code>RPS_F6_10_01_TYPE</code> (2-Bit-STATE)</li>
+</ul>
+
+<h3>Beispiel: F6_10_00 (Fenstergriff)</h3>
+<pre><code>lRpsTlg_p = (RPS_F6_10_00_TYPE *)&amp;(f_Pkt_st-&gt;u8DataBuffer[1]);
+switch (lRpsTlg_p-&gt;u8RpsTelData.STATE) {
+  case 0b1111: // Hebel unten (Fenster zu)
+    if (((knx.paramByte(firstParameter + ENO_CHWindowcloseValue)) &gt;&gt; ENO_CHWindowcloseValueShift) &amp; 1)
+      bvalue = true; else bvalue = false;
+    knx.getGroupObject(firstComObj + 3).value(bvalue, getDPT(VAL_DPT_1));
+    break;
+  case 0b1101: // Hebel oben (Fenster gekippt)
+    ...
+  case 0b1100: case 0b1110: // Hebel Mitte (offen)
+    ...
+}</code></pre>
+
+<h3>Kritische Befunde <span class="pill dead">verhindert Kompilierung bei Reaktivierung</span></h3>
+<ul>
+  <li><code>handle_RPS()</code> referenziert <code>firstParameter</code>/<code>firstComObj</code> als freie Bezeichner, ohne dass diese als Parameter oder lokale Variablen existieren.</li>
+  <li><code>handle_F6_05_0x</code> ist mit 2 Parametern deklariert, wird aber an allen 3 Aufrufstellen mit 3 Argumenten aufgerufen.</li>
+  <li>In <code>handle_F6_05_0x</code> fehlen bei 3 von 4 Anweisungen die Semikolons — echte Syntaxfehler.</li>
+  <li>Uneinheitliche Polaritätslogik zwischen <code>F6_10_00</code> (mit Shift/Maske) und <code>F6_10_01</code> (ohne) — Copy-Paste-Inkonsistenz.</li>
+  <li>Die umfangreiche Wippen-Logik (<code>longPress</code>, <code>shortPress</code>, <code>release_Button</code>) wird vom <code>handle_RPS</code>-Dispatcher nirgends aufgerufen — toter Code innerhalb der ohnehin inaktiven Datei.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="4bs">4BS_Telegram.h <span class="pill dead">nicht verdrahtet</span></h2>
+<p><span class="file-path">src/4BS_Telegram.h</span> (1609 Zeilen) — <code>uint8_t handle_4BS(PACKET_SERIAL_TYPE *f_Pkt_st, uint8_t profil, uint8_t profil2nd, uint16_t firstComObj, uint16_t firstParameter)</code>. Include und Aufruf in <code>EnoceanChannel.cpp</code> sind auskommentiert; der auskommentierte Aufruf übergibt zudem Variablen (<code>profil</code>, <code>profil2nd</code>, <code>firstComObj</code>, <code>firstParameter</code>), die im aktuellen Scope gar nicht existieren — reaktivieren allein reicht nicht, die Aufrufstelle müsste neu geschrieben werden.</p>
+
+<h3>Abgedeckte Profilfamilien (switch über ENO_CHProfilSelection4BS)</h3>
+<table>
+  <tr><th>Familie</th><th>Anzahl Subprofile</th><th>Beispiele</th></tr>
+  <tr><td>A5-02 (Temperatursensoren)</td><td>25</td><td>01…1B, 20, 30</td></tr>
+  <tr><td>A5-04 (Temp/Feuchte)</td><td>3</td><td>01, 02, 03</td></tr>
+  <tr><td>A5-06 (Helligkeit)</td><td>4</td><td>01, 01 V2, 02, 03</td></tr>
+  <tr><td>A5-07 (PIR)</td><td>3</td><td>01, 02, 03</td></tr>
+  <tr><td>A5-08 (Licht/Temp/Bewegung/Präsenz)</td><td>3</td><td>01, 02, 03</td></tr>
+  <tr><td>A5-12 (Zähler)</td><td>1</td><td>01</td></tr>
+  <tr><td>A5-14 (Fenster-/Vibrationskontakte)</td><td>10</td><td>01…0A</td></tr>
+  <tr><td>A5-20 (HLK-Aktoren)</td><td>3</td><td>01, 04, 06</td></tr>
+  <tr><td>A5_special (1BS über 4BS-RORG)</td><td>1</td><td>D5-00-01 V2</td></tr>
+</table>
+<p>Insgesamt ca. 55 Case-Blöcke über 8 Familien.</p>
+
+<h3>Beispiel: A5-02-01 (Temperatursensor)</h3>
+<pre><code>case A5_02_01:
+  fourBsA5_02_Tlg_p = (FOURBS_A5_02_TYPE *)&amp;(f_Pkt_st-&gt;u8DataBuffer[1]);
+  temp = (float)(fourBsA5_02_Tlg_p-&gt;Temp / -6.375);
+  knx.getGroupObject(firstComObj + 1).value(temp, getDPT(VAL_DPT_9));
+  break;</code></pre>
+<p>Alle weiteren A5-02-Fälle folgen demselben Muster (Byte-Cast + profilspezifische lineare Umrechnungsformel). A5-12-01 (Zähler) liest einen 3-Byte-Wert zusammen, skaliert je nach Divisor-Bitfeld und wählt je nach Einheits-Bitfeld zwischen Watt- und kWh-Gruppenobjekt.</p>
+
+<h3>Auffälligkeiten</h3>
+<ul>
+  <li>Fall <code>D2_04_03</code>-analoge Stelle in 4BS: an einer Stelle wird ein Struct-Pointer direkt statt eines berechneten Feldes an <code>.value(...)</code> übergeben (vermutlicher Copy-Paste-Fehler).</li>
+  <li>Auskommentierte <code>float temp_s;</code>-Variable und zugehörige <code>.value(temp_s, ...)</code>-Zeilen deuten auf eine unfertige Umstellung auf eine <code>union float_value</code>-Konstruktion hin.</li>
+  <li><code>case A5_08_xx</code> und <code>case A5_12</code> haben keinen <code>default</code>-Zweig im inneren Switch, im Gegensatz zu den übrigen Familien.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="vld">VLD_Telegram.h <span class="pill dead">nicht verdrahtet</span></h2>
+<p><span class="file-path">src/VLD_Telegram.h</span> (806 Zeilen) — <code>void handle_VLD(PACKET_SERIAL_TYPE *f_Pkt_st, uint8_t profil, uint16_t firstComObj, uint16_t firstParameter)</code>. Include und Aufruf in <code>EnoceanChannel.cpp</code> auskommentiert; der auskommentierte Aufruf übergibt nur 2 statt der 4 erwarteten Parameter — auch hier reicht Reaktivieren allein nicht.</p>
+
+<h3>Abgedeckte Profilfamilien (switch über ENO_CHProfilSelectionVLD)</h3>
+<table>
+  <tr><th>Familie</th><th>Anzahl Subprofile</th><th>Beispiele</th></tr>
+  <tr><td>D2-01 (Aktor-Statusantwort)</td><td>2</td><td>D2-01-0E, D2-01-12</td></tr>
+  <tr><td>D2-03 (Taster)</td><td>1</td><td>D2-03-0A</td></tr>
+  <tr><td>D2-04 (Raumklima/VOC)</td><td>16</td><td>00…10, 1A…1E</td></tr>
+  <tr><td>D2-05 (Jalousie-Aktor-Status)</td><td>1</td><td>CMD=4</td></tr>
+  <tr><td>D2-06 (Fenstergriff/Alarm/Klima)</td><td>2</td><td>D2-06-01, D2-06-50</td></tr>
+  <tr><td>D2-14 (Rauchmelder/Multisensor)</td><td>2</td><td>D2-14-30, D2-14-41</td></tr>
+</table>
+<p>Insgesamt ca. 24 Subprofile über 6 Familien.</p>
+
+<h3>Beispiel: D2-01-0E, CMD 0x07 (Energiezähler-Antwort)</h3>
+<pre><code>case 7:
+  ActStatResp_7_D2_01_0E = (VLD_D2_01_TELEGRAM_CMD_07_TYPE *)&amp;(f_Pkt_st-&gt;u8DataBuffer[2]);
+  uint32_t value = (f_Pkt_st-&gt;u8DataBuffer[3] &lt;&lt; 24) | f_Pkt_st-&gt;u8DataBuffer[4] &lt;&lt; 16
+                 | f_Pkt_st-&gt;u8DataBuffer[5] &lt;&lt; 8  | f_Pkt_st-&gt;u8DataBuffer[6];
+  switch (ActStatResp_7_D2_01_0E-&gt;u8VldTelActResp.UNIT)
+  {
+  case 0x01: knx.getGroupObject(firstComObj + 5).value(value, Dpt(13, 1)); break; // Wh
+  case 0x02: knx.getGroupObject(firstComObj + 6).value(value, Dpt(13, 1)); break; // KWh
+  case 0x03: knx.getGroupObject(firstComObj + 7).value(value, Dpt(14, 1)); break; // W
+  case 0x04: knx.getGroupObject(firstComObj + 8).value(value, Dpt(9, 1));  break; // KW
+  }
+  break;</code></pre>
+<p>Bemerkenswert: An mehreren Stellen (D2-01, D2-05) werden vor dem Struct-Cast zwei Bytes manuell getauscht (Byte-Order-Korrektur). D2-06-01 (Fenstergriff-/Klimasensor) ist der größte Einzelblock und wertet Alarm, Fensterzustand, Tasten, Bewegung, Temperatur, Feuchte, Helligkeit und Batterie in einem Rutsch aus, geschrieben auf bis zu 9 Gruppenobjekt-Offsets.</p>
+
+<h3>Auffälligkeiten</h3>
+<ul>
+  <li>In <code>D2_06_01</code> werden <code>mem</code>/<code>mem2</code> bei bestimmten Tastenzuständen (<code>BR</code>/<code>BL == 0x0</code>) uninitialisiert bzw. mit dem Wert aus einem vorherigen Telegramm weiterverwendet — potenzieller Bug bei „keine Änderung“-Tastenstatus.</li>
+  <li><code>D2_06_50</code> deckt keinen <code>default</code>-Fall für unbekannte <code>MT</code>-Werte ab.</li>
+  <li>D2-14-41 kombiniert mehrere Bitfeld-Structs manuell per Bitschiebe-/XOR-Operationen (Temp/Hum/Lux/Acc-X/Y/Z) — deutlich komplexer und handgestrickter als die übrigen Profile.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="todos">Offene Punkte &amp; bekannte Bugs (gesamt)</h2>
+<div class="card">
+<h4>Funktional blockierend / potenziell hängend</h4>
+<ul>
+  <li><strong>EnoceanModule::readBaseId()</strong> — blockierende Warteschleife ohne Timeout beim Start; hängt <code>setup()</code>, falls der Transceiver nicht antwortet.</li>
+  <li><strong>EnoceanModule::uart_sendPacket()</strong> — Busy-Wait ohne Timeout beim seriellen Schreiben des Sync-Bytes.</li>
+  <li><strong>EnoceanModule::uart_getPacket()</strong> — geplanter Inter-Byte-Timeout ist nur als TODO vorhanden, nicht implementiert.</li>
+</ul>
+<h4>Nicht erreichbarer / toter Code</h4>
+<ul>
+  <li><code>processCommand()</code> in EnoceanModule.cpp: <code>cmd.substr(0,5) == "Enocean"</code> ist strukturell nie wahr → Debug-Block unerreichbar.</li>
+  <li><code>getEnOceanMSG()</code>: große Debug-Blöcke hinter nirgends definierten Makros <code>KDEBUG_min</code> und <code>KDEBUG_handled</code>, inkl. eines Formatstring-Bugs (<code>logDebugP("RPS: Data:%u ID:%u", ...)</code> mit 7 statt 2 Argumenten).</li>
+  <li><code>registerUsbExchangeCallbacks()</code> implementiert, aber nirgends aufgerufen.</li>
+  <li><code>setupCustomFlash()</code> komplett auskommentiert — Flash-Persistenz für Enocean-Konfiguration nicht umgesetzt.</li>
+  <li>RPS-, 4BS- und VLD-Handler sowie der Rocker-Case sind vom Empfangspfad abgeklemmt (siehe <a href="#empfangspfad">Wiring-Status</a>); bei Reaktivierung sind die Aufrufstellen wegen veralteter/inkonsistenter Signaturen zusätzlich anzupassen.</li>
+  <li>In RPS_Telegram.h fehlen bei <code>handle_F6_05_0x</code> mehrere Semikolons — würde ohnehin nicht kompilieren.</li>
+</ul>
+<h4>Fehlende Funktionalität</h4>
+<ul>
+  <li><code>EnoceanModule::processInputKo()</code> ist ein leerer Stub — der KNX→EnOcean-Sendepfad fehlt komplett.</li>
+  <li><code>EnoceanChannel::check_Eno_ID()</code> hat kein <code>return true</code> — der Rückgabewert ist für Aufrufer aktuell nutzlos.</li>
+  <li>Base-ID-Abgleich/-Neuschreiben und Repeater-Funktion in <code>EnoceanModule::begin()</code> auskommentiert.</li>
+</ul>
+<h4>Stilistisch / Robustheit</h4>
+<ul>
+  <li><code>PACKET_SERIAL_TYPE_</code> wird per Rohspeicher-Cast auf die ersten drei Felder behandelt — ohne <code>packed</code>-Attribut oder <code>static_assert</code> gegen Padding abgesichert.</li>
+  <li>Uneinheitliche Namenskonventionen und teils fehlerhafte Bit-Kommentare in <code>EnoceanStructs.h</code>.</li>
+  <li><code>EnoceanChannel::name()</code> liefert für alle Kanäle denselben String.</li>
+</ul>
+</div>
+
+<p class="meta-note">Erstellt mithilfe einer parallelen Code-Analyse aller Quelldateien unter <code>src/</code>. Bei größeren Refactorings (insbesondere Reaktivierung von RPS/4BS/VLD) sollte diese Seite neu generiert werden.</p>

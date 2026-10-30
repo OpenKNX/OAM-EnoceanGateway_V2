@@ -116,12 +116,27 @@
 #define A5_06_03 33
 #define A5_06_04 34
 #define A5_06_05 35
+
 #define A5_07_01 36
 #define A5_07_02 37
 #define A5_07_03 38
+
 #define A5_08_01 39
 #define A5_08_02 40
 #define A5_08_03 41
+
+#define A5_09_02 50
+#define A5_09_03 51
+#define A5_09_04 52
+#define A5_09_05 53
+#define A5_09_06 54
+#define A5_09_07 55
+#define A5_09_08 56
+#define A5_09_09 57
+#define A5_09_0A 58
+#define A5_09_0B 59
+#define A5_09_0C 402
+#define A5_09_0D 403
 
 #define A5_12_00 90
 #define A5_12_01 91

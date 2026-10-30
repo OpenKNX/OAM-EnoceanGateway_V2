@@ -1,3 +1,12 @@
 {
-    "cmake.configureOnOpen": false
+    "clangd.arguments": [
+        "--query-driver=C:/Users/matthias.freudenreic/.platformio/packages/toolchain-rp2040-earlephilhower/bin/*",
+        "--compile-commands-dir=${workspaceFolder}"
+    ],
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    }
 }

@@ -1,0 +1,233 @@
+<title>OpenKNX Logger – Makro-Referenz</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1d23;
+    --muted: #5b6270;
+    --card-bg: #f6f7f9;
+    --border: #e2e5ea;
+    --code-bg: #eef0f3;
+    --accent: #2f6fed;
+    --ok-bg: #e3f6ea; --ok-fg: #146c3f;
+    --warn-bg: #fdeee0; --warn-fg: #9a4b06;
+    --dead-bg: #fbe7e9; --dead-fg: #9c2a35;
+    --link: #2f6fed;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --fg: #e7e9ee;
+      --muted: #9aa1ad;
+      --card-bg: #1c1f26;
+      --border: #2a2e37;
+      --code-bg: #22262f;
+      --accent: #6fa2ff;
+      --ok-bg: #0f2b1c; --ok-fg: #6fd39a;
+      --warn-bg: #2c2010; --warn-fg: #f0a95e;
+      --dead-bg: #2c1418; --dead-fg: #f0808c;
+      --link: #6fa2ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 6rem;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 0.25rem; }
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 3rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+  h3 { font-size: 1.1rem; margin-top: 1.75rem; }
+  h4 { font-size: 1rem; margin-top: 1.25rem; color: var(--muted); }
+  p { max-width: 74ch; }
+  .subtitle { color: var(--muted); margin-top: 0; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    display: block;
+    overflow-x: auto;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.92em;
+  }
+  th { background: var(--card-bg); }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-left: 0.4rem;
+  }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+  .pill.dead { background: var(--dead-bg); color: var(--dead-fg); }
+  nav.toc {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+  nav.toc h2 { margin: 0 0 0.5rem; padding: 0; border: none; font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; }
+  nav.toc li { break-inside: avoid; margin-bottom: 0.3rem; }
+  nav.toc a, a { color: var(--link); text-decoration: none; }
+  nav.toc a:hover, a:hover { text-decoration: underline; }
+  .file-path { color: var(--muted); font-size: 0.85em; }
+  hr.section-end { border: none; border-top: 1px dashed var(--border); margin: 2.5rem 0; }
+  .meta-note {
+    font-size: 0.85em;
+    color: var(--muted);
+    border-left: 3px solid var(--border);
+    padding-left: 0.8rem;
+    margin: 1rem 0;
+  }
+</style>
+
+<h1>OpenKNX Logger – Makro-Referenz</h1>
+<p class="subtitle">OAM-EnoceanNEU · Übersicht der Logging-Makros aus <code>OpenKNX::Log::Logger</code> (OGM-Common) und ihrer Verwendung in diesem Projekt</p>
+
+<div class="meta-note">
+Diese Seite ist eine Referenz für die <code>log...</code>-Makros, mit denen in diesem Projekt <code>SERIAL_PORT</code>-Debugausgaben ersetzt wurden (siehe <a href="#beispiele">Beispiele aus dem Projekt</a>). Quelle der Definitionen: <code>OGM-Common/src/OpenKNX/Log/Logger.h</code>.
+</div>
+
+<nav class="toc">
+  <h2>Inhalt</h2>
+  <ol>
+    <li><a href="#level">Log-Level</a></li>
+    <li><a href="#varianten">Die 4 Varianten pro Level</a></li>
+    <li><a href="#alle-makros">Alle 20 Makros im Überblick</a></li>
+    <li><a href="#hilfsmakros">Hilfsmakros</a></li>
+    <li><a href="#lowlevel">Low-Level-API (openknx.logger.*)</a></li>
+    <li><a href="#beispiele">Beispiele aus dem Projekt</a></li>
+  </ol>
+</nav>
+
+<h2 id="level">Log-Level</h2>
+<p>Jede Ausgabe hat einen Schweregrad, der Farbe und Kompilierbarkeit bestimmt:</p>
+<table>
+  <tr><th>Level</th><th>Farbe</th><th>Wann aktiv</th></tr>
+  <tr><td><code>logError...</code></td><td>rot</td><td>immer <span class="pill ok">aktiv</span></td></tr>
+  <tr><td><code>logWarning...</code></td><td>gelb</td><td>immer <span class="pill ok">aktiv</span></td></tr>
+  <tr><td><code>logInfo...</code></td><td>keine</td><td>immer <span class="pill ok">aktiv</span></td></tr>
+  <tr><td><code>logDebug...</code></td><td>cyan</td><td>nur wenn <code>OPENKNX_DEBUG</code> im Build gesetzt ist <span class="pill warn">bedingt</span> (sonst No-Op)</td></tr>
+  <tr><td><code>logTrace...</code></td><td>cyan</td><td>nur wenn <code>OPENKNX_TRACE</code> gesetzt <em>und</em> <code>checkTrace()</code> den Prefix durchlässt <span class="pill warn">bedingt</span></td></tr>
+</table>
+
+<h2 id="varianten">Die 4 Varianten pro Level</h2>
+<p>Für jeden Level (hier am Beispiel <code>Debug</code>) gibt es vier Formen, je nach Aufrufkontext und Datentyp:</p>
+<table>
+  <tr><th>Makro</th><th>Beispiel</th><th>Wann verwenden</th></tr>
+  <tr>
+    <td><code>logDebug(prefix, message, ...)</code></td>
+    <td><code>logDebug("1BS", "State: %u", state);</code></td>
+    <td><strong>Freie Funktionen</strong> (kein <code>this</code>, z. B. <code>inline void handle_1BS(...)</code>) — Prefix muss man selbst als String angeben.</td>
+  </tr>
+  <tr>
+    <td><code>logDebugP(message, ...)</code></td>
+    <td><code>logDebugP("State: %u", state);</code></td>
+    <td><strong>Klassenmethoden</strong>, deren Klasse eine <code>logPrefix()</code>-Methode besitzt (von <code>OpenKNX::Base</code> / <code>OpenKNX::Channel</code> abgeleitet) — Prefix kommt automatisch aus <code>logPrefix()</code>.</td>
+  </tr>
+  <tr>
+    <td><code>logHexDebug(prefix, data, size)</code></td>
+    <td><code>logHexDebug("1BS", buf, 4);</code></td>
+    <td>Byte-Array als Hex-Dump (zweistellig, mit führender Null), freie Funktion.</td>
+  </tr>
+  <tr>
+    <td><code>logHexDebugP(data, size)</code></td>
+    <td><code>logHexDebugP(buf, 4);</code></td>
+    <td>Byte-Array als Hex-Dump, Klassenmethode mit <code>logPrefix()</code>.</td>
+  </tr>
+</table>
+<div class="card">
+<strong>Faustregel:</strong> Endet die Methode/Funktion nicht auf einer Klasse mit <code>logPrefix()</code>, <em>muss</em> die Nicht-<code>P</code>-Variante mit explizitem Prefix-String verwendet werden — sonst schlägt der Compile mit <code>Use of undeclared identifier 'logPrefix'</code> fehl.
+</div>
+
+<h2 id="alle-makros">Alle 20 Makros im Überblick</h2>
+<p>Dieselben 4 Varianten existieren für alle 5 Level, macht 20 Makros insgesamt:</p>
+<pre><code>logError      logErrorP      logHexError      logHexErrorP
+logWarning    logWarningP    logHexWarning    logHexWarningP
+logInfo       logInfoP       logHexInfo       logHexInfoP
+logDebug      logDebugP      logHexDebug      logHexDebugP
+logTrace      logTraceP      logHexTrace      logHexTraceP</code></pre>
+
+<h2 id="hilfsmakros">Hilfsmakros</h2>
+<ul>
+  <li><code>logIndentUp()</code> / <code>logIndentDown()</code> — erhöht/verringert die Einrücktiefe nachfolgender Log-Zeilen, z. B. um verschachtelte Abläufe optisch zu gliedern.</li>
+  <li><code>logIndent(x)</code> — setzt die Einrücktiefe direkt auf <code>x</code>.</li>
+  <li><code>logBegin()</code> / <code>logEnd()</code> — exklusiver Lock für zusammenhängende Mehrzeilen-Ausgaben (Schutz bei Dual-Core-Zugriff).</li>
+</ul>
+
+<h2 id="lowlevel">Low-Level-API (<code>openknx.logger.*</code>)</h2>
+<p>Falls die Makros nicht reichen, kann direkt auf die <code>Logger</code>-Instanz zugegriffen werden:</p>
+<ul>
+  <li><code>log(message)</code> — Ausgabe ohne Prefix/Farbe.</li>
+  <li><code>logWithPrefix(prefix, message)</code> — Ausgabe mit explizitem Prefix, ohne printf-Formatierung.</li>
+  <li><code>logWithPrefixAndValues(prefix, message, ...)</code> / <code>logWithValues(message, ...)</code> — mit printf-Formatierung.</li>
+  <li><code>logHeader(header)</code> / <code>logDividingLine()</code> — optische Trennlinien/Überschriften im Log.</li>
+  <li><code>logHex(data, size)</code> / <code>logHexWithPrefix(prefix, data, size)</code> — Hex-Dump ohne Farbcodierung.</li>
+  <li><code>color(colorCode = 0)</code> — setzt die Ausgabefarbe manuell (0 = zurücksetzen).</li>
+  <li><code>indentUp()</code> / <code>indentDown()</code> / <code>indent(x)</code> — wie die Makros, aber ohne <code>log</code>-Präfix im Namen.</li>
+  <li><code>checkTrace(prefix)</code> — prüft, ob ein Prefix laut Trace-Filterliste durchgelassen wird (nur mit <code>OPENKNX_TRACE</code>).</li>
+  <li><code>printPrompt()</code>, <code>logOpenKnxHeader()</code>, <code>printTimestamp()</code>, <code>buildUptime()</code>, <code>buildPrefix(prefix, id)</code> — Hilfsfunktionen für Konsole/Header-Ausgaben.</li>
+</ul>
+
+<hr class="section-end">
+
+<h2 id="beispiele">Beispiele aus dem Projekt</h2>
+
+<h3><span class="file-path">src/1BS_Telegram.h</span> — freie Funktion</h3>
+<p><code>handle_1BS()</code> ist eine freie <code>inline</code>-Funktion ohne <code>this</code>, daher <code>logDebug()</code> mit explizitem Prefix <code>"1BS"</code>:</p>
+<pre><code>logDebug("1BS", "Profil: 1BS - %u", ParamENO_CHProfilSelection1BS);
+...
+logDebug("1BS", "D5-00-01 detected: 1BS State: %u, Output KNX: %u",
+          l1bsTlg_p->u81bsTelData.State, bvalue);</code></pre>
+
+<h3><span class="file-path">src/EnoceanChannel.cpp</span> — Klassenmethode</h3>
+<p><code>EnoceanChannel::check_Eno_ID()</code> ist eine Methode von <code>EnoceanChannel : public OpenKNX::Channel</code>, welche <code>logPrefix()</code> überschreibt — daher <code>logHexDebugP()</code> ohne expliziten Prefix:</p>
+<pre><code>logHexDebugP(&amp;pPacket->u8DataBuffer[2], 4);  // ersetzt 7 Zeilen manuellen HEX-Print-Loop</code></pre>
+<p>In <code>setup()</code> derselben Klasse werden zudem alle drei Text-Level demonstriert:</p>
+<pre><code>logInfoP("setup");
+logIndentUp();
+logDebugP("debug setup");
+logTraceP("trace setup");
+logIndentDown();</code></pre>

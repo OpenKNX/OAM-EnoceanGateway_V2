@@ -1,83 +1,155 @@
+#include "EnoceanModule.h"
+#include "HardwareConfig.h"
 #include "Logic.h"
 #include "OpenKNX.h"
-#ifndef ARDUINO_ARCH_RP2040
-  #include "wiring_private.h" // pinPeripheral() function
-#endif
-// #include "Enocean.h"
-#include "EnOceanHandle.h"
-
-#ifndef ARDUINO_ARCH_RP2040
-// XIAO PINS   RX = D3  TX = D2
-Uart Serial2(&sercom2, 3, 2, SERCOM_RX_PAD_3, UART_TX_PAD_2);
-
-void SERCOM2_Handler()
-{
-    Serial2.IrqHandler();
-}
-#endif
+// #include <async_http_client.h>
 
 #ifdef ARDUINO_ARCH_RP2040
-    #include "FileTransferModule.h"
-    #include "UsbExchangeModule.h"
+#include "FileTransferModule.h"
+#ifndef OPENKNX_USB_EXCHANGE_IGNORE
+#include "UsbExchangeModule.h"
+#endif
 #endif
 
-// #ifdef ARDUINO_ARCH_RP2040
-//     #pragma message "Pico Core Version: " ARDUINO_PICO_VERSION_STR
-// #endif
+uint32_t _debugCore0 = 0;
+uint32_t _debugCore1 = 0;
 
-EnOceanDevice device[MAX_NUMBER_OF_DEVICES] = {EnOceanDevice()}; 
+bool func1test = false;
+bool func2test = false;
+bool func3test = false;
+bool core1_separate_stack = true;
+
+// AsyncHTTPClient http;
+// #include "SPI.h"
+// #include <ELECHOUSE_CC1101_SRC_DRV.h>
+
 void setup()
 {
     const uint8_t firmwareRevision = 0;
-
-#ifdef ARDUINO_ARCH_RP2040
-    // die defines musst du dann noch setzen
-    Serial2.setRX(ENO_UART_RX_PIN);
-    Serial2.setTX(ENO_UART_TX_PIN);
-#endif
-
     openknx.init(firmwareRevision);
     openknx.addModule(1, openknxLogic);
-    openknx.addModule(2, enOcean);
+    openknx.addModule(2, openknxEnoceanModule);
 #ifdef ARDUINO_ARCH_RP2040
-    openknx.addModule(3, openknxFileTransferModule);
+#ifndef OPENKNX_USB_EXCHANGE_IGNORE
     openknx.addModule(8, openknxUsbExchangeModule);
+#endif
+    openknx.addModule(9, openknxFileTransferModule);
 #endif
 
     openknx.setup();
-
-#ifdef LED_YELLOW_PIN
-    pinMode(LED_YELLOW_PIN, OUTPUT);
-    digitalWrite(LED_YELLOW_PIN, HIGH);
+#ifdef FUNC1_BUTTON_PIN
+    openknx.func1Button.onShortClick([]() -> void
+                                     {
+                                         func1test = !func1test;
+                                         logInfo("ButtonTest", "Func1 button short click");
+#ifdef INFO1_LED_PIN
+                                         openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO1)->on(func1test);
+#endif
+                                     });
+    openknx.func1Button.onDoubleClick([]() -> void
+                                      {
+                                          logInfo("ButtonTest", "Func1 button double click");
+#ifdef INFO1_LED_PIN
+                                          openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO1)->pulsing();
+#endif
+                                      });
+    openknx.func1Button.onLongClick([]() -> void
+                                    {
+                                        logInfo("ButtonTest", "Func1 button long click");
+#ifdef INFO1_LED_PIN
+                                        openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO1)->blinking();
+#endif
+                                    });
+#endif
+#ifdef FUNC2_BUTTON_PIN
+    openknx.func2Button.onShortClick([]() -> void
+                                     {
+                                         func2test = !func2test;
+                                         logInfo("ButtonTest", "Func2 button short click");
+#ifdef INFO2_LED_PIN
+                                         openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO2)->on(func2test);
+#endif
+                                     });
+    openknx.func2Button.onDoubleClick([]() -> void
+                                      {
+                                          logInfo("ButtonTest", "Func2 button double click");
+#ifdef INFO2_LED_PIN
+                                          openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO2)->pulsing();
+#endif
+                                      });
+    openknx.func2Button.onLongClick([]() -> void
+                                    {
+                                        logInfo("ButtonTest", "Func2 button long click");
+#ifdef INFO2_LED_PIN
+                                        openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO2)->blinking();
+#endif
+                                    });
+#endif
+#ifdef FUNC3_BUTTON_PIN
+    openknx.func3Button.onShortClick([]() -> void
+                                     {
+                                         func3test = !func3test;
+                                         logInfo("ButtonTest", "Func3 button short click");
+#ifdef INFO3_LED_PIN
+                                         openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO3)->on(func3test);
+#endif
+                                     });
+    openknx.func3Button.onDoubleClick([]() -> void
+                                      {
+                                          logInfo("ButtonTest", "Func3 button double click");
+#ifdef INFO3_LED_PIN
+                                          openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO3)->pulsing();
+#endif
+                                      });
+    openknx.func3Button.onLongClick([]() -> void
+                                    {
+                                        logInfo("ButtonTest", "Func3 button long click");
+#ifdef INFO3_LED_PIN
+                                        openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO3)->blinking();
+#endif
+                                    });
 #endif
 
-    // start Enocean
-    for (int i = 0; i < MAX_NUMBER_OF_DEVICES; i++)
-    {
-        enOcean.configureDevice(device[i], i);
-    }
+    // openknx.leds.getProgLed()->off();
+    // openknx.leds.getProgLed()->on();
+    // openknx.leds.getProgLed()->blinking();
+    // openknx.leds.getProgLed()->pulsing();
+    // openknx.leds.getProgLed()->brightness(60);
 
-    Serial2.begin(57600); // Change to Serial wenn original Platine
-                          // Assign pins 2 & 3 SERCOM functionality
-#ifndef ARDUINO_ARCH_RP2040
-    pinPeripheral(2, PIO_SERCOM_ALT);
-    pinPeripheral(3, PIO_SERCOM_ALT);
+#ifdef INFO1_LED_PIN
+    openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO1)->pulsing();
+// openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO1)->brightness(60);
 #endif
-    enOcean.initSerial(Serial2);
-    enOcean.init2();
-
-    // Set own BAse-ID for each Channel
-    for (int i = 0; i < MAX_NUMBER_OF_DEVICES; i++)
-    {
-        enOcean.configureDeviceBaseID(device[i], i);
-    }
-
-    
-
+#ifdef INFO2_LED_PIN
+    openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO2)->pulsing();
+// openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO2)->brightness(60);
+#endif
+#ifdef INFO3_LED_PIN
+    openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO3)->pulsing();
+// openknx.leds.getLed(OpenKNX::Led::LED_TYPE_INFO3)->brightness(60);
+#endif
 }
 
 void loop()
 {
+    if (delayCheck(_debugCore0, 10000))
+    {
+        _debugCore0 = millis();
+    }
+
     openknx.loop();
+    // delay(50);
 }
 
+#ifdef OPENKNX_DUALCORE
+void setup1()
+{
+    openknx.setup1();
+}
+
+void loop1()
+{
+    openknx.loop1();
+    _debugCore1 = millis();
+}
+#endif
