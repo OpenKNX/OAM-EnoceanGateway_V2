@@ -12,7 +12,7 @@
 
   <op:ETS
     OpenKnxId="0xA2"
-    ApplicationNumber="0x01"
+    ApplicationNumber="0x00"
     ApplicationVersion="0.2"
     ReplacesVersions="0.1"
     ApplicationRevision="0"
@@ -20,8 +20,10 @@
     BusCurrent="10"
     BuildSuffix=""
     BuildSuffixText=""
-    MediumTypes="MT-0 MT-5"
-    OrderNumber="MFKnxEno" />
+    MediumTypes="MT-0"
+    OrderNumber="SmartMF-EnoceanGateway"
+    SerialNumber="EnoceanGatewayV2"
+  />
 
   <op:define prefix="BASE" ModuleType="10"
     share="../lib/OGM-Common/src/Common.share.xml">

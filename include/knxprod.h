@@ -15,12 +15,12 @@
 #define ETS_ModuleId_LOG 4
 #define MAIN_FirmwareName "Enocean-Gateway 2.0"
 #define MAIN_OpenKnxId 0xA2
-#define MAIN_ApplicationNumber 1
+#define MAIN_ApplicationNumber 0
 #define MAIN_ApplicationVersion 2
 #define MAIN_ApplicationEncoding iso-8859-15
 #define MAIN_ParameterSize 6141
 #define MAIN_MaxKoNumber 439
-#define MAIN_OrderNumber "MFKnxEno"
+#define MAIN_OrderNumber "SmartMF-EnoceanGateway"
 #define BASE_ModuleVersion 25
 #define UCT_ModuleVersion 5
 #define ENO_ModuleVersion 16

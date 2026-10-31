@@ -1,7 +1,7 @@
 #pragma once
 
-#define MAIN_Version "7ab7ff6"
-#define KNX_Version "2.4.0+8e4c5bc"
+#define MAIN_Version "6a9d427"
+#define KNX_Version "2.3.1+cedaac3"
 #define MODULE_Common_Version "1.9.1+66bc4af"
 #define MODULE_Common_Version_Major 1
 #define MODULE_Common_Version_Minor 9
@@ -22,7 +22,7 @@
 #define MODULE_HardwareConfig_Version_Minor 0
 #define MODULE_HardwareConfig_Version_Revision 0
 #define MODULE_HardwareConfig_ETS 16
-#define MODULE_UsbExchange_Version "0.0.2+3c4c5db"
+#define MODULE_UsbExchange_Version "0.0.2+55119fc"
 #define MODULE_UsbExchange_Version_Major 0
 #define MODULE_UsbExchange_Version_Minor 0
 #define MODULE_UsbExchange_Version_Revision 2

@@ -8,3 +8,5 @@ src/EnoceanGateway.knxprod
 src/EnoceanGateway.debug.xml
 src/EnoceanGateway.appl.debug.xml
 include/buildtime.h
+release/EnoceanGateway-Release-0.2.0.zip
+release/EnoceanGateway-Release-0.2.0.knxprod
