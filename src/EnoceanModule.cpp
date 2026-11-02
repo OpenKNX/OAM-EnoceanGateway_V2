@@ -932,8 +932,6 @@ void EnoceanModule::processInputKo(GroupObject &iKo) {
 void EnoceanModule::handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObject &iKo) {
   //logDebugP("handleKnxEvent: KO-Index %d, Value: %he", koIndex);
   //logHexDebugP(iKo.valueRef(), iKo.valueSize());
-  // TODO: je nach konfiguriertem EEP-Profil und koIndex das passende EnOcean-Funktelegramm senden.
-
   // Bidirektionale Geräte (A5-20-01/04/06, z.B. FKS-SV): Wert merken, gesendet wird mit der nächsten Antwort an das Gerät
   if (_channels[_channelIndex]->processKnxHvac(koIndex, iKo))
     return;
@@ -948,7 +946,8 @@ void EnoceanModule::handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObje
 
   switch (ParamENO_CHProfilSelection) {
   case u8RORG_VLD:
-    // TODO: D2-01 (Aktor schalten, Mess-/Statuswerte abfragen) KNX -> EnOcean ist noch nicht umgesetzt
+    // KNX -> EnOcean: D2-01-Aktoren schalten, Status und Messwerte abfragen, siehe EnoceanChannel::processKnxVld()
+    _channels[_channelIndex]->processKnxVld(koIndex, iKo);
     break;
 
   case u8RORG_Rocker:
@@ -1062,7 +1061,7 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
     if (!_channelsReady || channel < 1 || channel > ParamENO_VisibleChannels)
       logInfoP("Channel must be 1..%u", ParamENO_VisibleChannels);
     else if (!_channels[channel - 1]->sendLearnTelegram())
-      logInfoP("Channel %u does not send to EnOcean (rocker KNX -> EnOcean only)", channel);
+      logInfoP("Channel %u does not send to EnOcean (rocker KNX -> EnOcean or D2-01 actuator only)", channel);
     return true;
   }
 
@@ -1560,13 +1559,13 @@ bool EnoceanModule::sendRadioPacket(PACKET_SERIAL_TYPE_ *pPacket, const char *de
 }
 
 // Sendet ein Funktelegramm mit der Sender-ID Base-ID + Kanalindex, damit jeder Kanal eine eigene, in Aktoren
-// einlernbare ID hat. data: Nutzdaten ohne R-ORG (z.B. 1 Byte RPS, 4 Byte 4BS). destId: nullptr = Broadcast, sonst
-// adressiert an dieses Gerät (Optional Data mit Ziel-ID, der Transceiver sendet dann ein ADT-Telegramm).
+// einlernbare ID hat. data: Nutzdaten ohne R-ORG (z.B. 1 Byte RPS, 4 Byte 4BS, bis 7 Byte VLD/UTE). destId: nullptr =
+// Broadcast, sonst adressiert an dieses Gerät (Optional Data mit Ziel-ID, der Transceiver sendet dann ein ADT-Telegramm).
 bool EnoceanModule::sendChannelTelegram(uint8_t channelIndex, uint8_t rorg, const uint8_t *data, uint8_t dataLength, uint8_t status, const char *description, const uint8_t *destId)
 {
     PACKET_SERIAL_TYPE_ lPacket_st;
-    uint8_t lBuf_p[1 + 4 + 4 + 1 + 7]; // R-ORG + max. 4 Byte Daten + Sender-ID + Status + Optional Data
-    if (dataLength > 4)
+    uint8_t lBuf_p[1 + 7 + 4 + 1 + 7]; // R-ORG + max. 7 Byte Daten + Sender-ID + Status + Optional Data
+    if (dataLength > 7)
         return false;
 
     lPacket_st.u16DataLength = 1 + dataLength + 4 + 1;
@@ -1612,142 +1611,23 @@ bool EnoceanModule::send4BSTelegram(uint8_t channelIndex, const uint8_t data[4],
     return sendChannelTelegram(channelIndex, u8RORG_4BS, data, 4, 0x00, description, destId);
 }
 
-void EnoceanModule::setStatusActors(uint8_t *mySenderId, uint8_t idExtra, bool state)
+// Sendet ein VLD-Telegramm (R-ORG D2, data = Nutzdaten ab dem Kommando-Byte) mit der Sender-ID des Kanals als
+// Broadcast, z.B. Befehle an D2-01-Aktoren.
+bool EnoceanModule::sendVLDTelegram(uint8_t channelIndex, const uint8_t *data, uint8_t dataLength, const char *description)
 {
-    PACKET_SERIAL_TYPE_ lRdBaseIDPkt_st;
-
-    uint8_t lu8SndBuf[16];
-
-    lRdBaseIDPkt_st.u16DataLength = 0x0009;
-    lRdBaseIDPkt_st.u8OptionLength = 0x07;
-    lRdBaseIDPkt_st.u8Type = u8RADIO_ERP1;
-    lRdBaseIDPkt_st.u8DataBuffer = &lu8SndBuf[0];
-
-    lu8SndBuf[0] = u8RORG_VLD;
-    lu8SndBuf[1] = VLD_CMD_ID_01;
-    lu8SndBuf[2] = 0x1E; // Channel
-    if (state == true)
-        lu8SndBuf[3] = 0x01;
-    else
-        lu8SndBuf[3] = 0x00;
-    lu8SndBuf[4] = mySenderId[0];
-    lu8SndBuf[5] = mySenderId[1];
-    lu8SndBuf[6] = mySenderId[2];
-    lu8SndBuf[7] = mySenderId[3] + idExtra;
-    lu8SndBuf[8] = 0x00;
-    // optional data
-    lu8SndBuf[9] = 0x03;
-    lu8SndBuf[10] = 0xFF;
-    lu8SndBuf[11] = 0xFF;
-    lu8SndBuf[12] = 0xFF;
-    lu8SndBuf[13] = 0xFF;
-    lu8SndBuf[14] = 0x00;
-    lu8SndBuf[15] = 0x00;
-
-    sendRadioPacket(&lRdBaseIDPkt_st, "set actor status");
+    logDebugP("Send VLD CMD %02X (%u bytes), channel %u", data[0] & 0x0F, dataLength, channelIndex + 1);
+    return sendChannelTelegram(channelIndex, u8RORG_VLD, data, dataLength, 0x00, description);
 }
 
-void EnoceanModule::getStatusActors(uint8_t *mySenderId, uint8_t idExtra)
+// Sendet eine UTE-Teach-In-Anfrage (R-ORG D4) für das EEP D2-func-type mit der Sender-ID des Kanals, damit ein
+// VLD-Aktor im Lernmodus den Kanal einlernt. DB6 0xA0: bidirektional, Antwort erwartet, Einlernen oder Löschen;
+// DB5 0xFF: alle Kanäle; Hersteller-ID 0x7FF (Multi-User).
+bool EnoceanModule::sendUTETeachIn(uint8_t channelIndex, uint8_t func, uint8_t type)
 {
-    PACKET_SERIAL_TYPE_ lRdBaseIDPkt_st;
-
-    uint8_t lu8SndBuf[15];
-
-    lRdBaseIDPkt_st.u16DataLength = 0x0008;
-    lRdBaseIDPkt_st.u8OptionLength = 0x07;
-    lRdBaseIDPkt_st.u8Type = u8RADIO_ERP1;
-    lRdBaseIDPkt_st.u8DataBuffer = &lu8SndBuf[0];
-
-    lu8SndBuf[0] = u8RORG_VLD;
-    lu8SndBuf[1] = VLD_CMD_ID_03;
-    lu8SndBuf[2] = 0x1e;
-
-    lu8SndBuf[3] = mySenderId[0];
-    lu8SndBuf[4] = mySenderId[1];
-    lu8SndBuf[5] = mySenderId[2];
-    lu8SndBuf[6] = mySenderId[3] + idExtra;
-    lu8SndBuf[7] = 0x00;
-    // optional data
-    lu8SndBuf[8] = 0x03;
-    lu8SndBuf[9] = 0xFF;
-    lu8SndBuf[10] = 0xFF;
-    lu8SndBuf[11] = 0xFF;
-    lu8SndBuf[12] = 0xFF;
-    lu8SndBuf[13] = 0x00;
-    lu8SndBuf[14] = 0x00;
-
-    sendRadioPacket(&lRdBaseIDPkt_st, "request actor status");
+    const uint8_t data[7] = {0xA0, 0xFF, 0xFF, 0x07, type, func, u8RORG_VLD};
+    logInfoP("Send UTE teach-in D2-%02X-%02X, channel %u", func, type, channelIndex + 1);
+    return sendChannelTelegram(channelIndex, u8RORG_UTE, data, 7, 0x00, "UTE teach-in");
 }
-
-void EnoceanModule::setActorsMeasurment(uint8_t *mySenderId, uint8_t idExtra, uint8_t *inputs)
-{
-    PACKET_SERIAL_TYPE_ lRdBaseIDPkt_st;
-
-    uint8_t lu8SndBuf[19];
-
-    lRdBaseIDPkt_st.u16DataLength = 0x000C;
-    lRdBaseIDPkt_st.u8OptionLength = 0x07;
-    lRdBaseIDPkt_st.u8Type = u8RADIO_ERP1;
-    lRdBaseIDPkt_st.u8DataBuffer = &lu8SndBuf[0];
-
-    lu8SndBuf[0] = u8RORG_VLD;
-    lu8SndBuf[1] = VLD_CMD_ID_05;
-    lu8SndBuf[2] = inputs[0];
-    lu8SndBuf[3] = inputs[1];
-    lu8SndBuf[4] = inputs[2];
-    lu8SndBuf[5] = inputs[3];
-    lu8SndBuf[6] = inputs[4];
-    lu8SndBuf[7] = mySenderId[0];
-    lu8SndBuf[8] = mySenderId[1];
-    lu8SndBuf[9] = mySenderId[2];
-    lu8SndBuf[10] = mySenderId[3] + idExtra;
-    lu8SndBuf[11] = 0x00;
-    // optional data
-    lu8SndBuf[12] = 0x03;
-    lu8SndBuf[13] = 0xFF;
-    lu8SndBuf[14] = 0xFF;
-    lu8SndBuf[15] = 0xFF;
-    lu8SndBuf[16] = 0xFF;
-    lu8SndBuf[17] = 0x00;
-    lu8SndBuf[18] = 0x00;
-
-    sendRadioPacket(&lRdBaseIDPkt_st, "measurement setup");
-}
-
-void EnoceanModule::getActorsMeasurmentValue(uint8_t *mySenderId, uint8_t idExtra, uint8_t *inputs, bool unit)
-{
-    PACKET_SERIAL_TYPE_ lRdBaseIDPkt_st;
-
-    uint8_t lu8SndBuf[15];
-
-    lRdBaseIDPkt_st.u16DataLength = 0x0008;
-    lRdBaseIDPkt_st.u8OptionLength = 0x07;
-    lRdBaseIDPkt_st.u8Type = u8RADIO_ERP1;
-    lRdBaseIDPkt_st.u8DataBuffer = &lu8SndBuf[0];
-
-    lu8SndBuf[0] = u8RORG_VLD;
-    lu8SndBuf[1] = VLD_CMD_ID_06;
-    lu8SndBuf[2] = 0x00; // 0x00 = Energy
-    if (unit == 1)
-        lu8SndBuf[2] = 0x20; // 0x20 = Power
-    lu8SndBuf[2] = lu8SndBuf[2] + 0x1E;
-    lu8SndBuf[3] = mySenderId[0];
-    lu8SndBuf[4] = mySenderId[1];
-    lu8SndBuf[5] = mySenderId[2];
-    lu8SndBuf[6] = mySenderId[3] + idExtra;
-    lu8SndBuf[7] = 0x00;
-    // optional data
-    lu8SndBuf[8] = 0x03;
-    lu8SndBuf[9] = 0xFF;
-    lu8SndBuf[10] = 0xFF;
-    lu8SndBuf[11] = 0xFF;
-    lu8SndBuf[12] = 0xFF;
-    lu8SndBuf[13] = 0x00;
-    lu8SndBuf[14] = 0x00;
-
-    sendRadioPacket(&lRdBaseIDPkt_st, "request measurement");
-}
-
 
 // Schreibt Repeater-Mode (0 = aus, 1 = an, 2 = selektiv) und -Level (1/2) in den Transceiver (CO_WR_REPEATER).
 void EnoceanModule::setRepeaterFunc(uint8_t mode, uint8_t level)

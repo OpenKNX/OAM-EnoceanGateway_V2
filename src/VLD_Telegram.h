@@ -62,7 +62,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
             {
             case D2_01_0E:
                   logDebug("VLD", "Profil: D2-01-0E");
-                  switch (f_Pkt_st->u8DataBuffer[1])
+                  switch (f_Pkt_st->u8DataBuffer[1] & 0x0F) // CMD; Bit 7-6 bei CMD 0x04: Stromausfall-Flags
                   {
                   case 4: // CMD = 4   -->  Status AKTOR Channels
                         logDebug("VLD", "CMD = 0x04");
@@ -111,7 +111,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
                   break;
             case D2_01_12:
                   logDebug("VLD", "Profil: D2-01-12");
-                  switch (f_Pkt_st->u8DataBuffer[1])
+                  switch (f_Pkt_st->u8DataBuffer[1] & 0x0F) // CMD; Bit 7-6 bei CMD 0x04: Stromausfall-Flags
                   {
                   case 4: // CMD = 4   -->  Status AKTOR Channels
 // swap two bytes

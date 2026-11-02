@@ -244,10 +244,6 @@ private:
     void checkAndReportUnknownId(PACKET_SERIAL_TYPE_ *f_Pkt_st);
     void handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObject &ko);
     bool sendChannelTelegram(uint8_t channelIndex, uint8_t rorg, const uint8_t *data, uint8_t dataLength, uint8_t status, const char *description, const uint8_t *destId = nullptr);
-    void setStatusActors(uint8_t *mySenderId, uint8_t idExtra, bool state);
-    void getStatusActors(uint8_t *mySenderId, uint8_t idExtra);
-    void setActorsMeasurment(uint8_t *mySenderId, uint8_t idExtra, uint8_t *inputs);
-    void getActorsMeasurmentValue(uint8_t *mySenderId, uint8_t idExtra, uint8_t *inputs, bool unit);
     uint8_t uart_getPacket(PACKET_SERIAL_TYPE_ *pPacket, uint16_t u16BufferLength);
     uint8_t uart_sendPacket(PACKET_SERIAL_TYPE_ *pPacket);
     bool sendRadioPacket(PACKET_SERIAL_TYPE_ *pPacket, const char *description);
@@ -313,6 +309,8 @@ public:
     static bool extractSenderId(const PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t out8SenderId[4]);
     bool sendRockerTelegram(uint8_t channelIndex, uint8_t db0);
     bool send4BSTelegram(uint8_t channelIndex, const uint8_t data[4], const char *description, const uint8_t *destId = nullptr);
+    bool sendVLDTelegram(uint8_t channelIndex, const uint8_t *data, uint8_t dataLength, const char *description);
+    bool sendUTETeachIn(uint8_t channelIndex, uint8_t func, uint8_t type);
     bool learnedId(uint8_t channelIndex, uint8_t out8Id[4]);
 };
 

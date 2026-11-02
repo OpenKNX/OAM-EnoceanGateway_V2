@@ -75,6 +75,10 @@ private:
   uint8_t _hvacDest[4] = {0, 0, 0, 0}; // ID des Antriebs (Ziel adressierter Antworten)
   uint32_t _hvacRxTime = 0;            // Empfangszeit, für die Laufzeit der Antwort im Log
 
+  // D2-01-0E: Messkonfiguration (CMD 0x05) wird einmal nach dem Start an den Aktor gesendet
+  bool _vldMeasurementSetupDone = false;
+  uint32_t _setupTime = 0;
+
   void handleRocker(PACKET_SERIAL_TYPE_ *pPacket);
   void knxRockerPress(uint8_t db0, uint32_t releaseAfterMs);
   void deviceSeen();
@@ -84,6 +88,9 @@ private:
   void prepareHvacTeachResponse(PACKET_SERIAL_TYPE_ *pPacket);
   void prepareHvacReply(PACKET_SERIAL_TYPE_ *pPacket);
   void sendPendingHvacReply();
+  uint16_t vldProfile() const;
+  void sendVldSetOutput(uint8_t ioChannel, bool on);
+  void sendVldMeasurementSetup();
 
 public:
   EnoceanChannel(uint8_t index);
@@ -95,5 +102,6 @@ public:
   void processKnxRocker(GroupObject &ko);
   bool sendLearnTelegram();
   bool processKnxHvac(int koIndex, GroupObject &ko);
+  void processKnxVld(int koIndex, GroupObject &ko);
   void teachInReceived(PACKET_SERIAL_TYPE_ *pPacket);
 };

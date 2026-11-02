@@ -20,6 +20,7 @@ const std::string EnoceanChannel::name() { return "EnoceanChannel"; }
 void EnoceanChannel::setup() {
   logDebugP("setup");
   _lastSeen = millis();
+  _setupTime = millis();
 }
 
 // Das Gerät dieses Kanals hat gesendet: Ausfallüberwachung neu starten und einen gemeldeten Ausfall zurücknehmen.
@@ -53,6 +54,13 @@ void EnoceanChannel::loop() {
   // beim Senden für die Antwort des Transceivers wiederverwendet wird (Gerät hört ca. 1 s nach seinem Telegramm zu)
   sendPendingHvacReply();
 
+  // D2-01-0E: Messkonfiguration nach dem Start, je Kanal versetzt, damit nicht alle Kanäle gleichzeitig senden
+  if (!_vldMeasurementSetupDone && delayCheck(_setupTime, 5000 + _channelIndex * 500UL)) {
+    _vldMeasurementSetupDone = true;
+    if (vldProfile() == D2_01_0E)
+      sendVldMeasurementSetup();
+  }
+
   if (_knxRockerReleaseAt != 0 && (int32_t)(millis() - _knxRockerReleaseAt) >= 0) {
     _knxRockerReleaseAt = 0;
     openknxEnoceanModule.sendRockerTelegram(_channelIndex, 0x00);
@@ -81,9 +89,14 @@ void EnoceanChannel::knxRockerPress(uint8_t db0, uint32_t releaseAfterMs) {
 }
 
 // Sendet ein Lerntelegramm mit der Sender-ID dieses Kanals (Base-ID + Kanalindex), damit ein EnOcean-Aktor im
-// Lernmodus den Kanal einlernen kann (ETS-Button / Konsole "eno learn N"). Derzeit für den Taster in Richtung
-// KNX -> EnOcean: Tastendruck oben (AO), danach Loslassen. Liefert false, wenn der Kanal nicht sendet.
+// Lernmodus den Kanal einlernen kann (ETS-Button / Konsole "eno learn N"). Taster in Richtung KNX -> EnOcean:
+// Tastendruck oben (AO), danach Loslassen. D2-01-Aktor: UTE-Teach-In-Anfrage mit dem EEP des Kanals.
+// Liefert false, wenn der Kanal nicht sendet.
 bool EnoceanChannel::sendLearnTelegram() {
+  uint16_t vld = vldProfile();
+  if (vld != 0)
+    return openknxEnoceanModule.sendUTETeachIn(_channelIndex, 0x01, (uint8_t)(vld - D2_01_00));
+
   if (ParamENO_CHProductsel != EEP_Profil || ParamENO_CHProfilSelection != u8RORG_Rocker || ParamENO_CHDirectionKnxEnocean != 1)
     return false;
 
@@ -198,6 +211,14 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
     break;
 
   case EEP_Profil: // EEP Profile
+
+    // UTE-Antwort eines VLD-Aktors auf die Teach-In-Anfrage ("eno learn"): DB6 Bit 3-0 Kommando 1, Bit 5-4 Ergebnis
+    if (pPacket->u8DataBuffer[0] == u8RORG_UTE && ParamENO_CHProfilSelection == u8RORG_VLD) {
+      static const char *uteResult[] = {"rejected", "teach-in accepted", "deletion accepted", "EEP not supported"};
+      if ((pPacket->u8DataBuffer[1] & 0x0F) == 0x01)
+        logInfoP("UTE response: %s", uteResult[(pPacket->u8DataBuffer[1] >> 4) & 0x03]);
+      return true;
+    }
 
     // Get rid of messages we can't handle
     if (pPacket->u8DataBuffer[0] != ParamENO_CHProfilSelection && ParamENO_CHProfilSelection != u8RORG_Rocker) {
@@ -584,4 +605,92 @@ bool EnoceanChannel::processKnxHvac(int koIndex, GroupObject &ko) {
     break;
   }
   return true;
+}
+
+// D2-01-Aktor dieses Kanals: liefert das EEP (D2_01_0E oder D2_01_12) oder 0, wenn der Kanal keiner ist.
+uint16_t EnoceanChannel::vldProfile() const {
+  if (ParamENO_CHProductsel != EEP_Profil || ParamENO_CHProfilSelection != u8RORG_VLD || ParamENO_CHProfilSelectionVLD != D2_01)
+    return 0;
+  uint16_t profile = ParamENO_CHProfilVLD01;
+  return (profile == D2_01_0E || profile == D2_01_12) ? profile : 0;
+}
+
+// D2-01 CMD 0x01 (Actuator Set Output): DB1 Dimmwert 0 (sofort) + I/O-Kanal (0x1E = alle), DB0 Ausgangswert
+// 0 = AUS, 100 % = EIN.
+void EnoceanChannel::sendVldSetOutput(uint8_t ioChannel, bool on) {
+  const uint8_t data[3] = {VLD_CMD_ID_01, (uint8_t)(ioChannel & 0x1F), (uint8_t)(on ? 100 : 0)};
+  logInfoP("D2-01 set output %02X: %u", ioChannel, on);
+  openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 3, "D2-01 set output");
+}
+
+// D2-01 CMD 0x05 (Actuator Set Measurement) für D2-01-0E, je ein Telegramm für Energie und Leistung:
+// DB4 Bit 7 automatisch melden, Bit 5 Energie/Leistung, Bit 4-0 I/O-Kanal (alle); DB3 Bit 7-4 Delta (Bit 3-0),
+// Bit 2-0 Einheit; DB2 Delta (Bit 11-4); DB1 max. Zeit zwischen zwei Meldungen (10 s); DB0 min. Zeit (1 s).
+void EnoceanChannel::sendVldMeasurementSetup() {
+  uint8_t mit = ParamENO_CHD2010EMIT;
+  uint8_t mat = ParamENO_CHD2010EMAT;
+  if (mit == 0)
+    mit = 1;
+  if (mat * 10 < mit)
+    mat = (mit + 9) / 10; // max. Zeit muss >= min. Zeit sein
+  bool report = ParamENO_CHD2010ERM;
+
+  for (uint8_t power = 0; power < 2; power++) {
+    uint16_t delta = power ? ParamENO_CHD2010EdeltaPw : ParamENO_CHD2010EdeltaEwh;
+    if (delta > 4095)
+      delta = 4095;
+    uint8_t unit = power ? (ParamENO_CHD2010EUNP ? 4 : 3) : (ParamENO_CHD2010EUNE ? 2 : 1); // kW/W bzw. kWh/Wh
+    const uint8_t data[6] = {VLD_CMD_ID_05, (uint8_t)((report ? 0x80 : 0) | (power ? 0x20 : 0) | 0x1E),
+                             (uint8_t)(((delta & 0x0F) << 4) | unit), (uint8_t)(delta >> 4), mat, mit};
+    logInfoP("D2-01-0E measurement setup %s: unit %u, delta %u, min %u s, max %u s, auto %u", power ? "power" : "energy", unit,
+             delta, mit, mat * 10, report);
+    openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 6, "D2-01 measurement setup");
+  }
+}
+
+// KNX -> D2-01-Aktor (Belegung siehe EnoceanModule.templ.xml):
+// D2-01-0E: KO_1 Schalten, KO_2 Messwert abfragen (0 = Energie, 1 = Leistung), KO_3 Status abfragen.
+// D2-01-12: KO_1 Schalten CH1, KO_2 Schalten CH2, KO_5 Status abfragen.
+// Die Antworten des Aktors (CMD 0x04 Status, CMD 0x07 Messwert) wertet handle_VLD() aus.
+void EnoceanChannel::processKnxVld(int koIndex, GroupObject &ko) {
+  uint16_t profile = vldProfile();
+  bool statusQuery = false;
+
+  if (profile == D2_01_0E) {
+    switch (koIndex) {
+    case ENO_KoGO_BASE__1:
+      sendVldSetOutput(0x1E, ko.value(Dpt(1, 1)));
+      break;
+    case ENO_KoGO_BASE__2: {
+      // CMD 0x06 (Actuator Measurement Query): DB0 Bit 5 Energie/Leistung, Bit 4-0 I/O-Kanal (alle)
+      bool power = ko.value(Dpt(1, 1));
+      const uint8_t data[2] = {VLD_CMD_ID_06, (uint8_t)((power ? 0x20 : 0) | 0x1E)};
+      logInfoP("D2-01-0E query %s", power ? "power" : "energy");
+      openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 2, "D2-01 measurement query");
+      break;
+    }
+    case ENO_KoGO_BASE__3:
+      statusQuery = true;
+      break;
+    }
+  } else if (profile == D2_01_12) {
+    switch (koIndex) {
+    case ENO_KoGO_BASE__1:
+      sendVldSetOutput(0x00, ko.value(Dpt(1, 1)));
+      break;
+    case ENO_KoGO_BASE__2:
+      sendVldSetOutput(0x01, ko.value(Dpt(1, 1)));
+      break;
+    case ENO_KoGO_BASE__5:
+      statusQuery = true;
+      break;
+    }
+  }
+
+  if (statusQuery) {
+    // CMD 0x03 (Actuator Status Query): DB0 Bit 4-0 I/O-Kanal (alle), Antwort je Kanal mit CMD 0x04
+    const uint8_t data[2] = {VLD_CMD_ID_03, 0x1E};
+    logInfoP("D2-01 status query");
+    openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 2, "D2-01 status query");
+  }
 }
