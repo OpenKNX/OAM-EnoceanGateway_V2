@@ -18,8 +18,8 @@
 #define MAIN_ApplicationNumber 0
 #define MAIN_ApplicationVersion 2
 #define MAIN_ApplicationEncoding iso-8859-15
-#define MAIN_ParameterSize 6141
-#define MAIN_MaxKoNumber 439
+#define MAIN_ParameterSize 8811
+#define MAIN_MaxKoNumber 499
 #define MAIN_OrderNumber "SmartMF-EnoceanGateway"
 #define BASE_ModuleVersion 25
 #define UCT_ModuleVersion 5
@@ -585,10 +585,10 @@
 #define ParamENO_CHMonitorTime                       (knx.paramByte(ENO_ParamCalcIndex(ENO_CHMonitorTime)))
 
 // deprecated
-#define ENO_KoOffset 50
+#define ENO_KoOffset 20
 
 // Communication objects per channel (multiple occurrence)
-#define ENO_KoBlockOffset 50
+#define ENO_KoBlockOffset 20
 #define ENO_KoBlockSize 11
 
 #define ENO_KoCalcNumber(index) (index + ENO_KoBlockOffset + _channelIndex * ENO_KoBlockSize)
@@ -1141,7 +1141,7 @@
 // Welcher Feiertag ist morgen?
 #define KoLOG_Holiday2                            (knx.getGroupObject(LOG_KoHoliday2))
 
-#define LOG_ChannelCount 20
+#define LOG_ChannelCount 50
 
 // Parameter per channel
 #define LOG_ParamBlockOffset 4361
@@ -3028,10 +3028,10 @@
 #define ParamLOG_fOOffKOSendNumberRel                ((int16_t)knx.paramWord(LOG_ParamCalcIndex(LOG_fOOffKOSendNumberRel)))
 
 // deprecated
-#define LOG_KoOffset 380
+#define LOG_KoOffset 350
 
 // Communication objects per channel (multiple occurrence)
-#define LOG_KoBlockOffset 380
+#define LOG_KoBlockOffset 350
 #define LOG_KoBlockSize 3
 
 #define LOG_KoCalcNumber(index) (index + LOG_KoBlockOffset + _channelIndex * LOG_KoBlockSize)
