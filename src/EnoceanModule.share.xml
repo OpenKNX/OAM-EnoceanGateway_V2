@@ -89,7 +89,7 @@
                   <Enumeration Text="Rauch/Hitzemelder" Value="6" Id="%AID%_PT-ProductSelectionType_EN-6" />
                   <Enumeration Text="Heizungsstellaktoren" Value="7" Id="%AID%_PT-ProductSelectionType_EN-7" />
                   <Enumeration Text="Wassersensoren" Value="8" Id="%AID%_PT-ProductSelectionType_EN-8" />
-                  <Enumeration Text="Aktoren (Schalten/Dimmen)" Value="9" Id="%AID%_PT-ProductSelectionType_EN-9" />
+                  <Enumeration Text="Aktoren (Schalten/Dimmen/Jalousie)" Value="9" Id="%AID%_PT-ProductSelectionType_EN-9" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Kontakte-->
@@ -156,9 +156,15 @@
               <!-- Parameter type for  Product selection Aktoren (Zentralbefehl A5-38-08) -->
               <ParameterType Id="%AID%_PT-ProductSelectionTypeAktor" Name="ProductSelectionTypeAktor">
                 <TypeRestriction Base="Value" SizeInBit="8">
-                  <Enumeration Text="FSR61 / FSR71 / FSR14 - Schaltaktor" Value="1" Id="%AID%_PT-ProductSelectionTypeAktor_EN-1" />
-                  <Enumeration Text="FUD61 / FUD71 / FUD14 - Dimmaktor" Value="2" Id="%AID%_PT-ProductSelectionTypeAktor_EN-2" />
+                  <Enumeration Text="Schaltaktor (FSR61/71/14, FMS61/14, FASSA, FASSL, FSSG, FSLA, TF61L/R, FTA65L, F4SR14-LED)" Value="1" Id="%AID%_PT-ProductSelectionTypeAktor_EN-1" />
+                  <Enumeration Text="Dimmaktor (FUD61/71/14, FD62, FTA65D, TF-TA65D, FD2G14/71, FDG14, FSG14/71-1-10V)" Value="2" Id="%AID%_PT-ProductSelectionTypeAktor_EN-2" />
+                  <Enumeration Text="Jalousie-/Rollladenaktor (FSB14, FSB61, FSB71, FJ62)" Value="3" Id="%AID%_PT-ProductSelectionTypeAktor_EN-3" />
+                  <Enumeration Text="FSUD-230V - Zwischenstecker-Dimmer (eigenes Lerntelegramm)" Value="4" Id="%AID%_PT-ProductSelectionTypeAktor_EN-4" />
                 </TypeRestriction>
+              </ParameterType>
+              <!-- Jalousie-/Rollladenaktor: Fahrzeit ganz auf bis ganz zu -->
+              <ParameterType Id="%AID%_PT-ShutterTime" Name="ShutterTime">
+                <TypeNumber SizeInBit="8" Type="unsignedInt" minInclusive="1" maxInclusive="255" />
               </ParameterType>
               <!-- A5-38-08 Zentralbefehl: Einschaltwert (0 = letzter Wert) und Dimmrampe bzw. -geschwindigkeit -->
               <ParameterType Id="%AID%_PT-A53808OnValue" Name="A53808OnValue">
@@ -397,8 +403,8 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS38" Name="Profil4BS38">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="A5-38-08   Schaltaktor (Zentralbefehl Schalten)" Value="410" Id="%AID%_PT-Profil4BS38_EN-410" />
-                  <Enumeration Text="A5-38-08   Dimmaktor (Zentralbefehl Dimmen)" Value="411" Id="%AID%_PT-Profil4BS38_EN-411" />
+                  <Enumeration Text="A5-38-08   Schaltaktor (Zentralbefehl Schalten; Eltako-Geräte über Hersteller Eltako wählen)" Value="410" Id="%AID%_PT-Profil4BS38_EN-410" />
+                  <Enumeration Text="A5-38-08   Dimmaktor (Zentralbefehl Dimmen; Eltako-Geräte über Hersteller Eltako wählen)" Value="411" Id="%AID%_PT-Profil4BS38_EN-411" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for EEP Profil VLD -->

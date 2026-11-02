@@ -146,6 +146,8 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%079" Name="CH%C%D2010EMAT" Offset="0" BitOffset="0" ParameterType="%AID%_PT-D2010EMT"  Text="Sende-Interval (max):" Value="1" />
                 <!-- A5-38-08: EEP Rampe in s, Eltako Dimmgeschwindigkeit (0 = Drehschalter am Aktor) -->
                 <Parameter Id="%AID%_UP-%TT%%CC%101" Name="CH%C%A53808Ramp" Offset="0" BitOffset="0" ParameterType="%AID%_PT-A53808Ramp" Text="Dimmrampe" Value="0" />
+                <!-- Eltako Jalousie-/Rollladenaktor (A5-3F-7F): Fahrzeit ganz auf bis ganz zu -->
+                <Parameter Id="%AID%_UP-%TT%%CC%103" Name="CH%C%ShutterTime" Offset="0" BitOffset="0" ParameterType="%AID%_PT-ShutterTime" Text="Fahrzeit ganz auf bis ganz zu" Value="60" />
               </Union> <!-- Union 4 -->
               <Union SizeInBit="16">
                 <Memory CodeSegment="%AID%_RS-04-00000" Offset="24" BitOffset="0" />
@@ -304,6 +306,7 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10101" RefId="%AID%_UP-%TT%%CC%101" Text="Dimmrampe bis 100 % (0 = ohne Rampe)" SuffixText="s" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10102" RefId="%AID%_UP-%TT%%CC%101" Text="Dimmgeschwindigkeit (0 = Drehschalter, 1 = schnell ... 255 = langsam)" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201" RefId="%AID%_UP-%TT%%CC%102" />  <!-- Auswahl Produkt Type Aktoren-->
+              <ParameterRef Id="%AID%_UP-%TT%%CC%103_R-%TT%%CC%10301" RefId="%AID%_UP-%TT%%CC%103" SuffixText="s" />  <!-- Jalousie Fahrzeit -->
               <!-- EnOcean-ID nur lesbar (Teach-In: wird per Button aus dem Gateway übernommen) -->
               <ParameterRef Id="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05502" RefId="%AID%_UP-%TT%%CC%055" Access="Read" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05602" RefId="%AID%_UP-%TT%%CC%056" Access="Read" />
@@ -452,6 +455,12 @@
               <ComObjectRef Id="%AID%_O-%TT%%CC%006_R-%TT%%CC%00610" RefId="%AID%_O-%TT%%CC%006" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH3 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%007_R-%TT%%CC%00709" RefId="%AID%_O-%TT%%CC%007" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH4 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%008_R-%TT%%CC%00808" RefId="%AID%_O-%TT%%CC%008" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Request Status" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <!-- Eltako Jalousie-/Rollladenaktor (A5-3F-7F) -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%000_R-%TT%%CC%00017" RefId="%AID%_O-%TT%%CC%000" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Auf/Ab" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-8" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%001_R-%TT%%CC%00117" RefId="%AID%_O-%TT%%CC%001" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Stopp" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-17" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%002_R-%TT%%CC%00214" RefId="%AID%_O-%TT%%CC%002" Name="INP_CH_1_DPT_05" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Position anfahren" Priority="Low" ObjectSize="1 Byte" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%003_R-%TT%%CC%00313" RefId="%AID%_O-%TT%%CC%003" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Status Position" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%004_R-%TT%%CC%00413" RefId="%AID%_O-%TT%%CC%004" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Status Fahrt" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <!-- A5-38-08 Zentralbefehl: Schalt-/Dimmaktor -->
               <ComObjectRef Id="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" RefId="%AID%_O-%TT%%CC%000" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Schalten" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" RefId="%AID%_O-%TT%%CC%001" Name="INP_CH_1_DPT_05" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Dimmwert" Priority="Low" ObjectSize="1 Byte" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
@@ -1562,16 +1571,36 @@
                                 </when>
                               </choose>
                           </when>
-                          <when test="9">  <!-- AUSWAHL Aktoren (Zentralbefehl A5-38-08) -->
+                          <when test="9">  <!-- AUSWAHL Aktoren (Zentralbefehl A5-38-08, Jalousie A5-3F-7F) -->
                             <ParameterRefRef RefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201" IndentLevel="3"  />
                             <ParameterSeparator Id="%AID%_PS-1" Text="Informationen:" UIHint="Headline" />
-                            <ParameterSeparator Id="%AID%_PS-2" Text="EEP A5-38-08 (Zentralbefehl, Gateway an Aktor)" />
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201">
+                              <when test="1 2 4">
+                                <ParameterSeparator Id="%AID%_PS-2" Text="Zentralbefehl ähnlich EEP A5-38-08 (Gateway an Aktor)" />
+                              </when>
+                              <when test="3">
+                                <ParameterSeparator Id="%AID%_PS-2" Text="Eltako A5-3F-7F (Fahrbefehl mit Laufzeit, Gateway an Aktor)" />
+                              </when>
+                            </choose>
                             <ParameterSeparator Id="%AID%_PS-6" Text="Zum Einlernen: Aktor auf Lernen stellen (z.B. Drehschalter LRN), dann den Button drücken. Ist oben die EnOcean-ID des Aktors eingetragen, werden seine Bestätigungstelegramme als Status ausgewertet." />
                             <Button Id="%AID%_B-%TT%%CC%006" Text="Lerntelegramm an Aktor senden" EventHandlerOnline="ConnectionOriented" EventHandler="ENO_sendLearn" EventHandlerParameters="{ &quot;Channel&quot;: %C% }" />
-                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" /> <!-- Schalten -->
-                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00212" /> <!-- Status Schalten -->
                             <choose ParamRefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201">
-                              <when test="2">  <!-- Dimmaktor -->
+                              <when test="1 2 4">
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" /> <!-- Schalten -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00212" /> <!-- Status Schalten -->
+                              </when>
+                              <when test="3">  <!-- Jalousie-/Rollladenaktor -->
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%103_R-%TT%%CC%10301" IndentLevel="3" />
+                                <ParameterSeparator Id="%AID%_PS-7" Text="Die Position wird aus den Fahrzeiten berechnet. Sie ist bekannt, sobald der Behang einmal eine Endlage erreicht hat (Bestätigung des Aktors, dafür muss oben die EnOcean-ID des Aktors eingetragen sein)." />
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00017" /> <!-- Auf/Ab -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00117" /> <!-- Stopp -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00214" /> <!-- Position anfahren -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00313" /> <!-- Status Position -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00413" /> <!-- Status Fahrt -->
+                              </when>
+                            </choose>
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201">
+                              <when test="2 4">  <!-- Dimmaktor, FSUD-230V -->
                                 <ParameterRefRef RefId="%AID%_UP-%TT%%CC%100_R-%TT%%CC%10001" IndentLevel="3" />
                                 <ParameterRefRef RefId="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10102" IndentLevel="3" />
                                 <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" /> <!-- Dimmwert -->

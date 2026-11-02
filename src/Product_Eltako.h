@@ -65,6 +65,8 @@
 // ParamENO_CHProductselTypeAkt (Zentralbefehl A5-38-08)
 #define Eltako_Aktor_FSR 1
 #define Eltako_Aktor_FUD 2
+#define Eltako_Aktor_FSB 3 // Jalousie-/Rollladenaktor, Eltako-Profil A5-3F-7F
+#define Eltako_Aktor_FSUD 4 // Dimmer wie FUD, aber Lerntelegramm 0x02, 0x00, 0x00, 0x00
 
 // Prüft, ob das empfangene Telegramm den für das Produkt erwarteten Telegrammtyp (R-ORG) hat. Viele Eltako-Geräte
 // senden mehrere Telegrammtypen (z.B. FFKB: 1BS-Kontakt + 4BS-Spannung), die nicht falsch ausgewertet werden dürfen.

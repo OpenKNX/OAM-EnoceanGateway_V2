@@ -34,6 +34,9 @@ struct D201Caps {
 #define ACT_NONE   0
 #define ACT_SWITCH 1
 #define ACT_DIM    2
+#define ACT_SHUTTER 3 // Eltako Jalousie-/Rollladenaktor (A5-3F-7F), nur Hersteller-Pfad
+// _shutterPos: Position unbekannt (noch keine Endlage erreicht)
+#define SHUTTER_POS_UNKNOWN 0xFF
 
 
 
@@ -99,6 +102,9 @@ private:
   // A5-38-08 Aktor: zuletzt gesendeter bzw. gemeldeter Dimmwert (für "Einschalten mit letztem Wert")
   uint8_t _actLastDim = 100;
 
+  // Jalousieaktor: Position 0 = oben (auf) .. 100 % = unten (zu), aus Endlagen und gefahrenen Zeiten berechnet
+  uint8_t _shutterPos = SHUTTER_POS_UNKNOWN;
+
   void handleRocker(PACKET_SERIAL_TYPE_ *pPacket);
   void knxRockerPress(uint8_t db0, uint32_t releaseAfterMs);
   void deviceSeen();
@@ -120,6 +126,10 @@ private:
   void sendActuatorDim(uint8_t percent);
   void actuatorStatus(bool on, uint8_t percent);
   void handleActuatorStatus(PACKET_SERIAL_TYPE_ *pPacket);
+  void sendShutterCommand(uint8_t command, uint16_t time100ms);
+  void processKnxShutter(int koIndex, GroupObject &ko);
+  void handleShutterStatus(PACKET_SERIAL_TYPE_ *pPacket);
+  void shutterStatus(uint8_t pos, bool moving);
 
 public:
   EnoceanChannel(uint8_t index);

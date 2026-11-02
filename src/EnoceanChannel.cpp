@@ -98,6 +98,20 @@ bool EnoceanChannel::sendLearnTelegram() {
   if (vld != 0)
     return openknxEnoceanModule.sendUTETeachIn(_channelIndex, 0x01, (uint8_t)(vld - D2_01_00));
 
+  if (actuatorType() == ACT_SHUTTER) {
+    // Eltako Jalousieaktor: Lerntelegramm laut "Inhalte der Eltako-Funktelegramme" (FUNC 3F, TYPE 7F, Eltako)
+    const uint8_t data[4] = {0xFF, 0xF8, 0x0D, 0x80};
+    logInfoP("Send learn telegram A5-3F-7F (Eltako shutter)");
+    return openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "A5-3F-7F teach-in");
+  }
+
+  if (actuatorIsEltako() && ParamENO_CHProductselType == Eltako_Aktor && ParamENO_CHProductselTypeAkt == Eltako_Aktor_FSUD) {
+    // FSUD-230V weicht ab: Lerntelegramm laut "Inhalte der Eltako-Funktelegramme"
+    const uint8_t data[4] = {0x02, 0x00, 0x00, 0x00};
+    logInfoP("Send learn telegram (Eltako FSUD-230V)");
+    return openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "FSUD teach-in");
+  }
+
   if (actuatorType() != ACT_NONE) {
     // DB3 FUNC 0x38 / TYPE (Bit 6-5), DB2 TYPE (Bit 4-0) / Hersteller (Bit 10-8), DB1 Hersteller (Bit 7-0), DB0 LRN-Typ 1
     const uint8_t data[4] = {0xE0, (uint8_t)(actuatorIsEltako() ? 0x40 : 0x47), (uint8_t)(actuatorIsEltako() ? 0x0D : 0xFF), 0x80};
@@ -824,7 +838,10 @@ uint8_t EnoceanChannel::actuatorType() const {
     case Eltako_Aktor_FSR:
       return ACT_SWITCH;
     case Eltako_Aktor_FUD:
+    case Eltako_Aktor_FSUD:
       return ACT_DIM;
+    case Eltako_Aktor_FSB:
+      return ACT_SHUTTER;
     default:
       return ACT_NONE;
     }
@@ -872,6 +889,10 @@ bool EnoceanChannel::processKnxActuator(int koIndex, GroupObject &ko) {
   uint8_t type = actuatorType();
   if (type == ACT_NONE)
     return false;
+  if (type == ACT_SHUTTER) {
+    processKnxShutter(koIndex, ko);
+    return true;
+  }
 
   bool on;
   uint8_t percent;
@@ -900,6 +921,10 @@ bool EnoceanChannel::processKnxActuator(int koIndex, GroupObject &ko) {
 // Bestätigungstelegramme des Aktors: RPS (z.B. Eltako FSR: 0x70 = EIN, 0x50 = AUS) oder 4BS im Format des
 // Zentralbefehls (DB3 Kommando 1 Schalten / 2 Dimmen, DB2 Dimmwert in %, DB0 Bit 0 EIN/AUS, Bit 3 = 1 Datentelegramm).
 void EnoceanChannel::handleActuatorStatus(PACKET_SERIAL_TYPE_ *pPacket) {
+  if (actuatorType() == ACT_SHUTTER) {
+    handleShutterStatus(pPacket);
+    return;
+  }
   const uint8_t *d = pPacket->u8DataBuffer;
   if (d[0] == u8RORG_RPS && (d[1] == 0x70 || d[1] == 0x50)) {
     bool on = d[1] == 0x70;
@@ -915,4 +940,99 @@ void EnoceanChannel::handleActuatorStatus(PACKET_SERIAL_TYPE_ *pPacket) {
     return;
   }
   logDebugP("A5-38-08: telegram R-ORG %02X / %02X ignored", d[0], d[1]);
+}
+
+// Eltako Jalousie-/Rollladenaktor (FSB14/61/71, FJ62), Fahrbefehl laut "Inhalte der Eltako-Funktelegramme"
+// (FUNC 3F, TYPE 7F): DB3/DB2 Laufzeit in 100 ms, DB1 Kommando (0 = Stopp, 1 = Auf, 2 = Ab), DB0 Bit 3 Datentelegramm,
+// Bit 1 = Laufzeit in 100 ms (statt DB2 in Sekunden). Die am Aktor eingestellte Laufzeit wird dabei ignoriert.
+void EnoceanChannel::sendShutterCommand(uint8_t command, uint16_t time100ms) {
+  const uint8_t data[4] = {(uint8_t)(time100ms >> 8), (uint8_t)time100ms, command, 0x0A};
+  logInfoP("Shutter %s, %u.%u s", command == 1 ? "up" : (command == 2 ? "down" : "stop"), time100ms / 10, time100ms % 10);
+  openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "Eltako shutter");
+}
+
+// Status Position (KO_4, nur wenn bekannt) und Status Fahrt (KO_5) ausgeben.
+void EnoceanChannel::shutterStatus(uint8_t pos, bool moving) {
+  _shutterPos = pos;
+  if (pos != SHUTTER_POS_UNKNOWN)
+    KoENO_GO_BASE__4.value(pos, Dpt(5, 1));
+  KoENO_GO_BASE__5.value(moving, Dpt(1, 1));
+}
+
+// KNX -> Jalousieaktor: KO_1 Auf/Ab (DPT 1.008, 1 = Ab), KO_2 Stopp, KO_3 Position anfahren (DPT 5.001, 0 % = oben).
+// Fahrten in eine Endlage bekommen 10 % Reserve auf die Fahrzeit, damit die Endlage sicher erreicht wird. Eine
+// Zwischenposition geht nur bei bekannter Position. Ohne bekannte Aktor-ID kommt keine Bestätigung an, dann wird die
+// Position direkt aus dem Befehl gesetzt.
+void EnoceanChannel::processKnxShutter(int koIndex, GroupObject &ko) {
+  uint16_t full = ParamENO_CHShutterTime * 10; // 100 ms
+  uint8_t target;
+
+  switch (koIndex) {
+  case ENO_KoGO_BASE__1:
+    target = (bool)ko.value(Dpt(1, 8)) ? 100 : 0;
+    break;
+  case ENO_KoGO_BASE__2:
+    sendShutterCommand(0, 0);
+    return;
+  case ENO_KoGO_BASE__3:
+    target = (uint8_t)round((double)ko.value(Dpt(5, 1)));
+    if (target > 100)
+      target = 100;
+    break;
+  default:
+    return;
+  }
+
+  if (target == 0 || target == 100) {
+    sendShutterCommand(target ? 2 : 1, full + full / 10);
+  } else if (_shutterPos == SHUTTER_POS_UNKNOWN) {
+    logInfoP("Shutter: position unknown, move to an end position first");
+    return;
+  } else if (target != _shutterPos) {
+    uint8_t diff = target > _shutterPos ? target - _shutterPos : _shutterPos - target;
+    uint16_t time = (uint32_t)diff * full / 100;
+    sendShutterCommand(target > _shutterPos ? 2 : 1, time ? time : 1);
+  } else
+    return;
+
+  uint8_t id[4];
+  if (!deviceId(id))
+    shutterStatus(target, false);
+}
+
+// Bestätigungen des Jalousieaktors: RPS 0x70 = Endlage oben, 0x50 = Endlage unten, 0x01 = Start auf, 0x02 = Start ab;
+// 4BS beim Stopp vor der Endlage: DB3/DB2 gefahrene Zeit in 100 ms, DB1 1 = aufgefahren / 2 = abgefahren.
+void EnoceanChannel::handleShutterStatus(PACKET_SERIAL_TYPE_ *pPacket) {
+  const uint8_t *d = pPacket->u8DataBuffer;
+
+  if (d[0] == u8RORG_RPS) {
+    switch (d[1]) {
+    case 0x70:
+      logDebugP("Shutter: end position up");
+      shutterStatus(0, false);
+      return;
+    case 0x50:
+      logDebugP("Shutter: end position down");
+      shutterStatus(100, false);
+      return;
+    case 0x01:
+    case 0x02:
+      logDebugP("Shutter: moving %s", d[1] == 0x01 ? "up" : "down");
+      shutterStatus(_shutterPos, true);
+      return;
+    }
+  } else if (d[0] == u8RORG_4BS && (d[4] & 0x08) && (d[3] == 0x01 || d[3] == 0x02)) {
+    uint16_t time = ((uint16_t)d[1] << 8) | d[2];
+    uint8_t pos = _shutterPos;
+    uint16_t full = ParamENO_CHShutterTime * 10;
+    if (pos != SHUTTER_POS_UNKNOWN && full) {
+      int16_t moved = (int16_t)((uint32_t)time * 100 / full);
+      int16_t p = d[3] == 0x02 ? pos + moved : pos - moved;
+      pos = p < 0 ? 0 : (p > 100 ? 100 : p);
+    }
+    logDebugP("Shutter: stopped after %u.%u s %s, position %u", time / 10, time % 10, d[3] == 0x01 ? "up" : "down", pos);
+    shutterStatus(pos, false);
+    return;
+  }
+  logDebugP("Shutter: telegram R-ORG %02X / %02X ignored", d[0], d[1]);
 }

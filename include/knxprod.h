@@ -382,6 +382,7 @@
 #define ENO_CHA53808OnValue                     22      // uint8_t
 #define ENO_CHD2010EMAT                         23      // uint8_t
 #define ENO_CHA53808Ramp                        23      // uint8_t
+#define ENO_CHShutterTime                       23      // uint8_t
 #define ENO_CHD2010EdeltaEwh                    24      // uint16_t
 #define ENO_CHD2010EdeltaEkwh                   24      // uint16_t
 #define ENO_CHD2010EdeltaPw                     26      // uint16_t
@@ -559,6 +560,8 @@
 #define ParamENO_CHD2010EMAT                         (knx.paramByte(ENO_ParamCalcIndex(ENO_CHD2010EMAT)))
 // Dimmrampe
 #define ParamENO_CHA53808Ramp                        (knx.paramByte(ENO_ParamCalcIndex(ENO_CHA53808Ramp)))
+// Fahrzeit ganz auf bis ganz zu
+#define ParamENO_CHShutterTime                       (knx.paramByte(ENO_ParamCalcIndex(ENO_CHShutterTime)))
 // delta Value:
 #define ParamENO_CHD2010EdeltaEwh                    (knx.paramWord(ENO_ParamCalcIndex(ENO_CHD2010EdeltaEwh)))
 // delta Value:
