@@ -138,6 +138,10 @@
 #define A5_09_0C 402
 #define A5_09_0D 403
 
+// A5-38-08 Zentralbefehl (Gateway -> Aktor), Auswahl Schalt- bzw. Dimmaktor (ParamENO_CHProfil4BS38)
+#define A5_38_08_SWITCH 410
+#define A5_38_08_DIM 411
+
 #define A5_12_00 90
 #define A5_12_01 91
 #define A5_12_02 92

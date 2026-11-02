@@ -289,6 +289,7 @@
 #define ENO_CHProfil4BS14                        4      // 16 Bits, Bit 15-0
 #define ENO_CHProfil4BS20                        4      // 16 Bits, Bit 15-0
 #define ENO_CHProfil4BS30                        4      // 16 Bits, Bit 15-0
+#define ENO_CHProfil4BS38                        4      // 16 Bits, Bit 15-0
 #define ENO_CHProfil4BSAdd                       4      // 16 Bits, Bit 15-0
 #define ENO_CHProfilVLD00                        4      // 16 Bits, Bit 15-0
 #define ENO_CHProfilVLD01                        4      // 16 Bits, Bit 15-0
@@ -378,7 +379,9 @@
 #define ENO_CHD2010EUNP                         22      // 1 Bit, Bit 4
 #define     ENO_CHD2010EUNPMask 0x10
 #define     ENO_CHD2010EUNPShift 4
+#define ENO_CHA53808OnValue                     22      // uint8_t
 #define ENO_CHD2010EMAT                         23      // uint8_t
+#define ENO_CHA53808Ramp                        23      // uint8_t
 #define ENO_CHD2010EdeltaEwh                    24      // uint16_t
 #define ENO_CHD2010EdeltaEkwh                   24      // uint16_t
 #define ENO_CHD2010EdeltaPw                     26      // uint16_t
@@ -393,6 +396,7 @@
 #define ENO_CHProductselTypeMel                 35      // 8 Bits, Bit 7-0
 #define ENO_CHProductselTypeHei                 36      // 8 Bits, Bit 7-0
 #define ENO_CHProductselTypeWas                 37      // 8 Bits, Bit 7-0
+#define ENO_CHProductselTypeAkt                 36      // 8 Bits, Bit 7-0
 #define ENO_CHSelectionFFG7B                    38      // 1 Bit, Bit 7
 #define     ENO_CHSelectionFFG7BMask 0x80
 #define     ENO_CHSelectionFFG7BShift 7
@@ -441,6 +445,8 @@
 #define ParamENO_CHProfil4BS20                       (knx.paramWord(ENO_ParamCalcIndex(ENO_CHProfil4BS20)))
 // Digital Input 
 #define ParamENO_CHProfil4BS30                       (knx.paramWord(ENO_ParamCalcIndex(ENO_CHProfil4BS30)))
+// Central Command
+#define ParamENO_CHProfil4BS38                       (knx.paramWord(ENO_ParamCalcIndex(ENO_CHProfil4BS38)))
 // Special Profil
 #define ParamENO_CHProfil4BSAdd                      (knx.paramWord(ENO_ParamCalcIndex(ENO_CHProfil4BSAdd)))
 // Room Control Panel (RCP)
@@ -547,8 +553,12 @@
 #define ParamENO_CHD2010EUNE                         ((bool)(knx.paramByte(ENO_ParamCalcIndex(ENO_CHD2010EUNE)) & ENO_CHD2010EUNEMask))
 // Einheit:
 #define ParamENO_CHD2010EUNP                         ((bool)(knx.paramByte(ENO_ParamCalcIndex(ENO_CHD2010EUNP)) & ENO_CHD2010EUNPMask))
+// Einschaltwert (0 = letzter Wert)
+#define ParamENO_CHA53808OnValue                     (knx.paramByte(ENO_ParamCalcIndex(ENO_CHA53808OnValue)))
 // Sende-Interval (max):
 #define ParamENO_CHD2010EMAT                         (knx.paramByte(ENO_ParamCalcIndex(ENO_CHD2010EMAT)))
+// Dimmrampe
+#define ParamENO_CHA53808Ramp                        (knx.paramByte(ENO_ParamCalcIndex(ENO_CHA53808Ramp)))
 // delta Value:
 #define ParamENO_CHD2010EdeltaEwh                    (knx.paramWord(ENO_ParamCalcIndex(ENO_CHD2010EdeltaEwh)))
 // delta Value:
@@ -577,6 +587,8 @@
 #define ParamENO_CHProductselTypeHei                 (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeHei)))
 // Produkt:
 #define ParamENO_CHProductselTypeWas                 (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeWas)))
+// Produkt:
+#define ParamENO_CHProductselTypeAkt                 (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeAkt)))
 // delta Value:
 #define ParamENO_CHSelectionFFG7B                    ((bool)(knx.paramByte(ENO_ParamCalcIndex(ENO_CHSelectionFFG7B)) & ENO_CHSelectionFFG7BMask))
 // Einrichtung des Geräts

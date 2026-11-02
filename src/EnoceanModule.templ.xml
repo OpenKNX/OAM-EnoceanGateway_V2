@@ -39,6 +39,7 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%021" Name="CH%C%Profil4BS14" ParameterType="%AID%_PT-Profil4BS14" Text="Multi-Func Sensor " Value="106" Offset="0" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%022" Name="CH%C%Profil4BS20" ParameterType="%AID%_PT-Profil4BS20" Text="HVAC Components " Value="116" Offset="0" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%023" Name="CH%C%Profil4BS30" ParameterType="%AID%_PT-Profil4BS30" Text="Digital Input " Value="125" Offset="0" BitOffset="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%099" Name="CH%C%Profil4BS38" ParameterType="%AID%_PT-Profil4BS38" Text="Central Command" Value="410" Offset="0" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%069" Name="CH%C%Profil4BSAdd" ParameterType="%AID%_PT-Profil4BSAdd" Text="Special Profil" Value="401" Offset="0" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%024" Name="CH%C%ProfilVLD00" ParameterType="%AID%_PT-ProfilVLD00" Text="Room Control Panel (RCP)" Value="136" Offset="0" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%025" Name="CH%C%ProfilVLD01" ParameterType="%AID%_PT-ProfilVLD01" Text="Electronic switches and dimmers" Value="155" Offset="0" BitOffset="0" />
@@ -137,10 +138,14 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%075" Name="CH%C%D2010ERM"  Offset="0" BitOffset="1" ParameterType="%AID%_PT-D2010ERM"  Text="Sende-Modus:" Value="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%076" Name="CH%C%D2010EUNE" Offset="0" BitOffset="2" ParameterType="%AID%_PT-D2010EUNE"  Text="Einheit:" Value="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%077" Name="CH%C%D2010EUNP" Offset="0" BitOffset="3" ParameterType="%AID%_PT-D2010EUNP"  Text="Einheit:" Value="0" />
+                <!-- A5-38-08 -->
+                <Parameter Id="%AID%_UP-%TT%%CC%100" Name="CH%C%A53808OnValue" Offset="0" BitOffset="0" ParameterType="%AID%_PT-A53808OnValue" Text="Einschaltwert (0 = letzter Wert)" Value="100" />
               </Union> <!-- Union 3 -->
               <Union SizeInBit="8">
                 <Memory CodeSegment="%AID%_RS-04-00000" Offset="23" BitOffset="0" />
                 <Parameter Id="%AID%_UP-%TT%%CC%079" Name="CH%C%D2010EMAT" Offset="0" BitOffset="0" ParameterType="%AID%_PT-D2010EMT"  Text="Sende-Interval (max):" Value="1" />
+                <!-- A5-38-08: EEP Rampe in s, Eltako Dimmgeschwindigkeit (0 = Drehschalter am Aktor) -->
+                <Parameter Id="%AID%_UP-%TT%%CC%101" Name="CH%C%A53808Ramp" Offset="0" BitOffset="0" ParameterType="%AID%_PT-A53808Ramp" Text="Dimmrampe" Value="0" />
               </Union> <!-- Union 4 -->
               <Union SizeInBit="16">
                 <Memory CodeSegment="%AID%_RS-04-00000" Offset="24" BitOffset="0" />
@@ -164,6 +169,8 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%091" Name="CH%C%ProductselTypeMel" Offset="7" BitOffset="0" ParameterType="%AID%_PT-ProductSelectionTypeMelder"    Text="Produkt:" Value="1" />
                 <Parameter Id="%AID%_UP-%TT%%CC%092" Name="CH%C%ProductselTypeHei" Offset="8" BitOffset="0" ParameterType="%AID%_PT-ProductSelectionTypeHeizung"   Text="Produkt:" Value="1" />
                 <Parameter Id="%AID%_UP-%TT%%CC%093" Name="CH%C%ProductselTypeWas" Offset="9" BitOffset="0" ParameterType="%AID%_PT-ProductSelectionTypeWasser"    Text="Produkt:" Value="1" />
+                <!-- Aktoren teilen sich das Byte mit Heizung (Kategorien schließen sich aus, gleicher Wertebereich 1..2) -->
+                <Parameter Id="%AID%_UP-%TT%%CC%102" Name="CH%C%ProductselTypeAkt" Offset="8" BitOffset="0" ParameterType="%AID%_PT-ProductSelectionTypeAktor"   Text="Produkt:" Value="1" />
               </Union> <!-- Union 7 -->
               <Union SizeInBit="8">
                 <Memory CodeSegment="%AID%_RS-04-00000" Offset="38" BitOffset="0" />
@@ -291,6 +298,12 @@
               <ParameterRef Id="%AID%_P-%TT%%CC%096_R-%TT%%CC%09601" RefId="%AID%_P-%TT%%CC%096" />
               <ParameterRef Id="%AID%_P-%TT%%CC%097_R-%TT%%CC%09701" RefId="%AID%_P-%TT%%CC%097" />
               <ParameterRef Id="%AID%_P-%TT%%CC%098_R-%TT%%CC%09801" RefId="%AID%_P-%TT%%CC%098" />
+              <!-- A5-38-08 Zentralbefehl (EEP und Eltako-Aktoren) -->
+              <ParameterRef Id="%AID%_UP-%TT%%CC%099_R-%TT%%CC%09901" RefId="%AID%_UP-%TT%%CC%099" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%100_R-%TT%%CC%10001" RefId="%AID%_UP-%TT%%CC%100" SuffixText="%" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10101" RefId="%AID%_UP-%TT%%CC%101" Text="Dimmrampe bis 100 % (0 = ohne Rampe)" SuffixText="s" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10102" RefId="%AID%_UP-%TT%%CC%101" Text="Dimmgeschwindigkeit (0 = Drehschalter, 1 = schnell ... 255 = langsam)" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201" RefId="%AID%_UP-%TT%%CC%102" />  <!-- Auswahl Produkt Type Aktoren-->
               <!-- EnOcean-ID nur lesbar (Teach-In: wird per Button aus dem Gateway übernommen) -->
               <ParameterRef Id="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05502" RefId="%AID%_UP-%TT%%CC%055" Access="Read" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05602" RefId="%AID%_UP-%TT%%CC%056" Access="Read" />
@@ -428,6 +441,11 @@
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00903" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Taster 2" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00904" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Tarif" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-10" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00905" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Sensor-Status" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-10" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <!-- A5-38-08 Zentralbefehl: Schalt-/Dimmaktor -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" RefId="%AID%_O-%TT%%CC%000" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Schalten" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" RefId="%AID%_O-%TT%%CC%001" Name="INP_CH_1_DPT_05" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Dimmwert" Priority="Low" ObjectSize="1 Byte" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%002_R-%TT%%CC%00212" RefId="%AID%_O-%TT%%CC%002" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Status Schalten" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%003_R-%TT%%CC%00310" RefId="%AID%_O-%TT%%CC%003" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Status Dimmwert" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00906" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_09" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Werte µg/m3" Priority="Low" ObjectSize="2 Bytes" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-9-30" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%010_R-%TT%%CC%01001" RefId="%AID%_O-%TT%%CC%010" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Gerät ausgefallen" Priority="Low" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
             </ComObjectRefs>
@@ -870,6 +888,24 @@
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00701" /> <!-- Ventilstellung -->
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%008_R-%TT%%CC%00801" /> <!-- Lokale Verstellung -->
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%009_R-%TT%%CC%00901" /> <!-- Statusbits -->
+                                  </when>
+                                </choose>
+                              </when>
+                              <!-- A5-38 Zentralbefehl (Gateway -> Aktor) -->
+                              <when test="56">
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%099_R-%TT%%CC%09901" IndentLevel="1"  />
+                                <ParameterSeparator Id="%AID%_PS-2" Text="" UIHint="HorizontalRuler" />
+                                <ParameterSeparator Id="%AID%_PS-6" Text="Zum Einlernen: Aktor in den Lernmodus bringen, dann den Button drücken. Gesendet wird ein Lerntelegramm A5-38-08 mit der Sende-ID dieses Kanals. Ist oben die EnOcean-ID des Aktors eingetragen, werden seine Bestätigungstelegramme als Status ausgewertet." />
+                                <Button Id="%AID%_B-%TT%%CC%005" Text="Lerntelegramm an Aktor senden" EventHandlerOnline="ConnectionOriented" EventHandler="ENO_sendLearn" EventHandlerParameters="{ &quot;Channel&quot;: %C% }" />
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" /> <!-- Schalten -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00212" /> <!-- Status Schalten -->
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%099_R-%TT%%CC%09901">
+                                  <!-- A5-38-08 Dimmen -->
+                                  <when test="411">
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%100_R-%TT%%CC%10001" IndentLevel="1" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10101" IndentLevel="1" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" /> <!-- Dimmwert -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00310" /> <!-- Status Dimmwert -->
                                   </when>
                                 </choose>
                               </when>
@@ -1462,11 +1498,28 @@
                           <when test="8">  <!-- AUSWAHL Wasser -->
                             <ParameterRefRef RefId="%AID%_UP-%TT%%CC%093_R-%TT%%CC%09301" IndentLevel="3"  />
                               <choose ParamRefId="%AID%_UP-%TT%%CC%093_R-%TT%%CC%09301">
-                                <when test="0">  
+                                <when test="0">
                                 </when>
-                              </choose> 
+                              </choose>
                           </when>
-                        </choose> 
+                          <when test="9">  <!-- AUSWAHL Aktoren (Zentralbefehl A5-38-08) -->
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201" IndentLevel="3"  />
+                            <ParameterSeparator Id="%AID%_PS-1" Text="Informationen:" UIHint="Headline" />
+                            <ParameterSeparator Id="%AID%_PS-2" Text="EEP A5-38-08 (Zentralbefehl, Gateway an Aktor)" />
+                            <ParameterSeparator Id="%AID%_PS-6" Text="Zum Einlernen: Aktor auf Lernen stellen (z.B. Drehschalter LRN), dann den Button drücken. Ist oben die EnOcean-ID des Aktors eingetragen, werden seine Bestätigungstelegramme als Status ausgewertet." />
+                            <Button Id="%AID%_B-%TT%%CC%006" Text="Lerntelegramm an Aktor senden" EventHandlerOnline="ConnectionOriented" EventHandler="ENO_sendLearn" EventHandlerParameters="{ &quot;Channel&quot;: %C% }" />
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" /> <!-- Schalten -->
+                            <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00212" /> <!-- Status Schalten -->
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%102_R-%TT%%CC%10201">
+                              <when test="2">  <!-- Dimmaktor -->
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%100_R-%TT%%CC%10001" IndentLevel="3" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%101_R-%TT%%CC%10102" IndentLevel="3" />
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" /> <!-- Dimmwert -->
+                                <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00310" /> <!-- Status Dimmwert -->
+                              </when>
+                            </choose>
+                          </when>
+                        </choose>
                       </when>
                     </choose>
                     <!-- Ausfallüberwachung (ganz unten auf der Kanalseite) -->

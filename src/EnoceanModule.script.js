@@ -166,7 +166,7 @@ function ENO_sendLearn(device, online, progress, context) {
     try {
         var resp = ENO_call(online, [6, ch]);
         if (resp[0] == 7)
-            throw new Error("Kanal " + ch + " sendet nicht an EnOcean. Das Lerntelegramm gibt es nur für den Taster in Richtung KNX nach EnOcean.");
+            throw new Error("Kanal " + ch + " sendet nicht an EnOcean. Das Lerntelegramm gibt es nur für den Taster in Richtung KNX nach EnOcean sowie für Aktoren (A5-38-08, D2-01).");
         if (resp[0] != 0)
             throw new Error("Kanal " + ch + ": Lerntelegramm konnte nicht gesendet werden (Code " + resp[0] + ").");
         progress.setText("Kanal " + ch + ": Lerntelegramm gesendet. Den Lernmodus am Aktor jetzt beenden.");

@@ -936,6 +936,10 @@ void EnoceanModule::handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObje
   if (_channels[_channelIndex]->processKnxHvac(koIndex, iKo))
     return;
 
+  // Schalt-/Dimmaktoren mit Zentralbefehl A5-38-08 (EEP-Profil oder Eltako-Produkt)
+  if (_channels[_channelIndex]->processKnxActuator(koIndex, iKo))
+    return;
+
 //  if (koIndex != _channelIndex) // prüft ob KO zum CHannel passt
 //  {
 //    return;
@@ -1061,7 +1065,7 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
     if (!_channelsReady || channel < 1 || channel > ParamENO_VisibleChannels)
       logInfoP("Channel must be 1..%u", ParamENO_VisibleChannels);
     else if (!_channels[channel - 1]->sendLearnTelegram())
-      logInfoP("Channel %u does not send to EnOcean (rocker KNX -> EnOcean or D2-01 actuator only)", channel);
+      logInfoP("Channel %u does not send to EnOcean (rocker KNX -> EnOcean, A5-38-08 or D2-01 actuator only)", channel);
     return true;
   }
 

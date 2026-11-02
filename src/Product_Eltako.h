@@ -16,6 +16,7 @@
 #define Eltako_Melder 6
 #define Eltako_Heizung 7
 #define Eltako_Wasser 8
+#define Eltako_Aktor 9
 
 // ParamENO_CHProductselTypeKon
 #define ELtako_Kontakte_inaktive 0
@@ -60,6 +61,10 @@
 // ParamENO_CHProductselTypeWas
 #define Eltako_Wasser_inaktive 0
 #define Eltako_Wasser_FWS81 1
+
+// ParamENO_CHProductselTypeAkt (Zentralbefehl A5-38-08)
+#define Eltako_Aktor_FSR 1
+#define Eltako_Aktor_FUD 2
 
 // Prüft, ob das empfangene Telegramm den für das Produkt erwarteten Telegrammtyp (R-ORG) hat. Viele Eltako-Geräte
 // senden mehrere Telegrammtypen (z.B. FFKB: 1BS-Kontakt + 4BS-Spannung), die nicht falsch ausgewertet werden dürfen.

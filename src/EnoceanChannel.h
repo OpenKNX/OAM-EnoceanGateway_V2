@@ -18,6 +18,11 @@
 // _hvacInterval: Aufwachzyklus/Funkintervall aus der ETS verwenden (kein Wert per KNX)
 #define HVAC_INTERVAL_ETS 0xFF
 
+// Aktoren mit Zentralbefehl A5-38-08 (EnoceanChannel::actuatorType), per EEP-Profil oder Eltako-Produkt
+#define ACT_NONE   0
+#define ACT_SWITCH 1
+#define ACT_DIM    2
+
 
 
 
@@ -79,6 +84,9 @@ private:
   bool _vldMeasurementSetupDone = false;
   uint32_t _setupTime = 0;
 
+  // A5-38-08 Aktor: zuletzt gesendeter bzw. gemeldeter Dimmwert (für "Einschalten mit letztem Wert")
+  uint8_t _actLastDim = 100;
+
   void handleRocker(PACKET_SERIAL_TYPE_ *pPacket);
   void knxRockerPress(uint8_t db0, uint32_t releaseAfterMs);
   void deviceSeen();
@@ -91,6 +99,13 @@ private:
   uint16_t vldProfile() const;
   void sendVldSetOutput(uint8_t ioChannel, bool on);
   void sendVldMeasurementSetup();
+  uint8_t actuatorType() const;
+  bool actuatorIsEltako() const;
+  bool deviceId(uint8_t out8Id[4]) const;
+  void sendActuatorSwitch(bool on);
+  void sendActuatorDim(uint8_t percent);
+  void actuatorStatus(bool on, uint8_t percent);
+  void handleActuatorStatus(PACKET_SERIAL_TYPE_ *pPacket);
 
 public:
   EnoceanChannel(uint8_t index);
@@ -103,5 +118,6 @@ public:
   bool sendLearnTelegram();
   bool processKnxHvac(int koIndex, GroupObject &ko);
   void processKnxVld(int koIndex, GroupObject &ko);
+  bool processKnxActuator(int koIndex, GroupObject &ko);
   void teachInReceived(PACKET_SERIAL_TYPE_ *pPacket);
 };

@@ -91,11 +91,19 @@ void EnoceanChannel::knxRockerPress(uint8_t db0, uint32_t releaseAfterMs) {
 // Sendet ein Lerntelegramm mit der Sender-ID dieses Kanals (Base-ID + Kanalindex), damit ein EnOcean-Aktor im
 // Lernmodus den Kanal einlernen kann (ETS-Button / Konsole "eno learn N"). Taster in Richtung KNX -> EnOcean:
 // Tastendruck oben (AO), danach Loslassen. D2-01-Aktor: UTE-Teach-In-Anfrage mit dem EEP des Kanals.
+// A5-38-08-Aktor: 4BS-Lerntelegramm (Variante 3) mit EEP A5-38-08, Hersteller Eltako (0x00D) bzw. Multi-User (0x7FF).
 // Liefert false, wenn der Kanal nicht sendet.
 bool EnoceanChannel::sendLearnTelegram() {
   uint16_t vld = vldProfile();
   if (vld != 0)
     return openknxEnoceanModule.sendUTETeachIn(_channelIndex, 0x01, (uint8_t)(vld - D2_01_00));
+
+  if (actuatorType() != ACT_NONE) {
+    // DB3 FUNC 0x38 / TYPE (Bit 6-5), DB2 TYPE (Bit 4-0) / Hersteller (Bit 10-8), DB1 Hersteller (Bit 7-0), DB0 LRN-Typ 1
+    const uint8_t data[4] = {0xE0, (uint8_t)(actuatorIsEltako() ? 0x40 : 0x47), (uint8_t)(actuatorIsEltako() ? 0x0D : 0xFF), 0x80};
+    logInfoP("Send learn telegram A5-38-08 (%s)", actuatorIsEltako() ? "Eltako" : "EEP");
+    return openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "A5-38-08 teach-in");
+  }
 
   if (ParamENO_CHProductsel != EEP_Profil || ParamENO_CHProfilSelection != u8RORG_Rocker || ParamENO_CHDirectionKnxEnocean != 1)
     return false;
@@ -204,6 +212,12 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
     return true;
   }
 
+  // Aktor mit Zentralbefehl A5-38-08 (EEP-Profil oder Eltako-Produkt): Bestätigungstelegramme als Status auswerten
+  if (actuatorType() != ACT_NONE) {
+    handleActuatorStatus(pPacket);
+    return true;
+  }
+
   // Prüft wie der CH konfiguriert ist. Über EEP-Profil oder über Hersteller
   switch (ParamENO_CHProductsel) {
   case CH_inaktive: // Kein Profil oder Hersteller gewählt
@@ -276,22 +290,23 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
 // ID-Quelle: die ETS-Parameter, wenn dort eine ID steht; sonst im Teach-In-Modus die im Gateway eingelernte ID
 // (Brücke bis zum nächsten ETS-Download, siehe "Ergebnis übernehmen").
 bool EnoceanChannel::matchesDeviceId(const uint8_t id[4]) const {
+  uint8_t configuredId[4];
+  return deviceId(configuredId) && memcmp(configuredId, id, 4) == 0;
+}
+
+// Liefert die EnOcean-ID des Geräts dieses Kanals (Quelle wie bei matchesDeviceId()), false wenn keine bekannt ist.
+bool EnoceanChannel::deviceId(uint8_t out8Id[4]) const {
   if (ParamENO_CHProductsel == CH_inaktive)
     return false;
 
-  uint8_t configuredId[4];
-  configuredId[0] = (ParamENO_CHId0 << 4) | ParamENO_CHId1;
-  configuredId[1] = (ParamENO_CHId2 << 4) | ParamENO_CHId3;
-  configuredId[2] = (ParamENO_CHId4 << 4) | ParamENO_CHId5;
-  configuredId[3] = (ParamENO_CHId6 << 4) | ParamENO_CHId7;
+  out8Id[0] = (ParamENO_CHId0 << 4) | ParamENO_CHId1;
+  out8Id[1] = (ParamENO_CHId2 << 4) | ParamENO_CHId3;
+  out8Id[2] = (ParamENO_CHId4 << 4) | ParamENO_CHId5;
+  out8Id[3] = (ParamENO_CHId6 << 4) | ParamENO_CHId7;
 
-  bool paramIdSet = configuredId[0] | configuredId[1] | configuredId[2] | configuredId[3];
-  if (!paramIdSet) {
-    if (ParamENO_CHSetupMode != ENO_SETUP_TEACHIN || !openknxEnoceanModule.learnedId(_channelIndex, configuredId))
-      return false;
-  }
-
-  return memcmp(configuredId, id, 4) == 0;
+  if (out8Id[0] | out8Id[1] | out8Id[2] | out8Id[3])
+    return true;
+  return ParamENO_CHSetupMode == ENO_SETUP_TEACHIN && openknxEnoceanModule.learnedId(_channelIndex, out8Id);
 }
 
 // Bidirektionaler Heizkörper-Stellantrieb dieses Kanals (HVAC_*): EEP A5-20-01/04/06 oder Eltako FKS-SV (A5-20-01).
@@ -693,4 +708,119 @@ void EnoceanChannel::processKnxVld(int koIndex, GroupObject &ko) {
     logInfoP("D2-01 status query");
     openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 2, "D2-01 status query");
   }
+}
+
+// Aktor mit Zentralbefehl A5-38-08 dieses Kanals (ACT_*): per EEP-Profil (4BS A5-38) oder als Eltako-Produkt
+// (Kategorie Aktoren). Beide Wege nutzen dieselben Funktionen, Unterschiede nur über actuatorIsEltako().
+uint8_t EnoceanChannel::actuatorType() const {
+  switch (ParamENO_CHProductsel) {
+  case EEP_Profil:
+    if (ParamENO_CHProfilSelection != u8RORG_4BS || ParamENO_CHProfilSelection4BS != A5_38)
+      return ACT_NONE;
+    switch (ParamENO_CHProfil4BS38) {
+    case A5_38_08_SWITCH:
+      return ACT_SWITCH;
+    case A5_38_08_DIM:
+      return ACT_DIM;
+    default:
+      return ACT_NONE;
+    }
+  case Hersteller_Eltako:
+    if (ParamENO_CHProductselType != Eltako_Aktor)
+      return ACT_NONE;
+    switch (ParamENO_CHProductselTypeAkt) {
+    case Eltako_Aktor_FSR:
+      return ACT_SWITCH;
+    case Eltako_Aktor_FUD:
+      return ACT_DIM;
+    default:
+      return ACT_NONE;
+    }
+  default:
+    return ACT_NONE;
+  }
+}
+
+bool EnoceanChannel::actuatorIsEltako() const { return ParamENO_CHProductsel == Hersteller_Eltako; }
+
+// Zentralbefehl Schalten (CMD 0x01): DB2/DB1 Zeit 0 (kein Zeitablauf), DB0 Bit 3 Datentelegramm, Bit 0 EIN/AUS.
+void EnoceanChannel::sendActuatorSwitch(bool on) {
+  const uint8_t data[4] = {0x01, 0x00, 0x00, (uint8_t)(0x08 | (on ? 0x01 : 0x00))};
+  logInfoP("A5-38-08 switch %u", on);
+  openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "A5-38-08 switch");
+}
+
+// Zentralbefehl Dimmen (CMD 0x02): DB2 Dimmwert 0..100 %, DB1 Rampe (EEP: Sekunden bis 100 %, Eltako: Geschwindigkeit,
+// 0 = Drehschalter am Aktor), DB0 Bit 3 Datentelegramm, Bit 0 EIN/AUS. DB0 Bit 2 heißt beim EEP "Wert relativ
+// (0..100 %)", bei Eltako "Dimmwert blockieren" und bleibt dort deshalb 0.
+void EnoceanChannel::sendActuatorDim(uint8_t percent) {
+  if (percent > 100)
+    percent = 100;
+  if (percent)
+    _actLastDim = percent;
+  const uint8_t data[4] = {0x02, percent, ParamENO_CHA53808Ramp,
+                           (uint8_t)(0x08 | (actuatorIsEltako() ? 0x00 : 0x04) | (percent ? 0x01 : 0x00))};
+  logInfoP("A5-38-08 dim %u %%", percent);
+  openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "A5-38-08 dim");
+}
+
+// Status auf KO_3 (Schalten) und beim Dimmaktor auf KO_4 (Dimmwert) ausgeben.
+void EnoceanChannel::actuatorStatus(bool on, uint8_t percent) {
+  if (on && percent)
+    _actLastDim = percent;
+  KoENO_GO_BASE__3.value(on, Dpt(1, 1));
+  if (actuatorType() == ACT_DIM)
+    KoENO_GO_BASE__4.value((uint8_t)(on ? percent : 0), Dpt(5, 1));
+}
+
+// KNX -> Aktor: KO_1 Schalten (Dimmaktor: Einschaltwert per ETS, 0 = letzter Wert), KO_2 Dimmwert (nur Dimmaktor).
+// Ohne bekannte Aktor-ID kommt keine Bestätigung an, dann wird der Status direkt aus dem gesendeten Befehl gesetzt.
+// Liefert false, wenn der Kanal kein A5-38-08-Aktor ist.
+bool EnoceanChannel::processKnxActuator(int koIndex, GroupObject &ko) {
+  uint8_t type = actuatorType();
+  if (type == ACT_NONE)
+    return false;
+
+  bool on;
+  uint8_t percent;
+  if (koIndex == ENO_KoGO_BASE__1) {
+    on = ko.value(Dpt(1, 1));
+    if (type == ACT_SWITCH) {
+      percent = on ? 100 : 0;
+      sendActuatorSwitch(on);
+    } else {
+      percent = on ? (ParamENO_CHA53808OnValue ? ParamENO_CHA53808OnValue : _actLastDim) : 0;
+      sendActuatorDim(percent);
+    }
+  } else if (koIndex == ENO_KoGO_BASE__2 && type == ACT_DIM) {
+    percent = (uint8_t)round((double)ko.value(Dpt(5, 1)));
+    on = percent > 0;
+    sendActuatorDim(percent);
+  } else
+    return true;
+
+  uint8_t id[4];
+  if (!deviceId(id))
+    actuatorStatus(on, percent);
+  return true;
+}
+
+// Bestätigungstelegramme des Aktors: RPS (z.B. Eltako FSR: 0x70 = EIN, 0x50 = AUS) oder 4BS im Format des
+// Zentralbefehls (DB3 Kommando 1 Schalten / 2 Dimmen, DB2 Dimmwert in %, DB0 Bit 0 EIN/AUS, Bit 3 = 1 Datentelegramm).
+void EnoceanChannel::handleActuatorStatus(PACKET_SERIAL_TYPE_ *pPacket) {
+  const uint8_t *d = pPacket->u8DataBuffer;
+  if (d[0] == u8RORG_RPS && (d[1] == 0x70 || d[1] == 0x50)) {
+    bool on = d[1] == 0x70;
+    logDebugP("A5-38-08 status (RPS): %u", on);
+    actuatorStatus(on, on ? _actLastDim : 0);
+    return;
+  }
+  if (d[0] == u8RORG_4BS && (d[4] & 0x08) && (d[1] == 0x01 || d[1] == 0x02)) {
+    bool on = d[4] & 0x01;
+    uint8_t percent = d[1] == 0x02 ? (d[2] > 100 ? 100 : d[2]) : (on ? _actLastDim : 0);
+    logDebugP("A5-38-08 status (4BS): %u, %u %%", on, percent);
+    actuatorStatus(on, percent);
+    return;
+  }
+  logDebugP("A5-38-08: telegram R-ORG %02X / %02X ignored", d[0], d[1]);
 }
