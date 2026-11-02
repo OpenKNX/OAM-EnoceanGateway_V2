@@ -34,12 +34,9 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
   FOURBS_A5_02_TYPE *fourBsA5_02_Tlg_p;
   FOURBS_A5_02_2030TYPE *fourBsA5_02_2030_Tlg_p;
   FOURBS_A5_04_TYPE *fourBsA5_04_Tlg_p;
-  FOURBS_A5_04_03_TYPE *fourBsA5_04_03_Tlg_p;
   FOURBS_A5_06_01_TYPE *fourBsA5_06_01_Tlg_p;
-  FOURBS_A5_06_01_V2_TYPE *fourBsA5_06_01_V2_Tlg_p;
   FOURBS_A5_06_01_TYPE *fourBsA5_06_02_Tlg_p;
   FOURBS_A5_06_03_TYPE *fourBsA5_06_03_Tlg_p;
-  FOURBS_A5_07_01_TYPE *fourBsTlg2_p;
   FOURBS_A5_07_02_TYPE *fourBsTlg_p;
   FOURBS_A5_07_03_TYPE *fourBsTlg3_p;
   FOURBS_A5_08_TYPE *fourBsA5_08_Tlg_p;
