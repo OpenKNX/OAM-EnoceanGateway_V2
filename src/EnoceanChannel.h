@@ -18,6 +18,18 @@
 // _hvacInterval: Aufwachzyklus/Funkintervall aus der ETS verwenden (kein Wert per KNX)
 #define HVAC_INTERVAL_ETS 0xFF
 
+// D2-01-Aktoren: Messfunktion je Typ (EnoceanChannel::d201Caps)
+#define D201_MEAS_NONE   0 // keine Messung
+#define D201_MEAS_ENERGY 1 // nur Energie, nur auf Abfrage
+#define D201_MEAS_POWER  2 // Energie und Leistung, nicht konfigurierbar
+#define D201_MEAS_CONFIG 3 // Energie und Leistung, konfigurierbar (CMD 0x05)
+
+struct D201Caps {
+  uint8_t channels; // Anzahl Ausgänge
+  bool dim;         // Dimmer
+  uint8_t meas;     // D201_MEAS_*
+};
+
 // Aktoren mit Zentralbefehl A5-38-08 (EnoceanChannel::actuatorType), per EEP-Profil oder Eltako-Produkt
 #define ACT_NONE   0
 #define ACT_SWITCH 1
@@ -97,8 +109,10 @@ private:
   void prepareHvacReply(PACKET_SERIAL_TYPE_ *pPacket);
   void sendPendingHvacReply();
   uint16_t vldProfile() const;
-  void sendVldSetOutput(uint8_t ioChannel, bool on);
+  const D201Caps &d201Caps() const;
+  void sendVldSetOutput(uint8_t ioChannel, uint8_t percent);
   void sendVldMeasurementSetup();
+  void handleD201(PACKET_SERIAL_TYPE_ *pPacket);
   uint8_t actuatorType() const;
   bool actuatorIsEltako() const;
   bool deviceId(uint8_t out8Id[4]) const;

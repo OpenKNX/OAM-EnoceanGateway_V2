@@ -54,10 +54,10 @@ void EnoceanChannel::loop() {
   // beim Senden für die Antwort des Transceivers wiederverwendet wird (Gerät hört ca. 1 s nach seinem Telegramm zu)
   sendPendingHvacReply();
 
-  // D2-01-0E: Messkonfiguration nach dem Start, je Kanal versetzt, damit nicht alle Kanäle gleichzeitig senden
+  // D2-01 mit konfigurierbarer Messung: Messkonfiguration nach dem Start, je Kanal versetzt, damit nicht alle Kanäle gleichzeitig senden
   if (!_vldMeasurementSetupDone && delayCheck(_setupTime, 5000 + _channelIndex * 500UL)) {
     _vldMeasurementSetupDone = true;
-    if (vldProfile() == D2_01_0E)
+    if (vldProfile() != 0 && d201Caps().meas == D201_MEAS_CONFIG)
       sendVldMeasurementSetup();
   }
 
@@ -231,6 +231,12 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
       static const char *uteResult[] = {"rejected", "teach-in accepted", "deletion accepted", "EEP not supported"};
       if ((pPacket->u8DataBuffer[1] & 0x0F) == 0x01)
         logInfoP("UTE response: %s", uteResult[(pPacket->u8DataBuffer[1] >> 4) & 0x03]);
+      return true;
+    }
+
+    // D2-01-Aktor: Status- und Messwert-Antworten
+    if (pPacket->u8DataBuffer[0] == u8RORG_VLD && vldProfile() != 0) {
+      handleD201(pPacket);
       return true;
     }
 
@@ -622,25 +628,55 @@ bool EnoceanChannel::processKnxHvac(int koIndex, GroupObject &ko) {
   return true;
 }
 
-// D2-01-Aktor dieses Kanals: liefert das EEP (D2_01_0E oder D2_01_12) oder 0, wenn der Kanal keiner ist.
+// Eigenschaften der D2-01-Typen 0x00..0x13 laut EEP 2.6.7 (Tabelle "D2-01"): Anzahl Ausgänge, Dimmer, Messung.
+// 0x14 (8 Kanäle) passt nicht in die 10 KOs eines Kanals und wird nicht unterstützt.
+static const D201Caps d201CapsTable[] = {
+    {1, false, D201_MEAS_ENERGY}, // 00
+    {1, false, D201_MEAS_NONE},   // 01
+    {1, true, D201_MEAS_ENERGY},  // 02
+    {1, true, D201_MEAS_NONE},    // 03
+    {1, true, D201_MEAS_POWER},   // 04
+    {1, true, D201_MEAS_CONFIG},  // 05
+    {1, false, D201_MEAS_ENERGY}, // 06
+    {1, false, D201_MEAS_NONE},   // 07
+    {1, false, D201_MEAS_CONFIG}, // 08
+    {1, true, D201_MEAS_CONFIG},  // 09
+    {1, false, D201_MEAS_NONE},   // 0A
+    {1, false, D201_MEAS_CONFIG}, // 0B
+    {1, false, D201_MEAS_CONFIG}, // 0C
+    {1, false, D201_MEAS_NONE},   // 0D
+    {1, false, D201_MEAS_CONFIG}, // 0E
+    {1, false, D201_MEAS_NONE},   // 0F
+    {2, false, D201_MEAS_NONE},   // 10 (Energiemessung des Geräts wird nicht ausgewertet)
+    {2, false, D201_MEAS_NONE},   // 11
+    {2, false, D201_MEAS_NONE},   // 12
+    {4, false, D201_MEAS_NONE},   // 13
+};
+
+// D2-01-Aktor dieses Kanals: liefert das EEP (D2_01_00..D2_01_13) oder 0, wenn der Kanal keiner ist.
 uint16_t EnoceanChannel::vldProfile() const {
   if (ParamENO_CHProductsel != EEP_Profil || ParamENO_CHProfilSelection != u8RORG_VLD || ParamENO_CHProfilSelectionVLD != D2_01)
     return 0;
   uint16_t profile = ParamENO_CHProfilVLD01;
-  return (profile == D2_01_0E || profile == D2_01_12) ? profile : 0;
+  return (profile >= D2_01_00 && profile <= D2_01_13) ? profile : 0;
 }
 
+// Eigenschaften des D2-01-Typs dieses Kanals (nur aufrufen, wenn vldProfile() != 0).
+const D201Caps &EnoceanChannel::d201Caps() const { return d201CapsTable[vldProfile() - D2_01_00]; }
+
 // D2-01 CMD 0x01 (Actuator Set Output): DB1 Dimmwert 0 (sofort) + I/O-Kanal (0x1E = alle), DB0 Ausgangswert
-// 0 = AUS, 100 % = EIN.
-void EnoceanChannel::sendVldSetOutput(uint8_t ioChannel, bool on) {
-  const uint8_t data[3] = {VLD_CMD_ID_01, (uint8_t)(ioChannel & 0x1F), (uint8_t)(on ? 100 : 0)};
-  logInfoP("D2-01 set output %02X: %u", ioChannel, on);
+// 0 = AUS, 1..100 % (Schaltaktor: EIN).
+void EnoceanChannel::sendVldSetOutput(uint8_t ioChannel, uint8_t percent) {
+  if (percent > 100)
+    percent = 100;
+  const uint8_t data[3] = {VLD_CMD_ID_01, (uint8_t)(ioChannel & 0x1F), percent};
+  logInfoP("D2-01 set output %02X: %u %%", ioChannel, percent);
   openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 3, "D2-01 set output");
 }
 
-// D2-01 CMD 0x05 (Actuator Set Measurement) für D2-01-0E, je ein Telegramm für Energie und Leistung:
-// DB4 Bit 7 automatisch melden, Bit 5 Energie/Leistung, Bit 4-0 I/O-Kanal (alle); DB3 Bit 7-4 Delta (Bit 3-0),
-// Bit 2-0 Einheit; DB2 Delta (Bit 11-4); DB1 max. Zeit zwischen zwei Meldungen (10 s); DB0 min. Zeit (1 s).
+// D2-01 CMD 0x05 (Actuator Set Measurement) für Typen mit konfigurierbarer Messung, je ein Telegramm für Energie und
+// Leistung: DB4 Bit 7 automatisch melden, Bit 5 Energie/Leistung, Bit 4-0 I/O-Kanal (alle); DB3 Bit 7-4 Delta
+// (Bit 3-0), Bit 2-0 Einheit; DB2 Delta (Bit 11-4); DB1 max. Zeit zwischen zwei Meldungen (10 s); DB0 min. Zeit (1 s).
 void EnoceanChannel::sendVldMeasurementSetup() {
   uint8_t mit = ParamENO_CHD2010EMIT;
   uint8_t mat = ParamENO_CHD2010EMAT;
@@ -657,49 +693,50 @@ void EnoceanChannel::sendVldMeasurementSetup() {
     uint8_t unit = power ? (ParamENO_CHD2010EUNP ? 4 : 3) : (ParamENO_CHD2010EUNE ? 2 : 1); // kW/W bzw. kWh/Wh
     const uint8_t data[6] = {VLD_CMD_ID_05, (uint8_t)((report ? 0x80 : 0) | (power ? 0x20 : 0) | 0x1E),
                              (uint8_t)(((delta & 0x0F) << 4) | unit), (uint8_t)(delta >> 4), mat, mit};
-    logInfoP("D2-01-0E measurement setup %s: unit %u, delta %u, min %u s, max %u s, auto %u", power ? "power" : "energy", unit,
-             delta, mit, mat * 10, report);
+    logInfoP("D2-01 measurement setup %s: unit %u, delta %u, min %u s, max %u s, auto %u", power ? "power" : "energy", unit, delta,
+             mit, mat * 10, report);
     openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 6, "D2-01 measurement setup");
   }
 }
 
 // KNX -> D2-01-Aktor (Belegung siehe EnoceanModule.templ.xml):
-// D2-01-0E: KO_1 Schalten, KO_2 Messwert abfragen (0 = Energie, 1 = Leistung), KO_3 Status abfragen.
-// D2-01-12: KO_1 Schalten CH1, KO_2 Schalten CH2, KO_5 Status abfragen.
-// Die Antworten des Aktors (CMD 0x04 Status, CMD 0x07 Messwert) wertet handle_VLD() aus.
+// 1 Kanal:     KO_1 Schalten, KO_2 Messwert abfragen (0 = Energie, 1 = Leistung), KO_3 Status abfragen,
+//              KO_4 Dimmwert (nur Dimmer).
+// 2/4 Kanäle:  KO_1..n Schalten Kanal 1..n, KO_2n+1 Status abfragen.
+// Die Antworten des Aktors (CMD 0x04 Status, CMD 0x07 Messwert) wertet handleD201() aus.
 void EnoceanChannel::processKnxVld(int koIndex, GroupObject &ko) {
-  uint16_t profile = vldProfile();
+  if (vldProfile() == 0)
+    return;
+  const D201Caps &caps = d201Caps();
   bool statusQuery = false;
 
-  if (profile == D2_01_0E) {
+  if (caps.channels == 1) {
     switch (koIndex) {
     case ENO_KoGO_BASE__1:
-      sendVldSetOutput(0x1E, ko.value(Dpt(1, 1)));
+      sendVldSetOutput(0x1E, (bool)ko.value(Dpt(1, 1)) ? 100 : 0);
       break;
     case ENO_KoGO_BASE__2: {
+      if (caps.meas == D201_MEAS_NONE)
+        break;
       // CMD 0x06 (Actuator Measurement Query): DB0 Bit 5 Energie/Leistung, Bit 4-0 I/O-Kanal (alle)
       bool power = ko.value(Dpt(1, 1));
       const uint8_t data[2] = {VLD_CMD_ID_06, (uint8_t)((power ? 0x20 : 0) | 0x1E)};
-      logInfoP("D2-01-0E query %s", power ? "power" : "energy");
+      logInfoP("D2-01 query %s", power ? "power" : "energy");
       openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 2, "D2-01 measurement query");
       break;
     }
     case ENO_KoGO_BASE__3:
       statusQuery = true;
       break;
-    }
-  } else if (profile == D2_01_12) {
-    switch (koIndex) {
-    case ENO_KoGO_BASE__1:
-      sendVldSetOutput(0x00, ko.value(Dpt(1, 1)));
-      break;
-    case ENO_KoGO_BASE__2:
-      sendVldSetOutput(0x01, ko.value(Dpt(1, 1)));
-      break;
-    case ENO_KoGO_BASE__5:
-      statusQuery = true;
+    case ENO_KoGO_BASE__4:
+      if (caps.dim)
+        sendVldSetOutput(0x1E, (uint8_t)round((double)ko.value(Dpt(5, 1))));
       break;
     }
+  } else if (koIndex < caps.channels) {
+    sendVldSetOutput((uint8_t)koIndex, (bool)ko.value(Dpt(1, 1)) ? 100 : 0);
+  } else if (koIndex == 2 * caps.channels) {
+    statusQuery = true;
   }
 
   if (statusQuery) {
@@ -707,6 +744,61 @@ void EnoceanChannel::processKnxVld(int koIndex, GroupObject &ko) {
     const uint8_t data[2] = {VLD_CMD_ID_03, 0x1E};
     logInfoP("D2-01 status query");
     openknxEnoceanModule.sendVLDTelegram(_channelIndex, data, 2, "D2-01 status query");
+  }
+}
+
+// Telegramm eines D2-01-Aktors (d[1] = erstes Datenbyte):
+// CMD 0x04 Actuator Status Response: DB2 Bit 3-0 CMD (Bit 7-6 Stromausfall-Flags), DB1 Bit 4-0 I/O-Kanal,
+//   DB0 Bit 6-0 Ausgangswert (0 = AUS, 1..100 %). 1 Kanal: KO_5 Status, Dimmer zusätzlich KO_10 Dimmwert;
+//   2/4 Kanäle: KO_n+1.. Status je Kanal.
+// CMD 0x07 Actuator Measurement Response: DB4 Bit 7-5 Einheit, DB3..DB0 Messwert (MSB zuerst) -> KO_6..9.
+void EnoceanChannel::handleD201(PACKET_SERIAL_TYPE_ *pPacket) {
+  const uint8_t *d = pPacket->u8DataBuffer;
+  const D201Caps &caps = d201Caps();
+
+  switch (d[1] & 0x0F) {
+  case VLD_CMD_ID_04: {
+    uint8_t io = d[2] & 0x1F;
+    uint8_t value = d[3] & 0x7F;
+    if (value > 100)
+      value = 100; // 0x7F: Ausgangswert nicht gültig
+    logDebugP("D2-01 status: channel %u, value %u", io, value);
+    if (caps.channels == 1) {
+      KoENO_GO_BASE__5.value(value > 0, Dpt(1, 1));
+      if (caps.dim)
+        KoENO_GO_BASE__10.value(value, Dpt(5, 1));
+    } else if (io < caps.channels) {
+      knx.getGroupObject(ENO_KoCalcNumber(caps.channels + io)).value(value > 0, Dpt(1, 1));
+    }
+    break;
+  }
+  case VLD_CMD_ID_07: {
+    if (caps.channels != 1 || caps.meas == D201_MEAS_NONE)
+      break;
+    uint8_t unit = d[2] >> 5;
+    uint32_t value = ((uint32_t)d[3] << 24) | ((uint32_t)d[4] << 16) | ((uint32_t)d[5] << 8) | d[6];
+    logDebugP("D2-01 measurement: unit %u, value %u", unit, value);
+    switch (unit) {
+    case 0x01: // Wh
+      KoENO_GO_BASE__6.value(value, Dpt(13, 1));
+      break;
+    case 0x02: // kWh
+      KoENO_GO_BASE__7.value(value, Dpt(13, 1));
+      break;
+    case 0x03: // W
+      KoENO_GO_BASE__8.value(value, Dpt(14, 1));
+      break;
+    case 0x04: // kW
+      KoENO_GO_BASE__9.value(value, Dpt(9, 1));
+      break;
+    default: // 0x00 Ws wird nicht ausgegeben
+      break;
+    }
+    break;
+  }
+  default:
+    logDebugP("D2-01: CMD %02X ignored", d[1] & 0x0F);
+    break;
   }
 }
 

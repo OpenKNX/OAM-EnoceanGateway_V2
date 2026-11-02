@@ -126,6 +126,7 @@ struct EnoceanTeachEntry
 #define VLD_CMD_ID_04 0x04
 #define VLD_CMD_ID_05 0x05
 #define VLD_CMD_ID_06 0x06
+#define VLD_CMD_ID_07 0x07
 
 #define RPS_Func_10 0xA
 

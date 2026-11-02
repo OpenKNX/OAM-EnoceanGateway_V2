@@ -37,9 +37,6 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
             uint32_t lux;
       }valueU32;
 
-      VLD_D2_01_TELEGRAM_CMD_04_TYPE *ActStatResp;
-      VLD_D2_01_TELEGRAM_CMD_04_TYPE *ActStatResp_4_D2_01_0E;
-      VLD_D2_01_TELEGRAM_CMD_07_TYPE *ActStatResp_7_D2_01_0E;
       VLD_D2_04_00_TELEGRAM *SenVal_D2_04;
       VLD_D2_03_0A_TELEGRAM *SenVal_D2_03_0A;
       VLD_D2_05_00_TELEGRAM_CMD_04_TYPE *ActStatResp_D2_05;
@@ -53,96 +50,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
       //switch (knx.paramWord(firstParameter + ENO_CHProfilSelectionVLD))
       switch (ParamENO_CHProfilSelectionVLD)
       {
-      case D2_01:
-            //**************************************************************
-            // ----------------- Profil: D2-01-xx --------------------------
-            //**************************************************************
-            //switch (knx.paramWord(firstParameter + ENO_CHProfilVLD04))
-            switch (ParamENO_CHProfilVLD04)
-            {
-            case D2_01_0E:
-                  logDebug("VLD", "Profil: D2-01-0E");
-                  switch (f_Pkt_st->u8DataBuffer[1] & 0x0F) // CMD; Bit 7-6 bei CMD 0x04: Stromausfall-Flags
-                  {
-                  case 4: // CMD = 4   -->  Status AKTOR Channels
-                        logDebug("VLD", "CMD = 0x04");
-                        mem = f_Pkt_st->u8DataBuffer[2];
-                        f_Pkt_st->u8DataBuffer[2] = f_Pkt_st->u8DataBuffer[3];
-                        f_Pkt_st->u8DataBuffer[3] = mem;
-
-                        ActStatResp_4_D2_01_0E = (VLD_D2_01_TELEGRAM_CMD_04_TYPE *)&(f_Pkt_st->u8DataBuffer[2]);
-
-                        if (ActStatResp_4_D2_01_0E->u8VldTelActResp2.IOChannel == 0) // Abfrage ob CH1
-                        {
-                              if (ActStatResp_4_D2_01_0E->u8VldTelActResp.outputValue == 0)
-                                    KoENO_GO_BASE__5.value(false, Dpt(1, 1));
-                              else
-                                    KoENO_GO_BASE__5.value(true, Dpt(1, 1));
-                              logDebug("VLD", "State: %u", ActStatResp_4_D2_01_0E->u8VldTelActResp.outputValue);
-                        }
-                        break;
-                  case 7:
-                        logDebug("VLD", "CMD = 0x07");
-                        ActStatResp_7_D2_01_0E = (VLD_D2_01_TELEGRAM_CMD_07_TYPE *)&(f_Pkt_st->u8DataBuffer[2]);
-                        uint32_t value = (f_Pkt_st->u8DataBuffer[3] << 24) | f_Pkt_st->u8DataBuffer[4] << 16 | f_Pkt_st->u8DataBuffer[5] << 8 | f_Pkt_st->u8DataBuffer[6];
-                        switch (ActStatResp_7_D2_01_0E->u8VldTelActResp.UNIT)
-                        {
-                        case 0x00: // WS
-                              /* code */
-                              break;
-                        case 0x01: // Wh
-                              KoENO_GO_BASE__6.value(value, Dpt(13, 1));
-                              break;
-                        case 0x02: // KWh
-                              KoENO_GO_BASE__7.value(value, Dpt(13, 1));
-                              break;
-                        case 0x03: // W
-                              KoENO_GO_BASE__8.value(value, Dpt(14, 1));
-                              break;
-                        case 0x04: // KW
-                              KoENO_GO_BASE__9.value(value, Dpt(9, 1));
-                              break;
-                        default:
-                              break;
-                        }
-                        logDebug("VLD", "Unit: %u, Value: %u", ActStatResp_7_D2_01_0E->u8VldTelActResp.UNIT, value);
-                        break;
-                  } // Ende SWITCH (f_Pkt_st->u8DataBuffer[1])
-                  break;
-            case D2_01_12:
-                  logDebug("VLD", "Profil: D2-01-12");
-                  switch (f_Pkt_st->u8DataBuffer[1] & 0x0F) // CMD; Bit 7-6 bei CMD 0x04: Stromausfall-Flags
-                  {
-                  case 4: // CMD = 4   -->  Status AKTOR Channels
-// swap two bytes
-                        logDebug("VLD", "CMD = 0x04");
-                        mem = f_Pkt_st->u8DataBuffer[2];
-                        f_Pkt_st->u8DataBuffer[2] = f_Pkt_st->u8DataBuffer[3];
-                        f_Pkt_st->u8DataBuffer[3] = mem;
-
-                        ActStatResp = (VLD_D2_01_TELEGRAM_CMD_04_TYPE *)&(f_Pkt_st->u8DataBuffer[2]);
-
-                        if (ActStatResp->u8VldTelActResp2.IOChannel == 0) // Abfrage ob CH1
-                        {
-                              if (ActStatResp->u8VldTelActResp.outputValue == 0)
-                                    KoENO_GO_BASE__3.value(false, Dpt(1, 1));
-                              else
-                                    KoENO_GO_BASE__3.value(true, Dpt(1, 1));
-                              logDebug("VLD", "CH1: %u", ActStatResp->u8VldTelActResp.outputValue);
-                        }
-                        else if (ActStatResp->u8VldTelActResp2.IOChannel == 1) // Abfrage ob CH2
-                        {
-                              if (ActStatResp->u8VldTelActResp.outputValue == 0)
-                                    KoENO_GO_BASE__4.value(false, Dpt(1, 1));
-                              else
-                                    KoENO_GO_BASE__4.value(true, Dpt(1, 1));
-                              logDebug("VLD", "CH2: %u", ActStatResp->u8VldTelActResp.outputValue);
-                        }
-                        break;
-                  }
-                  break; // ENDE CASE D2_01_12
-            }
-            break;
+      // D2-01 (Schalt-/Dimmaktoren) wertet EnoceanChannel::handleD201() aus
 
       case D2_03:
             //**************************************************************

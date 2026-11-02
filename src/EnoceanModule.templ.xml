@@ -441,6 +441,17 @@
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00903" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Taster 2" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00904" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Tarif" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-10" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00905" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Sensor-Status" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-10" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <!-- D2-01 Dimmer (1 Kanal): Dimmwert und Status Dimmwert -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%003_R-%TT%%CC%00311" RefId="%AID%_O-%TT%%CC%003" Name="INP_CH_1_DPT_05" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Dimmwert" Priority="Low" ObjectSize="1 Byte" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%009_R-%TT%%CC%00907" RefId="%AID%_O-%TT%%CC%009" Name="OUT_CH_1_DPT_05" Text="Output    Kanal %C%: {{0:-}}" FunctionText="Status Dimmwert" Priority="Low" ObjectSize="1 Byte" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <!-- D2-01 4 Kanäle: Schalten CH3/CH4, Status CH1..CH4, Statusabfrage -->
+              <ComObjectRef Id="%AID%_O-%TT%%CC%002_R-%TT%%CC%00213" RefId="%AID%_O-%TT%%CC%002" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="schalten Aktor CH3" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%003_R-%TT%%CC%00312" RefId="%AID%_O-%TT%%CC%003" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="schalten Aktor CH4" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%004_R-%TT%%CC%00412" RefId="%AID%_O-%TT%%CC%004" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH1 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%005_R-%TT%%CC%00511" RefId="%AID%_O-%TT%%CC%005" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH2 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%006_R-%TT%%CC%00610" RefId="%AID%_O-%TT%%CC%006" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH3 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%007_R-%TT%%CC%00709" RefId="%AID%_O-%TT%%CC%007" Name="OUT_CH_1_DPT_01" Text="Output    Kanal %C%: {{0:-}}" FunctionText="CH4 Status" Priority="Low" ObjectSize="1 Bit" ReadFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" DatapointType="DPST-1-11" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%008_R-%TT%%CC%00808" RefId="%AID%_O-%TT%%CC%008" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Request Status" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <!-- A5-38-08 Zentralbefehl: Schalt-/Dimmaktor -->
               <ComObjectRef Id="%AID%_O-%TT%%CC%000_R-%TT%%CC%00016" RefId="%AID%_O-%TT%%CC%000" Name="INP_CH_1_DPT_01" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Schalten" Priority="Low" ObjectSize="1 Bit" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-1-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%001_R-%TT%%CC%00116" RefId="%AID%_O-%TT%%CC%001" Name="INP_CH_1_DPT_05" Text="Input     Kanal %C%: {{0:-}}" FunctionText="Dimmwert" Priority="Low" ObjectSize="1 Byte" WriteFlag="Enabled" CommunicationFlag="Enabled" DatapointType="DPST-5-1" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" />
@@ -931,15 +942,50 @@
                               <!-- VLD D2-01 -->
                               <when test="1">
                                 <ParameterRefRef RefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501" IndentLevel="1"  />
+                                <!-- Typen und Eigenschaften laut EEP 2.6.7 (Tabelle D2-01), Belegung im Code: EnoceanChannel::d201Caps() -->
                                 <choose ParamRefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501">
-                                  <!-- VLD D2-01-0E -->
-                                  <when test="151">
-                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" /> <!-- Input schalten -->
-                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00115" /> <!-- input Abfrage Messung -->
-                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00211" /> <!-- input Abfrage Status schalten -->     
-                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00409" /> <!-- OUtput Status schalten -->
+                                  <when test="137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156">
                                     <ParameterSeparator Id="%AID%_PS-2" Text="" UIHint="HorizontalRuler" />
-                                    <ParameterSeparator Id="%AID%_PS-3" Text="Schaltaktor mit Messfunktion" UIHint="Headline" />
+                                    <ParameterSeparator Id="%AID%_PS-6" Text="Zum Einlernen: Aktor in den Lernmodus bringen, dann den Button drücken. Gesendet wird eine UTE-Teach-In-Anfrage mit der Sende-ID dieses Kanals." />
+                                    <Button Id="%AID%_B-%TT%%CC%007" Text="Lerntelegramm an Aktor senden" EventHandlerOnline="ConnectionOriented" EventHandler="ENO_sendLearn" EventHandlerParameters="{ &quot;Channel&quot;: %C% }" />
+                                  </when>
+                                </choose>
+                                <!-- 1 Kanal: KO_1 Schalten, KO_3 Status abfragen, KO_5 Status -->
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501">
+                                  <when test="137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" /> <!-- Input schalten -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00211" /> <!-- input Abfrage Status schalten -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00409" /> <!-- OUtput Status schalten -->
+                                  </when>
+                                </choose>
+                                <!-- Dimmer: KO_4 Dimmwert, KO_10 Status Dimmwert -->
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501">
+                                  <when test="139 140 141 142 146">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00311" /> <!-- Dimmwert -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%009_R-%TT%%CC%00907" /> <!-- Status Dimmwert -->
+                                  </when>
+                                </choose>
+                                <!-- Messung: KO_2 Abfrage, KO_6..9 Messwerte (Einheit legt bei nicht konfigurierbaren Typen der Aktor fest) -->
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501">
+                                  <!-- nur Energie, nur auf Abfrage -->
+                                  <when test="137 139 143">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00115" /> <!-- input Abfrage Messung -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%005_R-%TT%%CC%00509" /> <!-- KO Wh -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%006_R-%TT%%CC%00608" /> <!-- KO KWh-->
+                                  </when>
+                                  <!-- Energie und Leistung, nicht konfigurierbar -->
+                                  <when test="141">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00115" /> <!-- input Abfrage Messung -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%005_R-%TT%%CC%00509" /> <!-- KO Wh -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%006_R-%TT%%CC%00608" /> <!-- KO KWh-->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00706" /> <!-- KO W -->
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%008_R-%TT%%CC%00806" /> <!-- KO KW -->
+                                  </when>
+                                  <!-- Energie und Leistung, konfigurierbar (CMD 0x05 beim Start) -->
+                                  <when test="142 145 146 148 149 151">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00115" /> <!-- input Abfrage Messung -->
+                                    <ParameterSeparator Id="%AID%_PS-2" Text="" UIHint="HorizontalRuler" />
+                                    <ParameterSeparator Id="%AID%_PS-3" Text="Messfunktion" UIHint="Headline" />
                                     <ParameterSeparator Id="%AID%_PS-4" Text="Wähle die passende Einheit:" />
                                     <ParameterRefRef RefId="%AID%_UP-%TT%%CC%076_R-%TT%%CC%07601" IndentLevel="1" /> <!--Einheit Energy --> 
                                       <choose ParamRefId="%AID%_UP-%TT%%CC%076_R-%TT%%CC%07601">
@@ -976,13 +1022,27 @@
                                     <ParameterSeparator Id="%AID%_PS-13" Text="- min muss >0 sein"  />
                                     <ParameterSeparator Id="%AID%_PS-14" Text="- max >= min"  />
                                   </when>
-                                  <!-- VLD D2-01-12 -->
-                                  <when test="155">
+                                </choose>
+                                <!-- 2 Kanäle: KO_1/2 Schalten, KO_3/4 Status, KO_5 Status abfragen -->
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%025_R-%TT%%CC%02501">
+                                  <when test="153 154 155">
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00011" />
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00111" />
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00206" />
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00305" />
                                     <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00404" />
+                                  </when>
+                                  <!-- 4 Kanäle: KO_1..4 Schalten, KO_5..8 Status, KO_9 Status abfragen -->
+                                  <when test="156">
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00011" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00111" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00213" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00312" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00412" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%005_R-%TT%%CC%00511" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%006_R-%TT%%CC%00610" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00709" />
+                                    <ComObjectRefRef RefId="%AID%_O-%TT%%CC%008_R-%TT%%CC%00808" />
                                   </when>
                                 </choose>
                               </when>

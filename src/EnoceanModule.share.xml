@@ -409,26 +409,26 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-ProfilVLD01" Name="ProfilVLD01">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="D2-01-00 N.A." Value="137" Id="%AID%_PT-ProfilVLD01_EN-0" />
-                  <Enumeration Text="D2-01-01 N.A." Value="138" Id="%AID%_PT-ProfilVLD01_EN-1" />
-                  <Enumeration Text="D2-01-02 N.A." Value="139" Id="%AID%_PT-ProfilVLD01_EN-2" />
-                  <Enumeration Text="D2-01-03 N.A." Value="140" Id="%AID%_PT-ProfilVLD01_EN-3" />
-                  <Enumeration Text="D2-01-04 N.A." Value="141" Id="%AID%_PT-ProfilVLD01_EN-4" />
-                  <Enumeration Text="D2-01-05 N.A." Value="142" Id="%AID%_PT-ProfilVLD01_EN-5" />
-                  <Enumeration Text="D2-01-06 N.A." Value="143" Id="%AID%_PT-ProfilVLD01_EN-6" />
-                  <Enumeration Text="D2-01-07 N.A." Value="144" Id="%AID%_PT-ProfilVLD01_EN-7" />
-                  <Enumeration Text="D2-01-08 N.A." Value="145" Id="%AID%_PT-ProfilVLD01_EN-8" />
-                  <Enumeration Text="D2-01-09 N.A." Value="146" Id="%AID%_PT-ProfilVLD01_EN-9" />
-                  <Enumeration Text="D2-01-0A N.A." Value="147" Id="%AID%_PT-ProfilVLD01_EN-10" />
-                  <Enumeration Text="D2-01-0B N.A." Value="148" Id="%AID%_PT-ProfilVLD01_EN-11" />
-                  <Enumeration Text="D2-01-0C N.A." Value="149" Id="%AID%_PT-ProfilVLD01_EN-12" />
-                  <Enumeration Text="D2-01-0D N.A." Value="150" Id="%AID%_PT-ProfilVLD01_EN-13" />
-                  <Enumeration Text="D2-01-0E Type 0x0E" Value="151" Id="%AID%_PT-ProfilVLD01_EN-14" />
-                  <Enumeration Text="D2-01-0F N.A." Value="152" Id="%AID%_PT-ProfilVLD01_EN-15" />
-                  <Enumeration Text="D2-01-10 N.A." Value="153" Id="%AID%_PT-ProfilVLD01_EN-16" />
-                  <Enumeration Text="D2-01-11 N.A." Value="154" Id="%AID%_PT-ProfilVLD01_EN-17" />
-                  <Enumeration Text="D2-01-12 Type 0x12" Value="155" Id="%AID%_PT-ProfilVLD01_EN-18" />
-                  <Enumeration Text="D2-01-13 N.A." Value="156" Id="%AID%_PT-ProfilVLD01_EN-19" />
+                  <Enumeration Text="D2-01-00   Schaltaktor 1 Kanal, Energiemessung" Value="137" Id="%AID%_PT-ProfilVLD01_EN-0" />
+                  <Enumeration Text="D2-01-01   Schaltaktor 1 Kanal" Value="138" Id="%AID%_PT-ProfilVLD01_EN-1" />
+                  <Enumeration Text="D2-01-02   Dimmer 1 Kanal, Energiemessung" Value="139" Id="%AID%_PT-ProfilVLD01_EN-2" />
+                  <Enumeration Text="D2-01-03   Dimmer 1 Kanal" Value="140" Id="%AID%_PT-ProfilVLD01_EN-3" />
+                  <Enumeration Text="D2-01-04   Dimmer 1 Kanal, Energie-/Leistungsmessung" Value="141" Id="%AID%_PT-ProfilVLD01_EN-4" />
+                  <Enumeration Text="D2-01-05   Dimmer 1 Kanal, Energie-/Leistungsmessung (konfigurierbar)" Value="142" Id="%AID%_PT-ProfilVLD01_EN-5" />
+                  <Enumeration Text="D2-01-06   Schaltaktor 1 Kanal, Energiemessung" Value="143" Id="%AID%_PT-ProfilVLD01_EN-6" />
+                  <Enumeration Text="D2-01-07   Schaltaktor 1 Kanal" Value="144" Id="%AID%_PT-ProfilVLD01_EN-7" />
+                  <Enumeration Text="D2-01-08   Schaltaktor 1 Kanal, Energie-/Leistungsmessung (konfigurierbar)" Value="145" Id="%AID%_PT-ProfilVLD01_EN-8" />
+                  <Enumeration Text="D2-01-09   Dimmer 1 Kanal, Energie-/Leistungsmessung (konfigurierbar)" Value="146" Id="%AID%_PT-ProfilVLD01_EN-9" />
+                  <Enumeration Text="D2-01-0A   Schaltaktor 1 Kanal" Value="147" Id="%AID%_PT-ProfilVLD01_EN-10" />
+                  <Enumeration Text="D2-01-0B   Schaltaktor 1 Kanal, Energie-/Leistungsmessung (konfigurierbar)" Value="148" Id="%AID%_PT-ProfilVLD01_EN-11" />
+                  <Enumeration Text="D2-01-0C   Schaltaktor 1 Kanal (Pilot Wire), Energie-/Leistungsmessung (konfigurierbar)" Value="149" Id="%AID%_PT-ProfilVLD01_EN-12" />
+                  <Enumeration Text="D2-01-0D   Schaltaktor 1 Kanal (Zwischenstecker)" Value="150" Id="%AID%_PT-ProfilVLD01_EN-13" />
+                  <Enumeration Text="D2-01-0E   Schaltaktor 1 Kanal (Zwischenstecker), Energie-/Leistungsmessung (konfigurierbar)" Value="151" Id="%AID%_PT-ProfilVLD01_EN-14" />
+                  <Enumeration Text="D2-01-0F   Schaltaktor 1 Kanal (Einbaumodul)" Value="152" Id="%AID%_PT-ProfilVLD01_EN-15" />
+                  <Enumeration Text="D2-01-10   Schaltaktor 2 Kanäle" Value="153" Id="%AID%_PT-ProfilVLD01_EN-16" />
+                  <Enumeration Text="D2-01-11   Schaltaktor 2 Kanäle" Value="154" Id="%AID%_PT-ProfilVLD01_EN-17" />
+                  <Enumeration Text="D2-01-12   Schaltaktor 2 Kanäle (Einbaumodul)" Value="155" Id="%AID%_PT-ProfilVLD01_EN-18" />
+                  <Enumeration Text="D2-01-13   Schaltaktor 4 Kanäle" Value="156" Id="%AID%_PT-ProfilVLD01_EN-19" />
                   <Enumeration Text="D2-01-14 N.A." Value="157" Id="%AID%_PT-ProfilVLD01_EN-20" />
                   <Enumeration Text="D2-01-15 N.A." Value="158" Id="%AID%_PT-ProfilVLD01_EN-21" />
                   <Enumeration Text="D2-01-16 N.A." Value="159" Id="%AID%_PT-ProfilVLD01_EN-22" />
