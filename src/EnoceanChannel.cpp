@@ -329,7 +329,7 @@ bool EnoceanChannel::deviceId(uint8_t out8Id[4]) const {
   return ParamENO_CHSetupMode == ENO_SETUP_TEACHIN && openknxEnoceanModule.learnedId(_channelIndex, out8Id);
 }
 
-// Bidirektionaler Heizkörper-Stellantrieb dieses Kanals (HVAC_*): EEP A5-20-01/04/06 oder Eltako FKS-SV (A5-20-01).
+// Bidirektionaler Heizkörper-Stellantrieb dieses Kanals (HVAC_*): EEP A5-20-01/04/06, Eltako FKS-SV (A5-20-01) oder FKS-B (A5-20-04).
 uint8_t EnoceanChannel::hvacProfile() const {
   switch (ParamENO_CHProductsel) {
   case EEP_Profil:
@@ -346,8 +346,12 @@ uint8_t EnoceanChannel::hvacProfile() const {
       return HVAC_NONE;
     }
   case Hersteller_Eltako:
-    if (ParamENO_CHProductselType == Eltako_Heizung && ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_SV)
-      return HVAC_A52001;
+    if (ParamENO_CHProductselType == Eltako_Heizung) {
+      if (ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_SV)
+        return HVAC_A52001;
+      if (ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_B)
+        return HVAC_A52004;
+    }
     return HVAC_NONE;
   default:
     return HVAC_NONE;

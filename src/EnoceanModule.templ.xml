@@ -1562,7 +1562,24 @@
                                   <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00701" /> <!-- Ventilstellung -->
                                   <ComObjectRefRef RefId="%AID%_O-%TT%%CC%009_R-%TT%%CC%00901" /> <!-- Statusbits -->
                                 </when>
-                              </choose> 
+                                <when test="2">  <!-- FKS-B - Funk-Klein-Stellantrieb mit Batterie -->
+                                  <ParameterSeparator Id="%AID%_PS-1" Text="Informationen:" UIHint="Headline" />
+                                  <ParameterSeparator Id="%AID%_PS-2" Text="EEP A5-20-04 (bidirektional)" />
+                                  <ParameterSeparator Id="%AID%_PS-5" Text="Das Gateway antwortet dem Antrieb nach jedem seiner Telegramme. Werte von KNX werden deshalb erst mit dem nächsten Telegramm des Antriebs übertragen." />
+                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%073_R-%TT%%CC%07301" IndentLevel="1" HelpContext="ENO-A52004" /> <!-- WUC -->
+                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%072_R-%TT%%CC%07201" IndentLevel="1" HelpContext="ENO-A52004" /> <!-- DSO -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00014" /> <!-- Ventilstellung -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%001_R-%TT%%CC%00112" /> <!-- Solltemperatur für das Display -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%002_R-%TT%%CC%00208" /> <!-- Aufwachzyklus -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%003_R-%TT%%CC%00309" /> <!-- Tastensperre -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%004_R-%TT%%CC%00408" /> <!-- Service-Befehl -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%005_R-%TT%%CC%00506" /> <!-- Fehlercode -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%006_R-%TT%%CC%00607" /> <!-- Vorlauf- bzw. am Gerät eingestellte Solltemperatur -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%007_R-%TT%%CC%00701" /> <!-- Ventilstellung -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%008_R-%TT%%CC%00804" /> <!-- Raumtemperatur -->
+                                  <ComObjectRefRef RefId="%AID%_O-%TT%%CC%009_R-%TT%%CC%00901" /> <!-- Statusbits -->
+                                </when>
+                              </choose>
                           </when>
                           <when test="8">  <!-- AUSWAHL Wasser -->
                             <ParameterRefRef RefId="%AID%_UP-%TT%%CC%093_R-%TT%%CC%09301" IndentLevel="3"  />

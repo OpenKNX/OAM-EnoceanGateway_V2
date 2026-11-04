@@ -251,7 +251,7 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
       break;
 
     case Eltako_Heizung_FKS_B:
-      /* code */
+      // A5-20-04 bidirektional: wird in EnoceanChannel::handleHvac() verarbeitet und kommt hier nicht an
       break;
 
     default:
