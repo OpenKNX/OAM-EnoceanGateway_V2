@@ -998,7 +998,7 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
     openknx.console.printHelpLine("eno repeater", "Read repeater mode/level");
     openknx.console.printHelpLine("eno repeater M L", "Write repeater mode M (0..2) and level L (0..2)");
     openknx.console.printHelpLine("eno version", "Read transceiver version and EURID");
-    openknx.console.printHelpLine("eno monitor on|off", "Log every received radio telegram");
+    openknx.console.printHelpLine("eno monitor on|off", "Log every received radio telegram (default on)");
     openknx.console.printHelpLine("eno learn N", "Send learn telegram of channel N to an actuator");
     return true;
   }
@@ -1505,8 +1505,19 @@ void EnoceanModule::logReceivedTelegram(PACKET_SERIAL_TYPE_ *f_Pkt_st) {
     data += hexByte;
   }
 
-  logInfoP("RX R-ORG %02X ID %02X%02X%02X%02X -%u dBm Security %u Status %02X Data: %s", f_Pkt_st->u8DataBuffer[0], id[0], id[1],
-           id[2], id[3], dBm, security, f_Pkt_st->u8DataBuffer[len - 1], data.c_str());
+  // Funksignal wie "eno signal": Repeater-Stufe aus dem Statusbyte (Bit 3-0), dazu der Kanal mit dieser ID
+  uint8_t status = f_Pkt_st->u8DataBuffer[len - 1];
+  std::string channels;
+  char chStr[8];
+  for (uint8_t i = 0; _channelsReady && i < ParamENO_VisibleChannels && i < ENO_ChannelCount; i++) {
+    if (_channels[i]->matchesDeviceId(id)) {
+      snprintf(chStr, sizeof(chStr), " CH%u", i + 1);
+      channels += chStr;
+    }
+  }
+
+  logInfoP("RX R-ORG %02X | ID %02X%02X%02X%02X |%s | -%u dBm | Repeater %u | Security %u | Status %02X | Data: %s", f_Pkt_st->u8DataBuffer[0],
+           id[0], id[1], id[2], id[3], channels.empty() ? " kein Kanal" : channels.c_str(), dBm, status & 0x0F, security, status, data.c_str());
 }
 
 // Liest Versionsinformationen und EURID des Transceivers (CO_RD_VERSION, ESP3-Spec Kap. 2.5.5) und loggt sie.

@@ -274,8 +274,9 @@ private:
 
     uint32_t _lastPollingTime = 0;
 
-    // Konsole "eno monitor on": jedes empfangene Funktelegramm loggen (auch mit ETS-Konfiguration)
-    bool _monitor = false;
+    // Jedes empfangene Funktelegramm loggen (auch mit ETS-Konfiguration); nach dem Start an, Konsole "eno monitor off"
+    // schaltet bis zum nächsten Neustart ab
+    bool _monitor = true;
 
     // Transceiver-Info (beim Start gelesen, für "eno version" und die ETS)
     bool _versionValid = false;

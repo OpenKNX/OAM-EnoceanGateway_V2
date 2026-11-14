@@ -317,22 +317,22 @@ inline RockerKeyConfig rockerKeyConfig(uint8_t wippe, bool upper, uint8_t _chann
   switch (wippe) {
   case ROCKER_WIPPE_A:
     if (upper)
-      return {ParamENO_CHRockerKeyAOFunktion, ParamENO_CHRockerKeyAORelease, ParamENO_CHRockerKeyAOInvert, ParamENO_CHRockerKeyAOLong,
-              ParamENO_CHRockerKeyAOLongScene};
-    return {ParamENO_CHRockerKeyAUFunktion, ParamENO_CHRockerKeyAURelease, ParamENO_CHRockerKeyAUInvert, ParamENO_CHRockerKeyAULong,
-            ParamENO_CHRockerKeyAULongScene};
+      return {(uint8_t)ParamENO_CHRockerKeyAOFunktion, ParamENO_CHRockerKeyAORelease, ParamENO_CHRockerKeyAOInvert, (uint8_t)ParamENO_CHRockerKeyAOLong,
+            (uint8_t)ParamENO_CHRockerKeyAOLongScene};
+    return {(uint8_t)ParamENO_CHRockerKeyAUFunktion, ParamENO_CHRockerKeyAURelease, ParamENO_CHRockerKeyAUInvert, (uint8_t)ParamENO_CHRockerKeyAULong,
+            (uint8_t)ParamENO_CHRockerKeyAULongScene};
   case ROCKER_WIPPE_B:
     if (upper)
-      return {ParamENO_CHRockerKeyBOFunktion, ParamENO_CHRockerKeyBORelease, ParamENO_CHRockerKeyBOInvert, ParamENO_CHRockerKeyBOLong,
-              ParamENO_CHRockerKeyBOLongScene};
-    return {ParamENO_CHRockerKeyBUFunktion, ParamENO_CHRockerKeyBURelease, ParamENO_CHRockerKeyBUInvert, ParamENO_CHRockerKeyBULong,
-            ParamENO_CHRockerKeyBULongScene};
+      return {(uint8_t)ParamENO_CHRockerKeyBOFunktion, ParamENO_CHRockerKeyBORelease, ParamENO_CHRockerKeyBOInvert, (uint8_t)ParamENO_CHRockerKeyBOLong,
+            (uint8_t)ParamENO_CHRockerKeyBOLongScene};
+    return {(uint8_t)ParamENO_CHRockerKeyBUFunktion, ParamENO_CHRockerKeyBURelease, ParamENO_CHRockerKeyBUInvert, (uint8_t)ParamENO_CHRockerKeyBULong,
+            (uint8_t)ParamENO_CHRockerKeyBULongScene};
   default:
     if (upper)
-      return {ParamENO_CHRockerKeyCOFunktion, ParamENO_CHRockerKeyCORelease, ParamENO_CHRockerKeyCOInvert, ParamENO_CHRockerKeyCOLong,
-              ParamENO_CHRockerKeyCOLongScene};
-    return {ParamENO_CHRockerKeyCUFunktion, ParamENO_CHRockerKeyCURelease, ParamENO_CHRockerKeyCUInvert, ParamENO_CHRockerKeyCULong,
-            ParamENO_CHRockerKeyCULongScene};
+      return {(uint8_t)ParamENO_CHRockerKeyCOFunktion, ParamENO_CHRockerKeyCORelease, ParamENO_CHRockerKeyCOInvert, (uint8_t)ParamENO_CHRockerKeyCOLong,
+            (uint8_t)ParamENO_CHRockerKeyCOLongScene};
+    return {(uint8_t)ParamENO_CHRockerKeyCUFunktion, ParamENO_CHRockerKeyCURelease, ParamENO_CHRockerKeyCUInvert, (uint8_t)ParamENO_CHRockerKeyCULong,
+            (uint8_t)ParamENO_CHRockerKeyCULongScene};
   }
 }
 
