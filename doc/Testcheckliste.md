@@ -70,6 +70,17 @@ Geräte und Sonderfälle:
 - [ ] neue Eltako-Sensoren: FFT65B/FFTF65B/FFT55B, FLGTF65/55, FCO2TS, FB65B/FB55B, FBH…-Melder
 - [ ] **F6-04-01 / 02 Hotelkartenschalter**: KO0 = 1 bei gesteckter Karte, 0 beim Ziehen
 
+## Neue A5-Profile
+
+- [ ] A5-10 Raumbediengerät (z.B. Eltako FTR78S = A5-10-03, FTR86B = A5-10-06): Temperatur, Sollwert-Stellrad, ggf. Lüfter, Präsenz, Tag/Nacht
+- [ ] A5-12-01 Stromzähler mit Teiler (DIV): Nachkommastellen korrekt; A5-12-02/03 Gas/Wasser: m³ und l/h
+- [ ] A5-13-01 Wetterstation (z.B. Eltako FWS61): Temperatur, Dämmerung, Wind, Regen, Tag/Nacht, Sonne West/Süd/Ost
+- [ ] A5-30-01/02 Digitaleingang: Kontakt, Batterie schwach
+- [ ] A5-09-08/09 CO2
+- [ ] Eltako-Raumregler: FTR78S (Soll 8..30 °C), FTR86B / FTR..-Serie FHK, FTR65HS / FTAF (Nachtabsenkung), FUTH (Feuchte und **Soll-Feuchte – Skalierung prüfen**, angenommen 0..255 = 0..100 %)
+- [ ] Eltako FWS61 über die Kategorie Wetterstation
+- [ ] Eltako-Zähler (FWZ14, DSZ14, F3Z14D Strom/Gas/Wasser): Zählerstand mit 0,1 kWh, Tarifwechsel, keine falschen Werte durch die Seriennummer-Telegramme alle 10 Minuten
+
 ## Heizung und Aktoren
 
 - [ ] FKS-SV, FKS-B, **FKS-H** (A5-20-04)

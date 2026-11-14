@@ -55,32 +55,32 @@ Dokumentation: [Applikationsbeschreibung](doc/Applikationsbeschreibung.md) · [U
 44|A5-09-05|x| |VOC (z.B. Eltako FLT58)
 45|A5-09-06| | | 
 46|A5-09-07| | | 
-47|A5-09-08| | | 
-48|A5-09-09| | | 
+47|A5-09-08|x| |reiner CO2-Sensor
+48|A5-09-09|x| |reiner CO2-Sensor (Spannungsausfall)
 49|A5-09-0A| | | 
 50|A5-09-0B| | | 
 51|A5-09-0C|x| |VOC (z.B. Eltako FLGTF55E)
-52|A5-10-01| | | 
-53|A5-10-02| | | 
-54|A5-10-03| | | 
-55|A5-10-04| | | 
-56|A5-10-05| | | 
-57|A5-10-06| | | 
-58|A5-10-07| | | 
-59|A5-10-08| | | 
-60|A5-10-09| | | 
-61|A5-10-0A| | | 
-62|A5-10-0B| | | 
-63|A5-10-0C| | | 
-64|A5-10-0D| | | 
-65|A5-10-10| | | 
-66|A5-10-11| | | 
-67|A5-10-12| | | 
-68|A5-10-13| | | 
-69|A5-10-14| | | 
-70|A5-10-15| | | 
-71|A5-10-16| | | 
-72|A5-10-17| | | 
+52|A5-10-01|x| |Raumbediengerät
+53|A5-10-02|x| |Raumbediengerät
+54|A5-10-03|x| |Raumbediengerät
+55|A5-10-04|x| |Raumbediengerät
+56|A5-10-05|x| |Raumbediengerät
+57|A5-10-06|x| |Raumbediengerät
+58|A5-10-07|x| |Raumbediengerät
+59|A5-10-08|x| |Raumbediengerät
+60|A5-10-09|x| |Raumbediengerät
+61|A5-10-0A|x| |Raumbediengerät
+62|A5-10-0B|x| |Raumbediengerät
+63|A5-10-0C|x| |Raumbediengerät
+64|A5-10-0D|x| |Raumbediengerät
+65|A5-10-10|x| |Raumbediengerät
+66|A5-10-11|x| |Raumbediengerät
+67|A5-10-12|x| |Raumbediengerät
+68|A5-10-13|x| |Raumbediengerät
+69|A5-10-14|x| |Raumbediengerät
+70|A5-10-15|x| |Raumbediengerät
+71|A5-10-16|x| |Raumbediengerät
+72|A5-10-17|x| |Raumbediengerät
 73|A5-10-18| | | 
 74|A5-10-19| | | 
 75|A5-10-1A| | | 
@@ -98,15 +98,15 @@ Dokumentation: [Applikationsbeschreibung](doc/Applikationsbeschreibung.md) · [U
 87|A5-11-03| | | 
 88|A5-11-04| | | 
 89|A5-11-05| | | 
-90|A5-12-00| | | 
+90|A5-12-00|x| |Zähler (Impulse)
 91|A5-12-01| | | 
-92|A5-12-02| | | 
-93|A5-12-03| | | 
+92|A5-12-02|x| |Gaszähler
+93|A5-12-03|x| |Wasserzähler
 94|A5-12-04| | | 
 95|A5-12-05| | | 
 96|A5-12-10| | | 
-97|A5-13-01| | | 
-98|A5-13-02| | | 
+97|A5-13-01|x| |Wetterstation (inkl. Sonne, z.B. Eltako FWS61)
+98|A5-13-02|x| |Sonnenintensität
 99|A5-13-03| | | 
 100|A5-13-04| | | 
 101|A5-13-05| | | 
@@ -133,8 +133,8 @@ Dokumentation: [Applikationsbeschreibung](doc/Applikationsbeschreibung.md) · [U
 122|A5-20-10| | | 
 123|A5-20-11| | | 
 124|A5-20-12| | | 
-125|A5-30-01| | | 
-126|A5-30-02| | | 
+125|A5-30-01|x| |Kontakt mit Batterieüberwachung
+126|A5-30-02|x| |Kontakt
 127|A5-30-03|(x)| |nur über Eltako FRWB/FHMB
 128|A5-30-04| | | 
 129|A5-30-05| | | 

@@ -17,6 +17,9 @@
 #define Eltako_Heizung 7
 #define Eltako_Wasser 8
 #define Eltako_Aktor 9
+#define Eltako_Raumregler 10
+#define Eltako_Wetter 11
+#define Eltako_Zaehler 12
 
 // ParamENO_CHProductselTypeKon
 #define ELtako_Kontakte_inaktive 0
@@ -87,6 +90,62 @@
 #define Eltako_Aktor_FUD 2
 #define Eltako_Aktor_FSB 3 // Jalousie-/Rollladenaktor, Eltako-Profil A5-3F-7F
 #define Eltako_Aktor_FSUD 4 // Dimmer wie FUD, aber Lerntelegramm 0x02, 0x00, 0x00, 0x00
+
+// ParamENO_CHProductselTypeRaum: 1 FTR78S (A5-10-03), 2..12 FTR86B und FTR..-Serie FHK (A5-10-06),
+// 13..16 FTR65HS / FTAF mit Nachtabsenkung, 17..19 FUTH mit Feuchte (A5-10-06 und A5-10-12)
+#define Eltako_Raum_FTR78S 1
+#define Eltako_Raum_NIGHT_MIN 13
+#define Eltako_Raum_FUTH_MIN 17
+
+// ParamENO_CHProductselTypeZaehler: 1..6 Stromzähler (A5-12-01, F3Z14D Strom = 6), 7 F3Z14D Gas (A5-12-02),
+// 8 F3Z14D Wasser (A5-12-03), 9..11 Aktoren mit Leistungsmessung (A5-12-01)
+#define Eltako_Zaehler_F3Z14D_GAS 7
+#define Eltako_Zaehler_F3Z14D_WASSER 8
+
+// Eltako-Raumregler (laut "Inhalte der Eltako-Funktelegramme", Sollwert als Temperatur statt Stellrad-Position):
+//   A5-10-06 / 03: DB1 Isttemperatur 255..0 = 0..40 °C, DB2 Solltemperatur (FTR78S 0..255 = 8..30 °C, sonst 0..40 °C),
+//                  DB3 Nachtabsenkung 0x00..0x1F = 0..5 K (FTR65HS, FTAF, FUTH), DB0 = 0x0F
+//   A5-10-12 (nur FUTH, DB0 = 0x08): DB3 Soll-Feuchte, DB2 Feuchte 0..250 = 0..100 %, DB1 Temperatur 0..250 = 0..40 °C
+// KO_1 Temperatur, KO_2 Feuchte, KO_3 Solltemperatur, KO_4 Nachtabsenkung, KO_5 Soll-Feuchte.
+inline void handleEltakoRaumregler(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t product, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  uint8_t db3 = f_Pkt_st->u8DataBuffer[1], db2 = f_Pkt_st->u8DataBuffer[2], db1 = f_Pkt_st->u8DataBuffer[3];
+  uint8_t db0 = f_Pkt_st->u8DataBuffer[4];
+
+  if (product >= Eltako_Raum_FUTH_MIN && (db0 & 0x07) == 0) {
+    // A5-10-12: Feuchte; Soll-Feuchte wie im EEP linear 0..255 = 0..100 %
+    float hum = db2 * 100.0f / 250.0f;
+    float temp = db1 * 40.0f / 250.0f;
+    float setHum = db3 * 100.0f / 255.0f;
+    KoENO_GO_BASE__2.value(temp, Dpt(9, 1));
+    KoENO_GO_BASE__3.value(hum, Dpt(9, 7));
+    KoENO_GO_BASE__6.value(setHum, Dpt(9, 7));
+    logDebug("Eltako", "Raumregler A5-10-12: %.1f °C, %.1f %%, Soll %.0f %%", temp, hum, setHum);
+    return;
+  }
+
+  float temp = (255 - db1) * 40.0f / 255.0f;
+  float setpoint = product == Eltako_Raum_FTR78S ? 8.0f + db2 * 22.0f / 255.0f : db2 * 40.0f / 255.0f;
+  KoENO_GO_BASE__2.value(temp, Dpt(9, 1));
+  KoENO_GO_BASE__4.value(setpoint, Dpt(9, 1));
+  if (product >= Eltako_Raum_NIGHT_MIN) {
+    float night = (float)(uint8_t)(db3 * 5.0f / 31.0f + 0.5f); // 0x00, 0x06, 0x0C, 0x13, 0x19, 0x1F = 0..5 K
+    KoENO_GO_BASE__5.value(night, Dpt(9, 2));
+  }
+  logDebug("Eltako", "Raumregler: Ist %.1f °C, Soll %.1f °C, DB3 %02X", temp, setpoint, db3);
+}
+
+// Eltako-Zähler: wie A5-12, aber alle 10 Minuten zusätzlich die Zähler-Seriennummer in zwei Telegrammen mit DB0 = 0x8F
+// (nach EEP-Lesart "aktueller Wert, Tarif 8, Teiler 1000"), die werden verworfen.
+inline void handleEltakoZaehler(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t product, uint8_t _channelIndex) {
+  if (f_Pkt_st->u8DataBuffer[4] == 0x8F) {
+    logDebug("Eltako", "Zähler-Seriennummer (Teil %u): %02X %02X", f_Pkt_st->u8DataBuffer[3], f_Pkt_st->u8DataBuffer[1], f_Pkt_st->u8DataBuffer[2]);
+    return;
+  }
+  uint16_t profile = product == Eltako_Zaehler_F3Z14D_GAS ? A5_12_02 : product == Eltako_Zaehler_F3Z14D_WASSER ? A5_12_03 : A5_12_01;
+  handle4BS_A5_12(f_Pkt_st, profile, _channelIndex);
+}
 
 // Prüft, ob das empfangene Telegramm den für das Produkt erwarteten Telegrammtyp (R-ORG) hat. Viele Eltako-Geräte
 // senden mehrere Telegrammtypen (z.B. FFKB: 1BS-Kontakt + 4BS-Spannung), die nicht falsch ausgewertet werden dürfen.
@@ -323,6 +382,21 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
     default:
       break;
     } // ENDE switch (ParamENO_CHProductselTypeWas)
+    break;
+
+  case Eltako_Raumregler:
+    if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
+      handleEltakoRaumregler(f_Pkt_st, ParamENO_CHProductselTypeRaum, _channelIndex);
+    break;
+
+  case Eltako_Wetter: // FWS61: A5-13-01 (Wetter) und A5-13-02 (Sonne), entspricht dem EEP
+    if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
+      handle4BS_A5_13(f_Pkt_st, A5_13_01, _channelIndex);
+    break;
+
+  case Eltako_Zaehler:
+    if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
+      handleEltakoZaehler(f_Pkt_st, ParamENO_CHProductselTypeZaehler, _channelIndex);
     break;
 
   default:

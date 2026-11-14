@@ -19,6 +19,11 @@ inline void handle4BS_A5_09_05(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 inline void handle4BS_A5_09_0C(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_A5_14(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
+inline void handle4BS_A5_10(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
+inline void handle4BS_A5_12(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
+inline void handle4BS_A5_13(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
+inline void handle4BS_A5_30(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
+inline void handle4BS_A5_09_08(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_A5_30_03(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_D5_00_01_V2(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline uint8_t handle4BS_A5_20_01(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
@@ -27,7 +32,6 @@ inline uint8_t handle4BS_A5_20_06(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channe
 
 
 inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
-  uint32_t value_4Byte;
   uint16_t lux;
   float luxfloat;
   float temp;
@@ -42,7 +46,6 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
   FOURBS_A5_07_02_TYPE *fourBsTlg_p;
   FOURBS_A5_07_03_TYPE *fourBsTlg3_p;
   FOURBS_A5_08_TYPE *fourBsA5_08_Tlg_p;
-  FOURBS_A5_12_01_TYPE *fourBsA5_12_01_Tlg_p;
 
   // Special Profil for a 4BS MSG from a 1BS Device
 
@@ -521,57 +524,24 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
     case A5_09_0C:
     handle4BS_A5_09_0C(f_Pkt_st, _channelIndex);
     break;
+    case A5_09_08:
+    case A5_09_09:
+    handle4BS_A5_09_08(f_Pkt_st, _channelIndex);
+    break;
     }//ENDE Switch A5_09
     break; 
+  case A5_10:
+    handle4BS_A5_10(f_Pkt_st, ParamENO_CHProfil4BS10, _channelIndex);
+    break;
   case A5_12:
-    logDebug("4BS", "A5-12-");
-    // switch (knx.paramWord(firstParameter + ENO_CHProfil4BS12))
-    switch (ParamENO_CHProfil4BS12) {
-    //**************************************************************
-    // ----------------- Profil: A5-12-01 --------------------------
-    //**************************************************************
-    case A5_12_01:
-      fourBsA5_12_01_Tlg_p = (FOURBS_A5_12_01_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "01");
-
-      value_4Byte = ((uint32_t)fourBsA5_12_01_Tlg_p->Meterreading_MSB) << 16 |
-                    fourBsA5_12_01_Tlg_p->Meterreading_MID << 8 | fourBsA5_12_01_Tlg_p->Meterreading_LSB;
-
-      switch (fourBsA5_12_01_Tlg_p->u84BsTelData.DIV) {
-      case 0:
-        value_4Byte = value_4Byte / 1;
-        break;
-      case 1:
-        value_4Byte = value_4Byte / 10;
-        break;
-      case 2:
-        value_4Byte = value_4Byte / 100;
-        break;
-      case 3:
-        value_4Byte = value_4Byte / 1000;
-        break;
-
-      default:
-        break;
-      }
-      // check unit
-      if (fourBsA5_12_01_Tlg_p->u84BsTelData.DT == 1) // WATT
-      {
-        KoENO_GO_BASE__8.value(value_4Byte, Dpt(14, 1)); // WATT
-      } else                                             // KWh
-      {
-        KoENO_GO_BASE__7.value(value_4Byte, Dpt(13, 1)); // KWH
-      }
-
-      // Tarif
-      KoENO_GO_BASE__10.value(fourBsA5_12_01_Tlg_p->u84BsTelData.TI, Dpt(5, 1));
-      logDebug("4BS", "Energy: %u DT: %u DIV: %u Tarif: %u %u %u %u", value_4Byte,
-               fourBsA5_12_01_Tlg_p->u84BsTelData.DT, fourBsA5_12_01_Tlg_p->u84BsTelData.DIV,
-               fourBsA5_12_01_Tlg_p->u84BsTelData.TI, fourBsA5_12_01_Tlg_p->Meterreading_MSB,
-               fourBsA5_12_01_Tlg_p->Meterreading_MID, fourBsA5_12_01_Tlg_p->Meterreading_LSB);
-      break;
-    }
+    handle4BS_A5_12(f_Pkt_st, ParamENO_CHProfil4BS12, _channelIndex);
     break; // ENDE A5-12-XX
+  case A5_13:
+    handle4BS_A5_13(f_Pkt_st, ParamENO_CHProfil4BS13, _channelIndex);
+    break;
+  case A5_30:
+    handle4BS_A5_30(f_Pkt_st, ParamENO_CHProfil4BS30, _channelIndex);
+    break;
 
   case A5_14:
     handle4BS_A5_14(f_Pkt_st, ParamENO_CHProfil4BS14, _channelIndex);
@@ -954,6 +924,191 @@ inline void handle4BS_A5_09_0C(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 
   KoENO_GO_BASE__8.value(voc_id, Dpt(5, 10));
   logDebug("4BS", "VOC: %d  VOC_ID: %d", voc, voc_id);
+}
+
+// Datenbytes eines 4BS-Telegramms: DB3 = u8DataBuffer[1] ... DB0 = u8DataBuffer[4]. DB0 Bit 3 = LRN (0 = Lerntelegramm).
+inline bool fourBsIsData(PACKET_SERIAL_TYPE_ *f_Pkt_st) {
+  if (f_Pkt_st->u8DataBuffer[4] & 0x08)
+    return true;
+  logDebug("4BS", "teach-in telegram ignored");
+  return false;
+}
+
+// A5-10-01..17 Raumbediengerät. KO_1 Temperatur, KO_2 Feuchte, KO_3 Sollwert (Stellrad in %), KO_4 Lüfterstufe
+// (0..3, 4 = Auto), KO_5 Präsenztaste, KO_6 Tag/Nacht (Schiebeschalter), KO_7 Kontakt (1 = offen).
+//   01..0D: DB3 Lüfter, DB2 Sollwert, DB1 Temperatur 255..0 = 0..40 °C, DB0.0 Präsenz / Schiebeschalter / Kontakt
+//   10..14: DB3 Sollwert, DB2 Feuchte 0..250 = 0..100 %, DB1 Temperatur 0..250 = 0..40 °C, DB0.0 wie oben
+//   15..17: DB2.7..2 Sollwert 0..63, DB2.1..DB1.0 Temperatur 10 Bit 1023..0 = -10..41,2 °C, DB0.0 Präsenz
+inline void handle4BS_A5_10(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  uint8_t db3 = f_Pkt_st->u8DataBuffer[1], db2 = f_Pkt_st->u8DataBuffer[2], db1 = f_Pkt_st->u8DataBuffer[3];
+  bool bit0 = f_Pkt_st->u8DataBuffer[4] & 0x01;
+
+  // Merkmale je Typ
+  enum { DB0_NONE, DB0_OCC, DB0_DAYNIGHT, DB0_CONTACT } db0Kind = DB0_NONE;
+  bool hasFan = false, hasSetpoint = false;
+  switch (profile) {
+  case A5_10_01: hasFan = hasSetpoint = true; db0Kind = DB0_OCC; break;
+  case A5_10_02: hasFan = hasSetpoint = true; db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_03: hasSetpoint = true; break;
+  case A5_10_04: hasFan = hasSetpoint = true; break;
+  case A5_10_05: hasSetpoint = true; db0Kind = DB0_OCC; break;
+  case A5_10_06: hasSetpoint = true; db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_07: hasFan = true; break;
+  case A5_10_08: hasFan = true; db0Kind = DB0_OCC; break;
+  case A5_10_09: hasFan = true; db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_0A: hasSetpoint = true; db0Kind = DB0_CONTACT; break;
+  case A5_10_0B: db0Kind = DB0_CONTACT; break;
+  case A5_10_0C: db0Kind = DB0_OCC; break;
+  case A5_10_0D: db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_10: hasSetpoint = true; db0Kind = DB0_OCC; break;
+  case A5_10_11: hasSetpoint = true; db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_12: hasSetpoint = true; break;
+  case A5_10_13: db0Kind = DB0_OCC; break;
+  case A5_10_14: db0Kind = DB0_DAYNIGHT; break;
+  case A5_10_15: hasSetpoint = true; break;
+  case A5_10_16: hasSetpoint = true; db0Kind = DB0_OCC; break;
+  case A5_10_17: db0Kind = DB0_OCC; break;
+  default: return;
+  }
+
+  float temp;
+  float setpointPercent = 0;
+  if (profile >= A5_10_15) {
+    uint16_t raw = ((uint16_t)(db2 & 0x03) << 8) | db1;
+    temp = -10.0f + (1023 - raw) * 51.2f / 1023.0f;
+    setpointPercent = (db2 >> 2) * 100.0f / 63.0f;
+  } else if (profile >= A5_10_10) {
+    temp = db1 * 40.0f / 250.0f;
+    setpointPercent = db3 * 100.0f / 255.0f;
+    float hum = db2 * 100.0f / 250.0f;
+    KoENO_GO_BASE__3.value(hum, Dpt(9, 7));
+    logDebug("4BS", "A5-10 Feuchte: %.1f", hum);
+  } else {
+    temp = (255 - db1) * 40.0f / 255.0f;
+    setpointPercent = db2 * 100.0f / 255.0f;
+  }
+  KoENO_GO_BASE__2.value(temp, Dpt(9, 1));
+
+  if (hasSetpoint)
+    KoENO_GO_BASE__4.value((uint8_t)(setpointPercent + 0.5f), Dpt(5, 1));
+  if (hasFan) {
+    // 210..255 Auto, 190..209 Stufe 0, 165..189 Stufe 1, 145..164 Stufe 2, 0..144 Stufe 3
+    uint8_t fan = db3 >= 210 ? 4 : db3 >= 190 ? 0 : db3 >= 165 ? 1 : db3 >= 145 ? 2 : 3;
+    KoENO_GO_BASE__5.value(fan, Dpt(5, 10));
+  }
+  switch (db0Kind) {
+  case DB0_OCC: // 0 = Taste gedrückt
+    KoENO_GO_BASE__6.value(!bit0, Dpt(1, 18));
+    break;
+  case DB0_DAYNIGHT: // 1 = Position O / Tag, 0 = Position I / Nacht; DPT 1.024: 0 = Tag, 1 = Nacht
+    KoENO_GO_BASE__7.value(!bit0, Dpt(1, 24));
+    break;
+  case DB0_CONTACT: // 0 = geschlossen, 1 = offen
+    KoENO_GO_BASE__8.value(bit0, Dpt(1, 19));
+    break;
+  default:
+    break;
+  }
+  logDebug("4BS", "A5-10 Temp: %.1f, Sollwert: %.0f %%, DB3 %02X, DB0.0 %u", temp, setpointPercent, db3, bit0);
+}
+
+// A5-12-00..03 Zähler: DB3..DB1 Zählerstand (24 Bit) / 10^DIV, DB0.7..4 Tarif bzw. Messkanal, DB0.2 DT (0 =
+// kumuliert, 1 = aktueller Wert), DB0.1..0 DIV. KO_6 kumuliert, KO_7 aktuell, KO_9 Tarif / Kanal.
+//   00 Zähler: Impulse bzw. Impulse/s, 01 Strom: kWh bzw. W, 02 Gas / 03 Wasser: m³ bzw. l/s (als l/h gesendet)
+inline void handle4BS_A5_12(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  uint8_t db0 = f_Pkt_st->u8DataBuffer[4];
+  uint32_t raw = ((uint32_t)f_Pkt_st->u8DataBuffer[1] << 16) | ((uint32_t)f_Pkt_st->u8DataBuffer[2] << 8) | f_Pkt_st->u8DataBuffer[3];
+  static const float divisor[4] = {1.0f, 10.0f, 100.0f, 1000.0f};
+  float value = raw / divisor[db0 & 0x03];
+  bool current = db0 & 0x04;
+
+  switch (profile) {
+  case A5_12_00:
+    if (current)
+      KoENO_GO_BASE__8.value(value, Dpt(14, 33));
+    else
+      KoENO_GO_BASE__7.value((uint32_t)value, Dpt(12, 1));
+    break;
+  case A5_12_01:
+    if (current)
+      KoENO_GO_BASE__8.value(value, Dpt(14, 56));
+    else
+      KoENO_GO_BASE__7.value((int32_t)value, Dpt(13, 13));
+    break;
+  case A5_12_02:
+  case A5_12_03:
+    if (current)
+      KoENO_GO_BASE__8.value(value * 3600.0f, Dpt(9, 25)); // l/s -> l/h
+    else
+      KoENO_GO_BASE__7.value(value, Dpt(14, 76));
+    break;
+  default:
+    return;
+  }
+  KoENO_GO_BASE__10.value((uint8_t)(db0 >> 4), Dpt(5, 10));
+  logDebug("4BS", "A5-12 %s: %.3f, Tarif/Kanal %u", current ? "aktuell" : "kumuliert", value, db0 >> 4);
+}
+
+// A5-13-01 Wetterstation (nimmt auch die Telegramme A5-13-02 Sonne derselben ID an), A5-13-02 Sonne.
+// Kenner in DB0.7..4: 1 = Wetter: DB3 Dämmerung 0..999 lx, DB2 Temperatur -40..80 °C, DB1 Wind 0..70 m/s, DB0.2 Nacht,
+// DB0.1 Regen; 2 = Sonne: DB3 West, DB2 Süd, DB1 Ost je 0..150 klx.
+// KO_1 Temperatur, KO_3 Dämmerung, KO_4 Wind, KO_5 Regen, KO_6 Tag/Nacht, KO_7 Sonne West, KO_8 Süd, KO_9 Ost.
+inline void handle4BS_A5_13(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  uint8_t db3 = f_Pkt_st->u8DataBuffer[1], db2 = f_Pkt_st->u8DataBuffer[2], db1 = f_Pkt_st->u8DataBuffer[3];
+  uint8_t db0 = f_Pkt_st->u8DataBuffer[4];
+  uint8_t id = db0 >> 4;
+
+  if (id == 1 && profile == A5_13_01) {
+    float dawn = db3 * 999.0f / 255.0f;
+    float temp = -40.0f + db2 * 120.0f / 255.0f;
+    float wind = db1 * 70.0f / 255.0f;
+    KoENO_GO_BASE__2.value(temp, Dpt(9, 1));
+    KoENO_GO_BASE__4.value(dawn, Dpt(9, 4));
+    KoENO_GO_BASE__5.value(wind, Dpt(9, 5));
+    KoENO_GO_BASE__6.value((bool)(db0 & 0x02), Dpt(1, 2));
+    KoENO_GO_BASE__7.value((bool)(db0 & 0x04), Dpt(1, 24));
+    logDebug("4BS", "A5-13 Wetter: %.0f lx, %.1f °C, %.1f m/s, Nacht %u, Regen %u", dawn, temp, wind, (db0 >> 2) & 1, (db0 >> 1) & 1);
+  } else if (id == 2) {
+    KoENO_GO_BASE__8.value(db3 * 150000.0f / 255.0f, Dpt(9, 4));
+    KoENO_GO_BASE__9.value(db2 * 150000.0f / 255.0f, Dpt(9, 4));
+    KoENO_GO_BASE__10.value(db1 * 150000.0f / 255.0f, Dpt(9, 4));
+    logDebug("4BS", "A5-13 Sonne: West %u, Süd %u, Ost %u", db3, db2, db1);
+  } else {
+    logDebug("4BS", "A5-13 Kenner %u nicht ausgewertet", id);
+  }
+}
+
+// A5-30-01 Kontakt mit Batterieüberwachung: DB2 0..120 = Batterie schwach, DB1 0..195 = geschlossen, 196..255 = offen.
+// A5-30-02 Kontakt: DB0.0 0 = geschlossen, 1 = offen. KO_3 Kontakt (Wert für geschlossen per ETS), KO_4 Batterie schwach.
+inline void handle4BS_A5_30(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  bool open;
+  if (profile == A5_30_01) {
+    open = f_Pkt_st->u8DataBuffer[3] >= 196;
+    KoENO_GO_BASE__5.value(f_Pkt_st->u8DataBuffer[2] <= 120, Dpt(1, 5));
+  } else if (profile == A5_30_02) {
+    open = f_Pkt_st->u8DataBuffer[4] & 0x01;
+  } else {
+    return;
+  }
+  KoENO_GO_BASE__4.value(windowKoValue(open, _channelIndex), Dpt(1, 19));
+  logDebug("4BS", "A5-30 Kontakt %s", open ? "offen" : "geschlossen");
+}
+
+// A5-09-08 / 09 reiner CO2-Sensor: DB1 0..255 = 0..2000 ppm (09: DB0.2 = Spannungsausfall erkannt). KO_0 CO2.
+inline void handle4BS_A5_09_08(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
+  if (!fourBsIsData(f_Pkt_st))
+    return;
+  float co2 = f_Pkt_st->u8DataBuffer[3] * 2000.0f / 255.0f;
+  KoENO_GO_BASE__1.value(co2, Dpt(9, 8));
+  logDebug("4BS", "A5-09-08/09 CO2: %.0f ppm, DB0 %02X", co2, f_Pkt_st->u8DataBuffer[4]);
 }
 
 // A5-14-01..0A (Multi-Function Sensor). Alle Typen: Versorgungsspannung KO_4. Je nach Typ zusätzlich:

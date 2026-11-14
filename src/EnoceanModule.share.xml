@@ -90,6 +90,53 @@
                   <Enumeration Text="Heizungsstellaktoren" Value="7" Id="%AID%_PT-ProductSelectionType_EN-7" />
                   <Enumeration Text="Wassersensoren" Value="8" Id="%AID%_PT-ProductSelectionType_EN-8" />
                   <Enumeration Text="Aktoren (Schalten/Dimmen/Jalousie)" Value="9" Id="%AID%_PT-ProductSelectionType_EN-9" />
+                  <Enumeration Text="Raumregler" Value="10" Id="%AID%_PT-ProductSelectionType_EN-10" />
+                  <Enumeration Text="Wetterstation" Value="11" Id="%AID%_PT-ProductSelectionType_EN-11" />
+                  <Enumeration Text="Zähler (Strom, Gas, Wasser)" Value="12" Id="%AID%_PT-ProductSelectionType_EN-12" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Eltako: Raumregler, Wetterstation, Zähler -->
+              <ParameterType Id="%AID%_PT-ProductSelectionTypeRaumregler" Name="ProductSelectionTypeRaumregler">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="FTR78S - Raumregler (Soll 8..30 °C)" Value="1" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-1" />
+                  <Enumeration Text="FTR86B - Raumregler" Value="2" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-2" />
+                  <Enumeration Text="FTR65DSB - Raumregler (Betriebsart FHK)" Value="3" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-3" />
+                  <Enumeration Text="FTR55DSB - Raumregler (Betriebsart FHK)" Value="4" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-4" />
+                  <Enumeration Text="FTR55EHB - Raumregler (Betriebsart FHK)" Value="5" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-5" />
+                  <Enumeration Text="FTR55ESB - Raumregler (Betriebsart FHK)" Value="6" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-6" />
+                  <Enumeration Text="FTR65HB - Raumregler (Betriebsart FHK)" Value="7" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-7" />
+                  <Enumeration Text="FTRF65HB - Raumregler (Betriebsart FHK)" Value="8" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-8" />
+                  <Enumeration Text="FTR55HB - Raumregler (Betriebsart FHK)" Value="9" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-9" />
+                  <Enumeration Text="FTR65SB - Raumregler (Betriebsart FHK)" Value="10" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-10" />
+                  <Enumeration Text="FTRF65SB - Raumregler (Betriebsart FHK)" Value="11" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-11" />
+                  <Enumeration Text="FTR55SB - Raumregler (Betriebsart FHK)" Value="12" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-12" />
+                  <Enumeration Text="FTR65HS - Raumregler mit Nachtabsenkung" Value="13" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-13" />
+                  <Enumeration Text="FTAF65D - Raumregler mit Nachtabsenkung" Value="14" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-14" />
+                  <Enumeration Text="FTAF55D - Raumregler mit Nachtabsenkung" Value="15" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-15" />
+                  <Enumeration Text="FTAF55ED - Raumregler mit Nachtabsenkung" Value="16" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-16" />
+                  <Enumeration Text="FUTH65D - Raumregler mit Feuchte" Value="17" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-17" />
+                  <Enumeration Text="FUTH55D - Raumregler mit Feuchte" Value="18" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-18" />
+                  <Enumeration Text="FUTH55ED - Raumregler mit Feuchte" Value="19" Id="%AID%_PT-ProductSelectionTypeRaumregler_EN-19" />
+                </TypeRestriction>
+              </ParameterType>
+              <ParameterType Id="%AID%_PT-ProductSelectionTypeWetter" Name="ProductSelectionTypeWetter">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="FWS61 - Wetterstation" Value="1" Id="%AID%_PT-ProductSelectionTypeWetter_EN-1" />
+                </TypeRestriction>
+              </ParameterType>
+              <ParameterType Id="%AID%_PT-ProductSelectionTypeZaehler" Name="ProductSelectionTypeZaehler">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="FWZ14 - Stromzähler" Value="1" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-1" />
+                  <Enumeration Text="FWZ12 - Stromzähler" Value="2" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-2" />
+                  <Enumeration Text="DSZ14DRS - Stromzähler" Value="3" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-3" />
+                  <Enumeration Text="DSZ14WDRS - Stromzähler" Value="4" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-4" />
+                  <Enumeration Text="FSDG14 - Stromzähler" Value="5" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-5" />
+                  <Enumeration Text="F3Z14D - Strom" Value="6" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-6" />
+                  <Enumeration Text="F3Z14D - Gas" Value="7" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-7" />
+                  <Enumeration Text="F3Z14D - Wasser" Value="8" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-8" />
+                  <Enumeration Text="FSR14M-2x - Schaltaktor mit Leistungsmessung" Value="9" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-9" />
+                  <Enumeration Text="FSR61VA - Schaltaktor mit Leistungsmessung" Value="10" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-10" />
+                  <Enumeration Text="FSVA-230V - Zwischenstecker mit Leistungsmessung" Value="11" Id="%AID%_PT-ProductSelectionTypeZaehler_EN-11" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Kontakte-->
@@ -351,13 +398,13 @@
                   <Enumeration Text="A5-07  Occupancy Sensor" Value="7" Id="%AID%_PT-ProfilSelection4BS_EN-7" />
                   <Enumeration Text="A5-08  Light, Temp, Occupancy Sensor" Value="8" Id="%AID%_PT-ProfilSelection4BS_EN-8" />
                   <Enumeration Text="A5-09  Gas Sensor" Value="9" Id="%AID%_PT-ProfilSelection4BS_EN-9" />
-                  <Enumeration Text="A5-10  N.A." Value="16" Id="%AID%_PT-ProfilSelection4BS_EN-16" />
+                  <Enumeration Text="A5-10  Room Operating Panel" Value="16" Id="%AID%_PT-ProfilSelection4BS_EN-16" />
                   <Enumeration Text="A5-11  N.A." Value="17" Id="%AID%_PT-ProfilSelection4BS_EN-17" />
                   <Enumeration Text="A5-12  Automated Meter Reading (AMR)" Value="18" Id="%AID%_PT-ProfilSelection4BS_EN-18" />
-                  <Enumeration Text="A5-13  N.A." Value="19" Id="%AID%_PT-ProfilSelection4BS_EN-19" />
+                  <Enumeration Text="A5-13  Environmental Applications (Wetter)" Value="19" Id="%AID%_PT-ProfilSelection4BS_EN-19" />
                   <Enumeration Text="A5-14  Multi-Func Sensor" Value="20" Id="%AID%_PT-ProfilSelection4BS_EN-20" />
                   <Enumeration Text="A5-20  Self Powered Heating Actors" Value="32" Id="%AID%_PT-ProfilSelection4BS_EN-32" />
-                  <Enumeration Text="A5-30  N.A." Value="48" Id="%AID%_PT-ProfilSelection4BS_EN-48" />
+                  <Enumeration Text="A5-30  Digital Input" Value="48" Id="%AID%_PT-ProfilSelection4BS_EN-48" />
                   <Enumeration Text="A5-37  N.A." Value="55" Id="%AID%_PT-ProfilSelection4BS_EN-55" />
                   <Enumeration Text="A5-38  Central Command (Aktoren schalten/dimmen)" Value="56" Id="%AID%_PT-ProfilSelection4BS_EN-56" />
                   <Enumeration Text="A5-3F  N.A." Value="63" Id="%AID%_PT-ProfilSelection4BS_EN-63" />
@@ -467,8 +514,8 @@
                   <Enumeration Text="A5-09-05   VOC Sensor" Value="44" Id="%AID%_PT-Profil4BS09_EN-44" />
                   <Enumeration Text="A5-09-06   N.A." Value="45" Id="%AID%_PT-Profil4BS09_EN-45" />
                   <Enumeration Text="A5-09-07   N.A." Value="46" Id="%AID%_PT-Profil4BS09_EN-46" />
-                  <Enumeration Text="A5-09-08   N.A." Value="47" Id="%AID%_PT-Profil4BS09_EN-47" />
-                  <Enumeration Text="A5-09-09   N.A." Value="48" Id="%AID%_PT-Profil4BS09_EN-48" />
+                  <Enumeration Text="A5-09-08   Pure CO2 Sensor" Value="47" Id="%AID%_PT-Profil4BS09_EN-47" />
+                  <Enumeration Text="A5-09-09   Pure CO2 Sensor (Power Failure)" Value="48" Id="%AID%_PT-Profil4BS09_EN-48" />
                   <Enumeration Text="A5-09-0A   N.A." Value="49" Id="%AID%_PT-Profil4BS09_EN-49" />
                   <Enumeration Text="A5-09-0B   N.A." Value="50" Id="%AID%_PT-Profil4BS09_EN-50" />
                   <Enumeration Text="A5-09-0C   VOC Sensor" Value="51" Id="%AID%_PT-Profil4BS09_EN-51" />
@@ -476,7 +523,27 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS10" Name="Profil4BS10">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="A5-10-01   N.A." Value="52" Id="%AID%_PT-Profil4BS10_EN-52" />
+                  <Enumeration Text="A5-10-01   Temperature, Set Point, Fan Speed and Occupancy" Value="52" Id="%AID%_PT-Profil4BS10_EN-52" />
+                  <Enumeration Text="A5-10-02   Temperature, Set Point, Fan Speed and Day/Night" Value="53" Id="%AID%_PT-Profil4BS10_EN-53" />
+                  <Enumeration Text="A5-10-03   Temperature, Set Point" Value="54" Id="%AID%_PT-Profil4BS10_EN-54" />
+                  <Enumeration Text="A5-10-04   Temperature, Set Point and Fan Speed" Value="55" Id="%AID%_PT-Profil4BS10_EN-55" />
+                  <Enumeration Text="A5-10-05   Temperature, Set Point and Occupancy" Value="56" Id="%AID%_PT-Profil4BS10_EN-56" />
+                  <Enumeration Text="A5-10-06   Temperature, Set Point and Day/Night" Value="57" Id="%AID%_PT-Profil4BS10_EN-57" />
+                  <Enumeration Text="A5-10-07   Temperature, Fan Speed" Value="58" Id="%AID%_PT-Profil4BS10_EN-58" />
+                  <Enumeration Text="A5-10-08   Temperature, Fan Speed and Occupancy" Value="59" Id="%AID%_PT-Profil4BS10_EN-59" />
+                  <Enumeration Text="A5-10-09   Temperature, Fan Speed and Day/Night" Value="60" Id="%AID%_PT-Profil4BS10_EN-60" />
+                  <Enumeration Text="A5-10-0A   Temperature, Set Point and Single Input Contact" Value="61" Id="%AID%_PT-Profil4BS10_EN-61" />
+                  <Enumeration Text="A5-10-0B   Temperature and Single Input Contact" Value="62" Id="%AID%_PT-Profil4BS10_EN-62" />
+                  <Enumeration Text="A5-10-0C   Temperature and Occupancy" Value="63" Id="%AID%_PT-Profil4BS10_EN-63" />
+                  <Enumeration Text="A5-10-0D   Temperature and Day/Night" Value="64" Id="%AID%_PT-Profil4BS10_EN-64" />
+                  <Enumeration Text="A5-10-10   Temperature, Humidity, Set Point and Occupancy" Value="65" Id="%AID%_PT-Profil4BS10_EN-65" />
+                  <Enumeration Text="A5-10-11   Temperature, Humidity, Set Point and Day/Night" Value="66" Id="%AID%_PT-Profil4BS10_EN-66" />
+                  <Enumeration Text="A5-10-12   Temperature, Humidity and Set Point" Value="67" Id="%AID%_PT-Profil4BS10_EN-67" />
+                  <Enumeration Text="A5-10-13   Temperature, Humidity and Occupancy" Value="68" Id="%AID%_PT-Profil4BS10_EN-68" />
+                  <Enumeration Text="A5-10-14   Temperature, Humidity and Day/Night" Value="69" Id="%AID%_PT-Profil4BS10_EN-69" />
+                  <Enumeration Text="A5-10-15   10 Bit Temperature, 6 Bit Set Point" Value="70" Id="%AID%_PT-Profil4BS10_EN-70" />
+                  <Enumeration Text="A5-10-16   10 Bit Temperature, 6 Bit Set Point and Occupancy" Value="71" Id="%AID%_PT-Profil4BS10_EN-71" />
+                  <Enumeration Text="A5-10-17   10 Bit Temperature and Occupancy" Value="72" Id="%AID%_PT-Profil4BS10_EN-72" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS11" Name="Profil4BS11">
@@ -486,10 +553,10 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS12" Name="Profil4BS12">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="A5-12-00   N.A." Value="90" Id="%AID%_PT-Profil4BS12_EN-90" />
+                  <Enumeration Text="A5-12-00   Counter" Value="90" Id="%AID%_PT-Profil4BS12_EN-90" />
                   <Enumeration Text="A5-12-01   Electricity" Value="91" Id="%AID%_PT-Profil4BS12_EN-91" />
-                  <Enumeration Text="A5-12-02   N.A." Value="92" Id="%AID%_PT-Profil4BS12_EN-92" />
-                  <Enumeration Text="A5-12-03   N.A." Value="93" Id="%AID%_PT-Profil4BS12_EN-93" />
+                  <Enumeration Text="A5-12-02   Gas" Value="92" Id="%AID%_PT-Profil4BS12_EN-92" />
+                  <Enumeration Text="A5-12-03   Water" Value="93" Id="%AID%_PT-Profil4BS12_EN-93" />
                   <Enumeration Text="A5-12-04   N.A." Value="94" Id="%AID%_PT-Profil4BS12_EN-94" />
                   <Enumeration Text="A5-12-05   N.A." Value="95" Id="%AID%_PT-Profil4BS12_EN-95" />
                   <Enumeration Text="A5-12-10   N.A." Value="96" Id="%AID%_PT-Profil4BS12_EN-96" />
@@ -497,7 +564,8 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS13" Name="Profil4BS13">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="A5-13-01   N.A." Value="97" Id="%AID%_PT-Profil4BS13_EN-97" />
+                  <Enumeration Text="A5-13-01   Weather Station (inkl. Sonne)" Value="97" Id="%AID%_PT-Profil4BS13_EN-97" />
+                  <Enumeration Text="A5-13-02   Sun Intensity" Value="98" Id="%AID%_PT-Profil4BS13_EN-98" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS14" Name="Profil4BS14">
@@ -529,7 +597,8 @@
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS30" Name="Profil4BS30">
                 <TypeRestriction Base="Value" SizeInBit="16">
-                  <Enumeration Text="A5-30-01   N.A." Value="125" Id="%AID%_PT-Profil4BS30_EN-125" />
+                  <Enumeration Text="A5-30-01   Single Input Contact, Battery Monitor" Value="125" Id="%AID%_PT-Profil4BS30_EN-125" />
+                  <Enumeration Text="A5-30-02   Single Input Contact" Value="126" Id="%AID%_PT-Profil4BS30_EN-126" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-Profil4BS38" Name="Profil4BS38">

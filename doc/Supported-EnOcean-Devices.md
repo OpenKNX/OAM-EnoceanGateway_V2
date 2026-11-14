@@ -67,6 +67,33 @@ F4CT55 wird bewusst nicht angeboten.
 |---|---|---|
 | FWS81 Wassersensor | F6-05-01 (Wasser im Statusbyte: 0x30 = Wasser, 0x20 = kein Wasser) | Alarm (mit „Alarm zurücksetzen“) |
 
+## Raumregler
+
+| Gerät | EEP | KOs |
+|---|---|---|
+| FTR78S | A5-10-03 (Soll 8..30 °C) | Ist-, Solltemperatur |
+| FTR86B, FTR55/65-Serie in Betriebsart FHK (FTR65DSB, FTR55DSB, FTR55EHB, FTR55ESB, FTR65HB, FTRF65HB, FTR55HB, FTR65SB, FTRF65SB, FTR55SB) | A5-10-06 | Ist-, Solltemperatur |
+| FTR65HS, FTAF65D, FTAF55D, FTAF55ED | A5-10-06 + Nachtabsenkung | Ist-, Solltemperatur, Nachtabsenkung (K) |
+| FUTH65D, FUTH55D, FUTH55ED | A5-10-06 und A5-10-12 | Ist-, Solltemperatur, Nachtabsenkung, Feuchte, Soll-Feuchte |
+
+Die Solltemperatur wird bei Eltako als echte Temperatur gesendet (nicht nur als Stellrad-Position wie im EEP).
+
+## Wetterstation
+
+| Gerät | EEP | KOs |
+|---|---|---|
+| FWS61 | A5-13-01 und A5-13-02 | Außentemperatur, Dämmerung, Wind, Regen, Sonne West/Süd/Ost |
+
+## Zähler
+
+| Gerät | EEP | KOs |
+|---|---|---|
+| FWZ14, FWZ12, DSZ14DRS, DSZ14WDRS, FSDG14, F3Z14D (Strom) | A5-12-01 | Zählerstand (kWh), Leistung (W), Tarif |
+| F3Z14D (Gas / Wasser) | A5-12-02 / 03 | Zählerstand (m³), Durchfluss (l/h) |
+| FSR14M-2x, FSR61VA, FSVA-230V | A5-12-01 | Leistung (W) |
+
+Die Seriennummer-Telegramme der Zähler (alle 10 Minuten, DB0 = 0x8F) werden verworfen.
+
 ## Aktoren (KNX → EnOcean)
 
 | Produkt | Geräte | Telegramm |
@@ -78,4 +105,4 @@ F4CT55 wird bewusst nicht angeboten.
 
 ## Noch nicht unterstützt
 
-Raumregler FTR…/FUTH… (A5-10), Wetterstation FWS61 (A5-13), Zähler F3Z14D/FWZ… (A5-12), Multisensoren FMMS44SB/FMS… (mehrere EEPs), FBH65TF (Temperatur/Feuchte und Bewegung mit gleichem Kennbyte), FSM60B (A5-30-01).
+Multisensoren FMMS44SB/FMS… (mehrere EEPs), FBH65TF (Temperatur/Feuchte und Bewegung mit gleichem Kennbyte), FSM60B (A5-30-01).

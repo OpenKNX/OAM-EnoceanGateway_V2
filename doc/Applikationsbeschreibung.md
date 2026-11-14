@@ -15,6 +15,8 @@
 * **Wippe AB** bei Einzeltasten mit allen Funktionen inklusive langem Tastendruck (KO8–KO11).
 * **Weitere Eltako-Geräte**: FPE-1, FZS65, FS55, FS55E, FS65E, FASM60, FSM61, FTKB-gr, eTronic, mTronic, FFT65B, FFTF65B, FFT55B, FLGTF65, FLGTF55, FCO2TS, FAH65S, FIH65S, FB65B, FB55B, FBH65SB, FBH55ESB, FBH55SB, FBHF65SB, FBH65, FBH65S, FKS-H.
 * **Hilfetexte** für alle Kanalparameter in der ETS.
+* **Weitere A5-Profile**: Raumbediengeräte A5-10-01..17, Zähler A5-12-00/02/03 (A5-12-01 jetzt mit Nachkommastellen), Wetterstation A5-13-01/02, Digitaleingang A5-30-01/02, reiner CO2-Sensor A5-09-08/09.
+* **Eltako-Kategorien Raumregler, Wetterstation und Zähler** (FTR78S, FTR86B, FTR..-Serie FHK, FTR65HS, FTAF, FUTH, FWS61, FWZ14/12, DSZ14, FSDG14, F3Z14D, FSR14M-2x, FSR61VA, FSVA-230V).
 * **RPS/1BS**: Schaltertyp „1 Taste (F6-01-01)“ im EEP-Pfad, Hotelkartenschalter F6-04-01/02 (KO0 „Karte gesteckt“), F6-02-03 auch KNX -> EnOcean (KO0 Dimmen 0x30/0x10, KO1 EIN/AUS 0x70/0x50, mit Lerntelegramm).
 * **D5-00-01 korrigiert**: im EEP-Pfad zeigt die ETS jetzt das KO3, das die Firmware beschreibt (vorher KO0, Gruppenadresse umhängen); Lerntelegramme werden ignoriert; Eltako-Kontakte (FTK, FTKB, FFKB, FTKB-gr) hängen nicht mehr vom ausgeblendeten EEP-Parameter ab.
 * **Profilnummern** werden vor jedem Build aus der ETS-Applikation erzeugt; der Release-Build prüft die ETS-Oberfläche automatisch.
@@ -147,6 +149,17 @@ Gilt für F6-05-00/01/02 (Rauch, Wind, Wasser), D2-06-01 und D2-06-50 (Fenstergr
 
 F6-05-01 (Wasser): Data 0x11, ob Wasser da ist steht im Statusbyte (Eltako FWS81: 0x30 = Wasser, 0x20 = kein Wasser).
 
+## Sensoren A5 (Auswahl)
+
+| Profil | KOs |
+|---|---|
+| A5-10 Raumbediengerät (01..17) | KO1 Temperatur, KO2 Feuchte (10..14), KO3 Sollwert-Stellrad in %, KO4 Lüfterstufe (0..3, 4 = Auto), KO5 Präsenztaste, KO6 Tag/Nacht-Schiebeschalter, KO7 Kontakt (0A/0B) |
+| A5-12 Zähler (00..03) | KO6 Zählerstand (Impulse, kWh bzw. m³), KO7 aktueller Wert (Impulse/s, W bzw. l/h), KO9 Tarif bzw. Messkanal |
+| A5-13 Wetterstation | KO1 Außentemperatur, KO3 Dämmerung (lx), KO4 Wind (m/s), KO5 Regen, KO6 Tag/Nacht, KO7..KO9 Sonne West/Süd/Ost (lx) |
+| A5-30 Digitaleingang | KO3 Kontakt (mit „Wert für geschlossen“), KO4 Batterie schwach (30-01) |
+
+Der Sollwert der Raumbediengeräte ist laut EEP nur eine Stellrad-Position („Min … Max“) ohne Einheit; die Umrechnung in °C hängt vom Gerät ab und gehört z.B. in die Logik. Lerntelegramme (LRN-Bit = 0) werden bei allen diesen Profilen ignoriert.
+
 ## Aktoren (KNX → EnOcean)
 
 * **A5-38-08 Zentralbefehl** (Schalten, Dimmen) über EEP-Profil oder Eltako-Produkt; Eltako-Abweichungen (Lerntelegramm, Dimmgeschwindigkeit, Bestätigungstelegramme als Status) werden berücksichtigt.
@@ -168,7 +181,7 @@ F6-05-01 (Wasser): Data 0x11, ob Wasser da ist steht im Statusbyte (Eltako FWS81
 * **Unions**: neue Parameter möglichst in Unions ablegen, die das jeweilige Profil nicht nutzt; Parameter mit eigener Speicheradresse brauchen die ID-Form `_P-`, Union-Parameter `_UP-`.
 * **Offene Punkte**:
   * F6-02-04 (Wippentaster ERP2) und F6-03-01/02 (4 Wippen) sind nicht umgesetzt.
-  * Raumregler (A5-10), Wetterstation FWS61 (A5-13), Zähler (A5-12), Multisensoren FMMS/FMS und FBH65TF sind noch nicht umgesetzt.
+  * A5-10-18..23, A5-12-04/05/10, A5-13-03..06 (Datum, Zeit, Position) sind noch nicht umgesetzt. Multisensoren FMMS/FMS und FBH65TF fehlen.
   * Eltako FABH130 (Bewegungsmelder, F6-02-01) ist auswählbar, aber noch nicht ausgewertet.
   * „Alarm Energy Low“ (F6-05) wird nur gesetzt, nie zurückgesetzt.
   * A5-30-03 ist nur über die Eltako-Melder umgesetzt, nicht über das EEP-Profil.

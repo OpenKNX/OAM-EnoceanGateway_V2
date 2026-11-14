@@ -452,6 +452,9 @@
 #define ENO_CHProductselTypeHei                 36      // 8 Bits, Bit 7-0
 #define ENO_CHProductselTypeWas                 37      // 8 Bits, Bit 7-0
 #define ENO_CHProductselTypeAkt                 36      // 8 Bits, Bit 7-0
+#define ENO_CHProductselTypeRaum                37      // 8 Bits, Bit 7-0
+#define ENO_CHProductselTypeWetter              35      // 8 Bits, Bit 7-0
+#define ENO_CHProductselTypeZaehler             33      // 8 Bits, Bit 7-0
 #define ENO_CHSelectionFFG7B                    38      // 1 Bit, Bit 7
 #define     ENO_CHSelectionFFG7BMask 0x80
 #define     ENO_CHSelectionFFG7BShift 7
@@ -719,6 +722,12 @@
 #define ParamENO_CHProductselTypeWas                 (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeWas)))
 // Produkt:
 #define ParamENO_CHProductselTypeAkt                 (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeAkt)))
+// Produkt:
+#define ParamENO_CHProductselTypeRaum                (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeRaum)))
+// Produkt:
+#define ParamENO_CHProductselTypeWetter              (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeWetter)))
+// Produkt:
+#define ParamENO_CHProductselTypeZaehler             (knx.paramByte(ENO_ParamCalcIndex(ENO_CHProductselTypeZaehler)))
 // delta Value:
 #define ParamENO_CHSelectionFFG7B                    ((bool)(knx.paramByte(ENO_ParamCalcIndex(ENO_CHSelectionFFG7B)) & ENO_CHSelectionFFG7BMask))
 // Langer Tastendruck
