@@ -4,6 +4,7 @@
 #include "EnoceanProfils.h"
 #include "EnoceanStructs.h"
 #include "knxprod.h"
+#include "WindowContact.h"
 
 /*******************************************************************************************
  *  Rocker / Taster (Kanal-Profil "Rocker", EnOcean -> KNX), Telegramme F6-02-xx
@@ -247,15 +248,6 @@ inline void handle_F6_05_0x(uint8_t value, uint8_t _channelIndex) {
   default:
     break;
   }
-}
-
-// Schreibt den Fenstergriff-/Kontaktzustand auf die Gruppenobjekte (Belegung wie A5-14-09):
-// KO2 = offen, KO3 = gekippt, KO4 = offen/geschlossen (Wert für "geschlossen" per ETS-Parameter).
-inline void setWindowHandleKOs(bool open, bool tilted, uint8_t _channelIndex) {
-  bool closed = !open && !tilted;
-  KoENO_GO_BASE__2.value(open, Dpt(1, 1));
-  KoENO_GO_BASE__3.value(tilted, Dpt(1, 1));
-  KoENO_GO_BASE__4.value(closed ? ParamENO_CHWindowcloseValue : !ParamENO_CHWindowcloseValue, Dpt(1, 1));
 }
 
 inline void handle_F6_10_00(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);

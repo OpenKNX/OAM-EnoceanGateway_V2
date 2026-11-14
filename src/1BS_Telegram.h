@@ -4,6 +4,7 @@
 #include "EnoceanProfils.h"
 #include "EnoceanStructs.h"
 #include "knxprod.h"
+#include "WindowContact.h"
 
 /*******************************************************************************************
  *  1BS   D5-00-01
@@ -26,18 +27,7 @@ inline void handle_1BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
 
     // ETS Parameter to define state for open / Close
     // D5-00-01 Contact: 0 = open / 1 = close
-    if (l1bsTlg_p->u81bsTelData.State == 1) // CLOSE
-    {
-      if (ParamENO_CHWindowcloseValue)
-        bvalue = true;
-      else
-        bvalue = false;
-    } else { // OPEN
-      if (ParamENO_CHWindowcloseValue)
-        bvalue = false;
-      else
-        bvalue = true;
-    }
+    bvalue = windowKoValue(l1bsTlg_p->u81bsTelData.State != 1, _channelIndex);
     KoENO_GO_BASE__4.valueNoSend(bvalue, DPT_OpenClose);
     KoENO_GO_BASE__4.objectWritten();
 

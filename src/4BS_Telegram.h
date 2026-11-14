@@ -4,6 +4,7 @@
 #include "EnoceanProfils.h"
 #include "EnoceanStructs.h"
 #include "knxprod.h"
+#include "WindowContact.h"
 
 // Vorwärtsdeklaration: Definition steht weiter unten in dieser Datei, wird aber schon innerhalb von handle_4BS
 // aufgerufen.
@@ -29,7 +30,6 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
   float luxfloat;
   float temp;
   float hum;
-  bool bvalue;
 
   FOURBS_A5_02_TYPE *fourBsA5_02_Tlg_p;
   FOURBS_A5_02_2030TYPE *fourBsA5_02_2030_Tlg_p;
@@ -588,20 +588,7 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
       KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
       logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
       // ........Contact..............................................
-      if (fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT == 0) // geschlossen
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = true;
-        else
-          bvalue = false;
-      } else // open
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = false;
-        else
-          bvalue = true;
-      }
-      KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
       logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
       break;
     //**************************************************************
@@ -619,20 +606,7 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
       KoENO_GO_BASE__2.value(luxfloat, Dpt(9, 1));
       logDebug("4BS", "LUX: %u", lux);
       // ........Contact..............................................
-      if (fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT == 0) // geschlossen
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = true;
-        else
-          bvalue = false;
-      } else // open
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = false;
-        else
-          bvalue = true;
-      }
-      KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
       logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
       break;
     //**************************************************************
@@ -645,20 +619,7 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
       KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
       logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
       // ........Contact..............................................
-      if (fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT == 0) // geschlossen
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = true;
-        else
-          bvalue = false;
-      } else // open
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = false;
-        else
-          bvalue = true;
-      }
-      KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
       logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
       // ........Vibration Det.........................................
       KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
@@ -679,20 +640,7 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
       KoENO_GO_BASE__2.value(luxfloat, Dpt(9, 1));
       logDebug("4BS", "LUX: %u", lux);
       // ........Contact..............................................
-      if (fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT == 0) // geschlossen
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = true;
-        else
-          bvalue = false;
-      } else // open
-      {
-        if (((ParamENO_CHWindowcloseValue) >> ENO_CHWindowcloseValueShift) & 1)
-          bvalue = false;
-        else
-          bvalue = true;
-      }
-      KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
       logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
       // ........Vibration Det.........................................
       KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
@@ -784,35 +732,15 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
       // ...................  Fenster Status .......................
       switch (fourBsA5_14_09_0A_Tlg_p->u84BsTelData.CT) {
       case 0x00: // close
-        KoENO_GO_BASE__2.value(false, Dpt(1, 1));
-        KoENO_GO_BASE__3.value(false, Dpt(1, 1));
-        if (ParamENO_CHWindowcloseValue)
-          bvalue = true;
-        else
-          bvalue = false;
-        KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
-
+        setWindowHandleKOs(false, false, _channelIndex);
         logDebug("4BS", "State: close");
         break;
       case 0x01: // tilt
-        KoENO_GO_BASE__2.value(false, Dpt(1, 1));
-        KoENO_GO_BASE__3.value(true, Dpt(1, 1));
-        if (ParamENO_CHWindowcloseValue)
-          bvalue = false;
-        else
-          bvalue = true;
-        KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
-
+        setWindowHandleKOs(false, true, _channelIndex);
         logDebug("4BS", "State: gekippt");
         break;
       case 0x03: // open
-        KoENO_GO_BASE__2.value(true, Dpt(1, 1));
-        KoENO_GO_BASE__3.value(false, Dpt(1, 1));
-        if (ParamENO_CHWindowcloseValue)
-          bvalue = false;
-        else
-          bvalue = true;
-        KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+        setWindowHandleKOs(true, false, _channelIndex);
         logDebug("4BS", "State: open");
         break;
 
@@ -1211,8 +1139,7 @@ inline void handle4BS_A5_09_0C(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 
 inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
   FOURBS_A5_14_09_0A_TYPE *fourBsA5_14_09_0A_Tlg_p;
-  bool bvalue;
-  fourBsA5_14_09_0A_Tlg_p = (FOURBS_A5_14_09_0A_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
+  fourBsA5_14_09_0A_Tlg_p =(FOURBS_A5_14_09_0A_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
   logDebug("4BS", "A5-14-09 ");
   //  ...................  Supply Voltage .......................
   KoENO_GO_BASE__5.value(fourBsA5_14_09_0A_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
@@ -1220,35 +1147,15 @@ inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 
   switch (fourBsA5_14_09_0A_Tlg_p->u84BsTelData.CT) {
   case 0x00: // close
-    KoENO_GO_BASE__2.value(false, Dpt(1, 1));
-    KoENO_GO_BASE__3.value(false, Dpt(1, 1));
-    if (ParamENO_CHWindowcloseValue)
-      bvalue = true;
-    else
-      bvalue = false;
-    KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
-
+    setWindowHandleKOs(false, false, _channelIndex);
     logDebug("4BS", "State: close");
     break;
   case 0x01: // tilt
-    KoENO_GO_BASE__2.value(false, Dpt(1, 1));
-    KoENO_GO_BASE__3.value(true, Dpt(1, 1));
-    if (ParamENO_CHWindowcloseValue)
-      bvalue = false;
-    else
-      bvalue = true;
-    KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
-
+    setWindowHandleKOs(false, true, _channelIndex);
     logDebug("4BS", "State: gekippt");
     break;
   case 0x03: // open
-    KoENO_GO_BASE__2.value(true, Dpt(1, 1));
-    KoENO_GO_BASE__3.value(false, Dpt(1, 1));
-    if (ParamENO_CHWindowcloseValue)
-      bvalue = false;
-    else
-      bvalue = true;
-    KoENO_GO_BASE__4.value(bvalue, Dpt(1, 1));
+    setWindowHandleKOs(true, false, _channelIndex);
     logDebug("4BS", "State: open");
     break;
 
