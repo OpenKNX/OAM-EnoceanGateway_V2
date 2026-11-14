@@ -27,6 +27,19 @@ void setup()
 {
     const uint8_t firmwareRevision = 0;
     openknx.init(firmwareRevision);
+
+    // Schutz: Passt die gespeicherte KO-Tabelle nicht zur Firmware (z.B. KO-Anzahl geändert, ApplicationVersion aber
+    // nicht erhöht), würden Zugriffe auf KOs hinter dem Tabellenende abstürzen - der KNX-Stack prüft keine Grenzen. Dann
+    // die KO-Tabelle entladen: das Gerät startet unkonfiguriert und wartet auf die Programmierung durch die ETS.
+    if (knx.configured() && knx.bau().groupObjectTable().entryCount() < MAIN_MaxKoNumber)
+    {
+        logError("Main", "KO table has %u entries, firmware needs %u - reprogram the application with the ETS",
+                 knx.bau().groupObjectTable().entryCount(), MAIN_MaxKoNumber);
+        uint8_t unload[10] = {LE_UNLOAD};
+        uint8_t count = 1;
+        knx.bau().groupObjectTable().writeProperty(PID_LOAD_STATE_CONTROL, 1, unload, count);
+    }
+
     openknx.addModule(1, openknxLogic);
     openknx.addModule(2, openknxEnoceanModule);
 #ifdef ARDUINO_ARCH_RP2040
