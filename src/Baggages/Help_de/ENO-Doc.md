@@ -1,6 +1,6 @@
 ### EnOcean Gateway
 
-Das Gateway verbindet bis zu 30 EnOcean-Geräte mit KNX. Jedes Gerät belegt einen Kanal mit bis zu 10 Kommunikationsobjekten.
+Das Gateway verbindet bis zu 30 EnOcean-Geräte mit KNX. Jedes Gerät belegt einen Kanal mit bis zu 20 Kommunikationsobjekten.
 
 **Einrichtung eines Kanals**
 
