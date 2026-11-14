@@ -4,6 +4,7 @@
 #include "EnoceanProfils.h"
 #include "EnoceanStructs.h"
 #include "knxprod.h"
+#include "AlarmOutput.h"
 
 inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
 {
@@ -278,14 +279,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
                   {
                         logDebug("VLD", "Profil: D2-06-01");
                         // Alarm
-                        if (SenVal_D2_06_01->u8VldTelAlarm.BAL || SenVal_D2_06_01->u8VldTelAlarm.PPAL)
-                        {
-                              KoENO_GO_BASE__4.value(true, Dpt(1, 1));
-                        }
-                        else
-                        {
-                              KoENO_GO_BASE__4.value(false, Dpt(1, 1));
-                        }
+                        sendAlarm(KoENO_GO_BASE__4, SenVal_D2_06_01->u8VldTelAlarm.BAL || SenVal_D2_06_01->u8VldTelAlarm.PPAL, _channelIndex);
                         logDebug("VLD", "Alarm: %u", SenVal_D2_06_01->u8VldTelAlarm.BAL);
                         // Window State
                         // closed = State1 = 0 & State2 = 0
@@ -398,7 +392,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
                   {
                         SenVal_D2_06_50_0x02 = (VLD_D2_06_50_Alarm_Status_0x02 *)&(f_Pkt_st->u8DataBuffer[1]);
                         logDebug("VLD", "Profil: D2-06-50 (0x02), Alarm: %u", SenVal_D2_06_50_0x02->u8VldTelAlarm.BA);
-                        KoENO_GO_BASE__4.value(SenVal_D2_06_50_0x02->u8VldTelAlarm.BA, Dpt(1, 1));
+                        sendAlarm(KoENO_GO_BASE__4, SenVal_D2_06_50_0x02->u8VldTelAlarm.BA, _channelIndex);
                   }
                   break;
 
@@ -421,7 +415,7 @@ inline void handle_VLD(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex)
                   SenStat_D2_14_30 = (VLD_D2_14_30_TELEGRAM *)&(f_Pkt_st->u8DataBuffer[1]);
                   logDebug("VLD", "Profil: D2-14-30");
                   // Smoke Alarm
-                  KoENO_GO_BASE__4.value(SenStat_D2_14_30->u8VldTelSenSta5.smokeAlarm, Dpt(1, 1));
+                  sendAlarm(KoENO_GO_BASE__4, SenStat_D2_14_30->u8VldTelSenSta5.smokeAlarm, _channelIndex);
                   logDebug("VLD", "Smoke Alarm: %u", SenStat_D2_14_30->u8VldTelSenSta5.smokeAlarm);
                   // Status Bits
                   KoENO_GO_BASE__10.value(SenStat_D2_14_30->u8VldTelSenSta5.statusbits, Dpt(5, 1));

@@ -69,12 +69,17 @@ void EnoceanChannel::loop() {
   if (_rockerWippe == ROCKER_NONE || _rockerLong)
     return;
 
-  if (!rockerNeedsLongPress(rockerFunction(_rockerWippe, _channelIndex)))
+  bool keyMode = rockerKeyMode(_rockerWippe, _channelIndex);
+  if (keyMode ? !rockerKeyNeedsLongPress(rockerKeyConfig(_rockerWippe, _rockerUpper, _channelIndex))
+              : !rockerNeedsLongPress(rockerFunction(_rockerWippe, _channelIndex)))
     return;
 
   if (delayCheck(_rockerPressTime, ParamENO_CHRockerLongPressWaitTime * 10)) {
     _rockerLong = true;
-    rockerLongStart(_rockerWippe, _rockerUpper, _channelIndex);
+    if (keyMode)
+      rockerKeyLongStart(_rockerWippe, _rockerUpper, _rockerKeyDirections, _channelIndex);
+    else
+      rockerLongStart(_rockerWippe, _rockerUpper, _channelIndex);
   }
 }
 
@@ -170,26 +175,39 @@ void EnoceanChannel::handleRocker(PACKET_SERIAL_TYPE_ *pPacket) {
   bool pressed = db0 & 0x10; // EB: Energy Bow
 
   if (pressed) {
-    bool upper = false;
-    uint8_t wippe = rockerDecode(db0, &upper, _channelIndex);
+    bool upper = true;
+    uint8_t wippe = ROCKER_WIPPE_A; // Einzeltaste (F6-01-01): Einstellungen wie Wippe A, Taste oben
+    if (rockerLayout(_channelIndex) != ROCKER_LAYOUT_1KEY)
+      wippe = rockerDecode(db0, &upper, _channelIndex);
     logDebugP("Rocker pressed: DB0 %02X, Wippe %u, %s", db0, wippe, upper ? "oben" : "unten");
     if (wippe == ROCKER_NONE)
       return;
 
+    uint8_t key = rockerKeyBit(wippe, upper);
+    if (key == _rockerLastKey && !delayCheck(_rockerPressTime, ROCKER_DUPLICATE_MS)) {
+      logDebugP("Rocker: duplicate telegram ignored");
+      return;
+    }
+    _rockerLastKey = key;
     _rockerWippe = wippe;
     _rockerUpper = upper;
     _rockerLong = false;
     _rockerPressTime = millis();
-    rockerPress(wippe, upper, _channelIndex);
+    if (rockerKeyMode(wippe, _channelIndex))
+      rockerKeyPress(wippe, upper, _channelIndex);
+    else
+      rockerPress(wippe, upper, _channelIndex);
     return;
   }
 
-  // losgelassen
+  // losgelassen (das Telegramm sagt nicht welche Taste, daher die gemerkte)
   logDebugP("Rocker released");
   if (_rockerWippe == ROCKER_NONE)
     return;
 
-  if (_rockerLong)
+  if (rockerKeyMode(_rockerWippe, _channelIndex))
+    rockerKeyRelease(_rockerWippe, _rockerUpper, _rockerLong, _rockerKeyDirections, _channelIndex);
+  else if (_rockerLong)
     rockerLongEnd(_rockerWippe, _channelIndex);
   else
     rockerShort(_rockerWippe, _rockerUpper, _channelIndex);
@@ -294,6 +312,13 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
     break; // ENDE EEP-Profil
 
   case Hersteller_Eltako: // Hersteller Eltako
+    // Taster: gleiche Auswertung wie das EEP-Profil Rocker, Tastenlayout aus dem Produkt (siehe rockerLayout())
+    if (ParamENO_CHProductselType == Eltako_Taster) {
+      if (!eltakoExpectRorg(pPacket, u8RORG_RPS))
+        return false;
+      handleRocker(pPacket);
+      return true;
+    }
     handleProductEltako(pPacket, _channelIndex);
     return true;
     break; // ENDE Hersteller ELTAKO

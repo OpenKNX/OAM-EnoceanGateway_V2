@@ -3,6 +3,8 @@
 Bezugsquelle: [Link to page](https://Smart-mf.de/)
 ------------------------------------------------
 
+Dokumentation: [Applikationsbeschreibung](doc/Applikationsbeschreibung.md) · [Unterstützte Eltako-Geräte](doc/Supported-EnOcean-Devices.md)
+
 Übersicht aktuell unterstützer EEP Profile
 
 **Nr**|**Profil**|**impl.**|**tested**|**Beschreibung**
@@ -49,15 +51,15 @@ Bezugsquelle: [Link to page](https://Smart-mf.de/)
 40|A5-08-02|x| | 
 41|A5-08-03|x| | 
 42|A5-09-02| | | 
-43|A5-09-04| | | 
-44|A5-09-05| | | 
+43|A5-09-04|x| |CO2 (z.B. Eltako FCO2TF65)
+44|A5-09-05|x| |VOC (z.B. Eltako FLT58)
 45|A5-09-06| | | 
 46|A5-09-07| | | 
 47|A5-09-08| | | 
 48|A5-09-09| | | 
 49|A5-09-0A| | | 
 50|A5-09-0B| | | 
-51|A5-09-0C| | | 
+51|A5-09-0C|x| |VOC (z.B. Eltako FLGTF55E)
 52|A5-10-01| | | 
 53|A5-10-02| | | 
 54|A5-10-03| | | 
@@ -122,10 +124,10 @@ Bezugsquelle: [Link to page](https://Smart-mf.de/)
 113|A5-14-08|x| | 
 114|A5-14-09|x| | 
 115|A5-14-0A|x| | 
-116|A5-20-01| | | 
+116|A5-20-01|x| |Stellantrieb bidirektional (z.B. Eltako FKS-SV)
 117|A5-20-02| | | 
 118|A5-20-03| | | 
-119|A5-20-04| | | 
+119|A5-20-04|x| |Stellantrieb bidirektional (z.B. Eltako FKS-B)
 120|A5-20-05| | | 
 121|A5-20-06|x| |MVA-005 Heizungsaktor
 122|A5-20-10| | | 
@@ -133,36 +135,36 @@ Bezugsquelle: [Link to page](https://Smart-mf.de/)
 124|A5-20-12| | | 
 125|A5-30-01| | | 
 126|A5-30-02| | | 
-127|A5-30-03| | | 
+127|A5-30-03|(x)| |nur über Eltako FRWB/FHMB
 128|A5-30-04| | | 
 129|A5-30-05| | | 
 130|A5-30-06| | | 
 131|A5-37-01| | | 
-132|A5-38-08| | | 
+132|A5-38-08|x| |Zentralbefehl Schalten/Dimmen (KNX → EnOcean)
 133|A5-38-09| | | 
 134|A5-3F-00| | | 
-135|A5-3F-7F| | | 
+135|A5-3F-7F|(x)| |Eltako-Jalousieaktor (KNX → EnOcean)
 136|D2-00-01| | | 
-137|D2-01-00| | | 
-138|D2-01-01| | | 
-139|D2-01-02| | | 
-140|D2-01-03| | | 
-141|D2-01-04| | | 
-142|D2-01-05| | | 
-143|D2-01-06| | | 
-144|D2-01-07| | | 
-145|D2-01-08| | | 
-146|D2-01-09| | | 
-147|D2-01-0A| | | 
-148|D2-01-0B| | | 
-149|D2-01-0C| | | 
-150|D2-01-0D| | | 
-151|D2-01-0E| | | 
-152|D2-01-0F| | | 
-153|D2-01-10| | | 
-154|D2-01-11| | | 
+137|D2-01-00|x| |
+138|D2-01-01|x| |
+139|D2-01-02|x| |
+140|D2-01-03|x| |
+141|D2-01-04|x| |
+142|D2-01-05|x| |
+143|D2-01-06|x| |
+144|D2-01-07|x| |
+145|D2-01-08|x| |
+146|D2-01-09|x| |
+147|D2-01-0A|x| |
+148|D2-01-0B|x| |
+149|D2-01-0C|x| |
+150|D2-01-0D|x| |
+151|D2-01-0E|x| |
+152|D2-01-0F|x| |
+153|D2-01-10|x| |
+154|D2-01-11|x| |
 155|D2-01-12|x|passed|NodOn 2CH Aktor
-156|D2-01-13| | | 
+156|D2-01-13|x| |
 157|D2-01-14| | | 
 158|D2-01-15| | | 
 159|D2-01-16| | | 
@@ -288,8 +290,8 @@ Bezugsquelle: [Link to page](https://Smart-mf.de/)
 279|D2-B0-00| | | 
 280|D2-B1-00| | | 
 281|D5-00-01|x|passed|Fensterkontakt
-282|F6-01-01|x|passed|Rocker Switch 1Wippe
-283|F6-02-01|x|passed|Rocker Switch 2Wippen
+282|F6-01-01|x|passed|Taster mit 1 Taste
+283|F6-02-01|x|passed|Rocker Switch, Einzeltasten, langer Tastendruck
 284|F6-02-02|x| | 
 285|F6-02-03|x| | 
 286|F6-02-04|x| | 
@@ -298,7 +300,7 @@ Bezugsquelle: [Link to page](https://Smart-mf.de/)
 289|F6-04-01| | | 
 290|F6-04-02| | | 
 291|F6-05-00|x| | 
-292|F6-05-01|x| | 
+292|F6-05-01|x| |Wasser (Statusbyte, z.B. Eltako FWS81)
 293|F6-05-02|x| | 
 294|F6-10-00|x|passed|Fenstergriff
 295|F6-10-01|x|passed|Fenstergriff

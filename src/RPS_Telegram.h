@@ -5,6 +5,7 @@
 #include "EnoceanStructs.h"
 #include "knxprod.h"
 #include "WindowContact.h"
+#include "AlarmOutput.h"
 
 /*******************************************************************************************
  *  Rocker / Taster (Kanal-Profil "Rocker", EnOcean -> KNX), Telegramme F6-02-xx
@@ -13,10 +14,12 @@
  *       Bit 3-1 R2 (zweite Taste), Bit 0 SA (zweite Taste gültig).
  *  "O" = Wippe oben, "I" = Wippe unten.
  *
- *  KO-Belegung (ETS / KO-Tabelle):
- *    Wippe A : KO_1 (GO_BASE__2) Schalten / AUF-AB / Szene,  KO_2 (GO_BASE__3) Dimmen / Lamelle-Stopp
- *    Wippe B : KO_3 (GO_BASE__4)                              KO_4 (GO_BASE__5)
- *    Wippe AB: KO_5 (GO_BASE__6)                              KO_6 (GO_BASE__7)
+ *  KO-Belegung (ETS / KO-Tabelle), alle KOs einer Wippe stehen zusammen:
+ *    Bedienung Wippe:  A KO_0 Schalten / AUF-AB / Szene, KO_1 Dimmen / Lamelle-Stopp
+ *                      B KO_4 / KO_5, AB KO_8 / KO_9
+ *    Einzeltasten:     A oben KO_0 (kurz) / KO_1 (lang, Dimmen, Stopp), A unten KO_2 / KO_3
+ *                      B oben KO_4 / KO_5, B unten KO_6 / KO_7, AB oben KO_8, AB unten KO_9
+ *    (KO_n = GO_BASE__(n+1); KO_0 ist nur bei Taster-Emulation KNX -> EnOcean der Eingang)
  *******************************************************************************************/
 
 #define ROCKER_WIPPE_A 0
@@ -32,6 +35,71 @@
 #define ROCKER_FUNC_BLIND_UP_DOWN 5
 #define ROCKER_FUNC_BLIND_DOWN_UP 6
 #define ROCKER_FUNC_SCENE 7
+
+// Tastenlayout: Wippen1..Wippen3 wie ETS-Parameter RockerProfil (1 Wippe, 2 Wippen, 1 + 2 Wippen) plus Einzeltaste
+#define ROCKER_LAYOUT_1KEY 0
+
+// Eltako-Taster (Hersteller Eltako, Kategorie Taster): der Produktwert legt das Tastenlayout fest, laut "Inhalte der
+// Eltako-Funktelegramme":
+//    1..19: eine Taste (F6-01-01): Drücken 0x10, Loslassen 0x00
+//   20..49: eine Wippe bzw. 2 Tasten (F6-02-01): oben 0x70, unten 0x50
+//   50.. : Doppelwippe bzw. 4 Tasten (F6-02-01): rechts 0x70 / 0x50 (Wippe B), links 0x30 / 0x10 (Wippe A),
+//          beide Wippen gleichzeitig = Wippe AB.
+// 6- und 8-fach-Sender senden mit zwei IDs, je ID ein Kanal: ihre Tastengruppen sind eigene Produkte (40..49 die
+// 2er-Gruppe der 6-fach-Sender, ab 70 je 4 Tasten). Sie haben keine Wippen, nur Einzeltasten, und kein gleichzeitiges
+// Drücken (Wippe AB).
+#define ELTAKO_TASTER_1KEY_MAX 19
+#define ELTAKO_TASTER_1ROCKER_MAX 49
+#define ELTAKO_TASTER_2KEYS_MIN 40
+#define ELTAKO_TASTER_4KEYS_MIN 70
+
+// Funktionen einer Einzeltaste (ETS-Parameter RockerKey..Funktion; Dimmen und Jalousie nur Wippe A/B, nicht AB)
+#define ROCKER_KEY_TOGGLE 1
+#define ROCKER_KEY_PUSH 2
+#define ROCKER_KEY_SCENE 3
+#define ROCKER_KEY_DIM 4   // kurz Umschalten, lang Dimmen (Richtung wechselt)
+#define ROCKER_KEY_BLIND 5 // lang Fahren (Richtung wechselt), kurz Stopp/Lamelle
+
+// Langer Tastendruck einer Einzeltaste bei Umschalten / Gedrückt / Szene (ETS-Parameter RockerKey..Long), auf dem
+// zweiten KO
+#define ROCKER_KEY_LONG_NONE 0
+#define ROCKER_KEY_LONG_TOGGLE 1
+#define ROCKER_KEY_LONG_ON 2
+#define ROCKER_KEY_LONG_OFF 3
+#define ROCKER_KEY_LONG_SCENE 4
+
+// Einstellungen einer Einzeltaste
+struct RockerKeyConfig {
+  uint8_t function;
+  bool sendRelease;     // beim Loslassen senden (nur Gedrückt)
+  bool invert;          // Gedrückt invertiert: Drücken = 0, Loslassen = 1
+  uint8_t longFunction; // langer Tastendruck bei Umschalten / Gedrückt / Szene (nur Wippe A/B)
+  uint8_t longScene;    // Szene (1..64) beim langen Tastendruck
+};
+
+// Liefert das Tastenlayout des Kanals: EEP-Profil per Parameter "Schaltertyp", Eltako-Taster aus dem Produkt.
+inline uint8_t rockerLayout(uint8_t _channelIndex) {
+  if (ParamENO_CHProductsel != Hersteller_Eltako)
+    return ParamENO_CHRockerProfil;
+
+  uint8_t product = ParamENO_CHProductselTypeTas;
+  if (product <= ELTAKO_TASTER_1KEY_MAX)
+    return ROCKER_LAYOUT_1KEY;
+  if (product <= ELTAKO_TASTER_1ROCKER_MAX)
+    return Wippen1;
+  if (product >= ELTAKO_TASTER_4KEYS_MIN)
+    return Wippen2;
+  return Wippen3;
+}
+
+// true bei Eltako-Sendern ohne Wippen (Einzeltaste, 6- und 8-fach-Sender): immer Einzeltasten.
+inline bool rockerKeysOnly(uint8_t _channelIndex) {
+  if (ParamENO_CHProductsel != Hersteller_Eltako)
+    return false;
+  uint8_t product = ParamENO_CHProductselTypeTas;
+  return product <= ELTAKO_TASTER_1KEY_MAX || (product >= ELTAKO_TASTER_2KEYS_MIN && product <= ELTAKO_TASTER_1ROCKER_MAX) ||
+         product >= ELTAKO_TASTER_4KEYS_MIN;
+}
 
 // Startet einen Dimmvorgang (DPT 3.007, Stepcode 1 = 100 %) in die angegebene Richtung (true = heller).
 inline void SendDPT3_007(bool dir, GroupObject &ko) {
@@ -71,27 +139,27 @@ inline uint8_t rockerScene(uint8_t wippe, bool upper, uint8_t _channelIndex) {
   }
 }
 
-// Erstes KO der logischen Wippe (Schalten / AUF-AB / Szene).
+// Erstes KO der logischen Wippe (Schalten / AUF-AB / Szene): A KO_0, B KO_4, AB KO_8.
 inline GroupObject &rockerKoMain(uint8_t wippe, uint8_t _channelIndex) {
+  switch (wippe) {
+  case ROCKER_WIPPE_A:
+    return KoENO_GO_BASE__1;
+  case ROCKER_WIPPE_B:
+    return KoENO_GO_BASE__5;
+  default:
+    return KoENO_GO_BASE__9;
+  }
+}
+
+// Zweites KO der logischen Wippe (Dimmen / Lamelle-Stopp): A KO_1, B KO_5, AB KO_9.
+inline GroupObject &rockerKoSecond(uint8_t wippe, uint8_t _channelIndex) {
   switch (wippe) {
   case ROCKER_WIPPE_A:
     return KoENO_GO_BASE__2;
   case ROCKER_WIPPE_B:
-    return KoENO_GO_BASE__4;
-  default:
     return KoENO_GO_BASE__6;
-  }
-}
-
-// Zweites KO der logischen Wippe (Dimmen / Lamelle-Stopp).
-inline GroupObject &rockerKoSecond(uint8_t wippe, uint8_t _channelIndex) {
-  switch (wippe) {
-  case ROCKER_WIPPE_A:
-    return KoENO_GO_BASE__3;
-  case ROCKER_WIPPE_B:
-    return KoENO_GO_BASE__5;
   default:
-    return KoENO_GO_BASE__7;
+    return KoENO_GO_BASE__10;
   }
 }
 
@@ -188,7 +256,7 @@ inline uint8_t rockerDecode(uint8_t db0, bool *upper, uint8_t _channelIndex) {
   // zweite Taste auf der jeweils anderen Wippe -> beide Wippen gleichzeitig (Wippe AB)
   bool both = secondAction && ((r2 & 0x02) != (r1 & 0x02));
 
-  switch (ParamENO_CHRockerProfil) {
+  switch (rockerLayout(_channelIndex)) {
   case Wippen1: // 1 Wippe: jede Taste / Kombination wirkt auf Wippe A
     return ROCKER_WIPPE_A;
   case Wippen2: // 2 Wippen
@@ -199,6 +267,185 @@ inline uint8_t rockerDecode(uint8_t db0, bool *upper, uint8_t _channelIndex) {
     if (both)
       return ROCKER_WIPPE_AB;
     return rockerB ? ROCKER_WIPPE_B : ROCKER_WIPPE_A;
+  }
+}
+
+// Führt die Funktion einer Einzeltaste aus: Umschalten bei jedem Drücken, Gedrückt (Drücken = 1, Loslassen = 0 nur
+// wenn gewünscht, invertiert umgekehrt) oder Szene (scene = 1..64) beim Drücken.
+inline void rockerKeyAction(GroupObject &ko, const RockerKeyConfig &cfg, uint8_t scene, bool pressed) {
+  switch (cfg.function) {
+  case ROCKER_KEY_TOGGLE:
+    if (pressed) {
+      bool on = !(bool)ko.value(Dpt(1, 1));
+      logDebug("RPS", "Taste: Umschalten %u", on);
+      ko.value(on, Dpt(1, 1));
+    }
+    break;
+  case ROCKER_KEY_PUSH:
+    logDebug("RPS", "Taste: %s", pressed ? "gedrückt" : "losgelassen");
+    if (pressed || cfg.sendRelease)
+      ko.value(pressed != cfg.invert, Dpt(1, 1));
+    break;
+  case ROCKER_KEY_SCENE:
+    if (pressed) {
+      logDebug("RPS", "Taste: Szene %u", scene);
+      ko.value((uint8_t)(scene - 1), Dpt(17, 1));
+    }
+    break;
+  }
+}
+
+// true, wenn die Tasten oben und unten der logischen Wippe getrennt bedient werden (ETS: Bedienung = Einzeltasten,
+// bei Eltako-Sendern ohne Wippen immer).
+inline bool rockerKeyMode(uint8_t wippe, uint8_t _channelIndex) {
+  if (rockerKeysOnly(_channelIndex))
+    return true;
+  switch (wippe) {
+  case ROCKER_WIPPE_A:
+    return ParamENO_CHRockerModeA;
+  case ROCKER_WIPPE_B:
+    return ParamENO_CHRockerModeB;
+  default:
+    return ParamENO_CHRockerModeC;
+  }
+}
+
+// Einstellungen der Taste oben bzw. unten einer Wippe mit getrennten Tasten (Wippe AB ohne Dimmen / langen Druck).
+inline RockerKeyConfig rockerKeyConfig(uint8_t wippe, bool upper, uint8_t _channelIndex) {
+  switch (wippe) {
+  case ROCKER_WIPPE_A:
+    if (upper)
+      return {ParamENO_CHRockerKeyAOFunktion, ParamENO_CHRockerKeyAORelease, ParamENO_CHRockerKeyAOInvert, ParamENO_CHRockerKeyAOLong,
+              ParamENO_CHRockerKeyAOLongScene};
+    return {ParamENO_CHRockerKeyAUFunktion, ParamENO_CHRockerKeyAURelease, ParamENO_CHRockerKeyAUInvert, ParamENO_CHRockerKeyAULong,
+            ParamENO_CHRockerKeyAULongScene};
+  case ROCKER_WIPPE_B:
+    if (upper)
+      return {ParamENO_CHRockerKeyBOFunktion, ParamENO_CHRockerKeyBORelease, ParamENO_CHRockerKeyBOInvert, ParamENO_CHRockerKeyBOLong,
+              ParamENO_CHRockerKeyBOLongScene};
+    return {ParamENO_CHRockerKeyBUFunktion, ParamENO_CHRockerKeyBURelease, ParamENO_CHRockerKeyBUInvert, ParamENO_CHRockerKeyBULong,
+            ParamENO_CHRockerKeyBULongScene};
+  default:
+    if (upper)
+      return {ParamENO_CHRockerKeyCOFunktion, ParamENO_CHRockerKeyCORelease, ParamENO_CHRockerKeyCOInvert, ROCKER_KEY_LONG_NONE, 1};
+    return {ParamENO_CHRockerKeyCUFunktion, ParamENO_CHRockerKeyCURelease, ParamENO_CHRockerKeyCUInvert, ROCKER_KEY_LONG_NONE, 1};
+  }
+}
+
+// Erstes KO einer Einzeltaste: A oben KO_0, A unten KO_2, B oben KO_4, B unten KO_6, AB oben KO_8, AB unten KO_9.
+inline GroupObject &rockerKeyKo(uint8_t wippe, bool upper, uint8_t _channelIndex) {
+  switch (wippe) {
+  case ROCKER_WIPPE_A:
+    return upper ? KoENO_GO_BASE__1 : KoENO_GO_BASE__3;
+  case ROCKER_WIPPE_B:
+    return upper ? KoENO_GO_BASE__5 : KoENO_GO_BASE__7;
+  default:
+    return upper ? KoENO_GO_BASE__9 : KoENO_GO_BASE__10;
+  }
+}
+
+// Zweites KO einer Einzeltaste (langer Tastendruck, Dimmen, Stopp/Lamelle), direkt hinter dem ersten: A oben KO_1,
+// A unten KO_3, B oben KO_5, B unten KO_7. Wippe AB hat keins.
+inline GroupObject &rockerKeyKo2(uint8_t wippe, bool upper, uint8_t _channelIndex) {
+  if (wippe == ROCKER_WIPPE_A)
+    return upper ? KoENO_GO_BASE__2 : KoENO_GO_BASE__4;
+  return upper ? KoENO_GO_BASE__6 : KoENO_GO_BASE__8;
+}
+
+// Bit der Einzeltaste im Richtungsspeicher (Dimmen: zuletzt heller, Jalousie: zuletzt AB).
+inline uint8_t rockerKeyBit(uint8_t wippe, bool upper) { return 1 << (wippe * 2 + (upper ? 0 : 1)); }
+
+// true, wenn die Taste zwischen kurzem und langem Tastendruck unterscheidet. Dann wird der kurze Druck erst beim
+// Loslassen ausgeführt, sonst sofort beim Drücken.
+inline bool rockerKeyNeedsLongPress(const RockerKeyConfig &cfg) {
+  if (cfg.function == ROCKER_KEY_DIM || cfg.function == ROCKER_KEY_BLIND)
+    return true;
+  return cfg.longFunction != ROCKER_KEY_LONG_NONE;
+}
+
+// Einzeltaste gedrückt: ohne Unterscheidung kurz / lang sofort ausführen.
+inline void rockerKeyPress(uint8_t wippe, bool upper, uint8_t _channelIndex) {
+  RockerKeyConfig cfg = rockerKeyConfig(wippe, upper, _channelIndex);
+  logDebug("RPS", "Wippe %u: Taste %s gedrückt", wippe, upper ? "oben" : "unten");
+  if (!rockerKeyNeedsLongPress(cfg))
+    rockerKeyAction(rockerKeyKo(wippe, upper, _channelIndex), cfg, rockerScene(wippe, upper, _channelIndex), true);
+}
+
+// Langer Tastendruck einer Einzeltaste erkannt (Taste noch gedrückt): Dimmen bzw. Fahren mit wechselnder Richtung
+// (Dimmen bei ausgeschaltetem Licht immer heller) oder die Funktion für langen Tastendruck auf dem zweiten KO.
+inline void rockerKeyLongStart(uint8_t wippe, bool upper, uint8_t &directions, uint8_t _channelIndex) {
+  RockerKeyConfig cfg = rockerKeyConfig(wippe, upper, _channelIndex);
+  GroupObject &ko2 = rockerKeyKo2(wippe, upper, _channelIndex);
+  uint8_t bit = rockerKeyBit(wippe, upper);
+
+  switch (cfg.function) {
+  case ROCKER_KEY_DIM: {
+    bool up = !(bool)rockerKeyKo(wippe, upper, _channelIndex).value(Dpt(1, 1)) || !(directions & bit);
+    directions = up ? (directions | bit) : (directions & ~bit);
+    logDebug("RPS", "Wippe %u: Taste lang, Dimmen %s", wippe, up ? "heller" : "dunkler");
+    SendDPT3_007(up, ko2);
+    break;
+  }
+  case ROCKER_KEY_BLIND: {
+    bool down = !(directions & bit);
+    directions = down ? (directions | bit) : (directions & ~bit);
+    // DPT 1.008 AUF/AB: 0 = AUF, 1 = AB
+    logDebug("RPS", "Wippe %u: Taste lang, Jalousie %s", wippe, down ? "AB" : "AUF");
+    rockerKeyKo(wippe, upper, _channelIndex).value(down, Dpt(1, 8));
+    break;
+  }
+  default:
+    switch (cfg.longFunction) {
+    case ROCKER_KEY_LONG_TOGGLE:
+      ko2.value(!(bool)ko2.value(Dpt(1, 1)), Dpt(1, 1));
+      break;
+    case ROCKER_KEY_LONG_ON:
+      ko2.value(true, Dpt(1, 1));
+      break;
+    case ROCKER_KEY_LONG_OFF:
+      ko2.value(false, Dpt(1, 1));
+      break;
+    case ROCKER_KEY_LONG_SCENE:
+      ko2.value((uint8_t)(cfg.longScene - 1), Dpt(17, 1));
+      break;
+    }
+    logDebug("RPS", "Wippe %u: Taste lang, Funktion %u", wippe, cfg.longFunction);
+    break;
+  }
+}
+
+// Einzeltaste losgelassen: nach langem Druck Dimmen stoppen (Jalousie fährt weiter), nach kurzem Druck die kurze
+// Funktion ausführen (Dimmen: Umschalten, Jalousie: Stopp/Lamelle in letzter Fahrtrichtung).
+inline void rockerKeyRelease(uint8_t wippe, bool upper, bool wasLong, uint8_t directions, uint8_t _channelIndex) {
+  RockerKeyConfig cfg = rockerKeyConfig(wippe, upper, _channelIndex);
+  GroupObject &ko = rockerKeyKo(wippe, upper, _channelIndex);
+  logDebug("RPS", "Wippe %u: Taste %s losgelassen", wippe, upper ? "oben" : "unten");
+
+  if (wasLong) {
+    if (cfg.function == ROCKER_KEY_DIM)
+      stopDim(rockerKeyKo2(wippe, upper, _channelIndex));
+    return;
+  }
+
+  if (!rockerKeyNeedsLongPress(cfg)) {
+    rockerKeyAction(ko, cfg, rockerScene(wippe, upper, _channelIndex), false);
+    return;
+  }
+
+  switch (cfg.function) {
+  case ROCKER_KEY_DIM:
+    ko.value(!(bool)ko.value(Dpt(1, 1)), Dpt(1, 1));
+    break;
+  case ROCKER_KEY_BLIND:
+    // DPT 1.007 Schritt: 0 = AUF, 1 = AB
+    rockerKeyKo2(wippe, upper, _channelIndex).value((bool)(directions & rockerKeyBit(wippe, upper)), Dpt(1, 7));
+    break;
+  default: // Umschalten / Gedrückt / Szene mit langem Tastendruck: kurzer Druck erst jetzt
+    rockerKeyAction(ko, cfg, rockerScene(wippe, upper, _channelIndex), true);
+    // Gedrückt: Drücken und Loslassen fallen zusammen, ergibt einen kurzen Impuls (wenn Loslassen gesendet wird)
+    if (cfg.function == ROCKER_KEY_PUSH)
+      rockerKeyAction(ko, cfg, 0, false);
+    break;
   }
 }
 
@@ -228,19 +475,25 @@ inline void handle_F6_02_03(uint8_t value, uint8_t _channelIndex) {
   }
 }
 
-// Verarbeitet die F6-05-xx-Telegramme (Rauch-/Wassermelder bzw. Energiestatus) und schreibt den passenden
+// Verarbeitet die F6-05-xx-Telegramme (Rauch-/Wind-/Wassermelder bzw. Energiestatus) und schreibt den passenden
 // Alarm-/Statuswert.
 // KO-Belegung laut ETS: KO_3 (GO_BASE__4) = Alarm, KO_4 (GO_BASE__5) = Energy Low.
-inline void handle_F6_05_0x(uint8_t value, uint8_t _channelIndex) {
+// Wasser (F6-05-01): Data 0x11, ob Wasser da ist steht im Statusbyte (NU-Bit, z.B. Eltako FWS81: 0x30 = Wasser,
+// 0x20 = kein Wasser).
+inline void handle_F6_05_0x(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
+  uint8_t value = f_Pkt_st->u8DataBuffer[1];
+  uint8_t status = f_Pkt_st->u8DataBuffer[6];
+  logDebug("RPS", "F6-05: Data %02X, Status %02X", value, status);
+
   switch (value) {
   case 0x00: // SMOKE/WIND Alarm OFF
-    KoENO_GO_BASE__4.value(false, DPT_Bool);
+    sendAlarm(KoENO_GO_BASE__4, false, _channelIndex);
     break;
   case 0x10: // SMOKE/WIND Alarm ON
-    KoENO_GO_BASE__4.value(true, DPT_Bool);
+    sendAlarm(KoENO_GO_BASE__4, true, _channelIndex);
     break;
-  case 0x11: // Water detected
-    KoENO_GO_BASE__4.value(true, DPT_Bool);
+  case 0x11: // Water detected / kein Wasser (NU-Bit)
+    sendAlarm(KoENO_GO_BASE__4, status & 0x10, _channelIndex);
     break;
   case 0x30: // Energy LOW
     KoENO_GO_BASE__5.value(true, DPT_Bool);
@@ -283,21 +536,21 @@ inline void handle_RPS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
   //**************************************************************
   case F6_05_00:
     logDebug("RPS", "Profil: F6-05-00");
-    handle_F6_05_0x(f_Pkt_st->u8DataBuffer[1], _channelIndex);
+    handle_F6_05_0x(f_Pkt_st, _channelIndex);
     break;
   //**************************************************************
   // ----------------- Profil: F6-05-01 --------------------------
   //**************************************************************
   case F6_05_01:
     logDebug("RPS", "Profil: F6-05-01");
-    handle_F6_05_0x(f_Pkt_st->u8DataBuffer[1], _channelIndex);
+    handle_F6_05_0x(f_Pkt_st, _channelIndex);
     break;
     //**************************************************************
   // ----------------- Profil: F6-05-02   ------------------------
   //**************************************************************
   case F6_05_02:
     logDebug("RPS", "Profil: F6-05-02");
-    handle_F6_05_0x(f_Pkt_st->u8DataBuffer[1], _channelIndex);
+    handle_F6_05_0x(f_Pkt_st, _channelIndex);
     break;
   //**************************************************************
   // ----------------- Profil: F6-10-00 --------------------------

@@ -940,6 +940,11 @@ void EnoceanModule::handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObje
   if (_channels[_channelIndex]->processKnxActuator(koIndex, iKo))
     return;
 
+  // VLD und Taster-Emulation gibt es nur über das EEP-Profil (die Profilauswahl bleibt beim Wechsel auf ein
+  // Hersteller-Produkt im Speicher stehen)
+  if (ParamENO_CHProductsel != EEP_Profil)
+    return;
+
 //  if (koIndex != _channelIndex) // prüft ob KO zum CHannel passt
 //  {
 //    return;

@@ -125,18 +125,17 @@
 #define A5_08_02 40
 #define A5_08_03 41
 
-#define A5_09_02 50
-#define A5_09_03 51
-#define A5_09_04 52
-#define A5_09_05 53
-#define A5_09_06 54
-#define A5_09_07 55
-#define A5_09_08 56
-#define A5_09_09 57
-#define A5_09_0A 58
-#define A5_09_0B 59
-#define A5_09_0C 402
-#define A5_09_0D 403
+// Werte wie in der ETS (ParameterType Profil4BS09), A5-09-03 und A5-09-0D gibt es dort nicht
+#define A5_09_02 42
+#define A5_09_04 43
+#define A5_09_05 44
+#define A5_09_06 45
+#define A5_09_07 46
+#define A5_09_08 47
+#define A5_09_09 48
+#define A5_09_0A 49
+#define A5_09_0B 50
+#define A5_09_0C 51
 
 // A5-38-08 Zentralbefehl (Gateway -> Aktor), Auswahl Schalt- bzw. Dimmaktor (ParamENO_CHProfil4BS38)
 #define A5_38_08_SWITCH 410

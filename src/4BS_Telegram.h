@@ -5,6 +5,7 @@
 #include "EnoceanStructs.h"
 #include "knxprod.h"
 #include "WindowContact.h"
+#include "AlarmOutput.h"
 
 // Vorwärtsdeklaration: Definition steht weiter unten in dieser Datei, wird aber schon innerhalb von handle_4BS
 // aufgerufen.
@@ -1165,22 +1166,16 @@ inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 }
 
 inline void handle4BS_A5_30_03(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
-  bool bvalue;
   FOURBS_A5_30_03_TYPE *fourBsA5_30_39_Tlg_p;
   fourBsA5_30_39_Tlg_p = (FOURBS_A5_30_03_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
   logDebug("4BS", "A5-30-03 ");
   //******************** Temperatur **************************************************/
   float temp = (float)(fourBsA5_30_39_Tlg_p->u8Temp * 0.156862745);
   KoENO_GO_BASE__2.value(temp, Dpt(9, 1));
-  //******************** Alarm *******************************************************/
-  if (fourBsA5_30_39_Tlg_p->u8Alarm == 0x0F)
-    bvalue = true;
-  else if (fourBsA5_30_39_Tlg_p->u8Alarm == 0x1F)
-    bvalue = false;
-  else
-    bvalue = false;
-  KoENO_GO_BASE__4.value(bvalue, Dpt(1, 5));
+  //******************** Alarm: 0x0F = Alarm, 0x1F = kein Alarm *******************************************/
+  bool alarm = fourBsA5_30_39_Tlg_p->u8Alarm == 0x0F;
+  sendAlarm(KoENO_GO_BASE__4, alarm, _channelIndex);
 
   logDebug("4BS", "Temp: %.1f", temp);
-  logDebug("4BS", "Alarm: %.1f", bvalue);
+  logDebug("4BS", "Alarm: %u (%02X)", alarm, fourBsA5_30_39_Tlg_p->u8Alarm);
 }

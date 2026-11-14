@@ -93,9 +93,103 @@
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Kontakte-->
+              <!-- Eltako-Taster: der Wert legt das Tastenlayout fest (siehe RPS_Telegram.h): 1..19 eine Taste,
+                   20..49 eine Wippe, ab 50 Doppelwippe / 4 Tasten. 6- und 8-fach-Sender senden mit zwei IDs und
+                   haben je Tastengruppe einen Eintrag (40..42 bzw. 70..76), je ID ein Kanal -->
               <ParameterType Id="%AID%_PT-ProductSelectionTypeTaster" Name="ProductSelectionTypeTaster">
                 <TypeRestriction Base="Value" SizeInBit="8">
-                  <Enumeration Text="XXXX - Taster" Value="0" Id="%AID%_PT-ProductSelectionTypeTaster_EN-0" />
+                  <Enumeration Text="auswählen" Value="0" Id="%AID%_PT-ProductSelectionTypeTaster_EN-0" />
+                  <Enumeration Text="F1FT65 - 1 Taste" Value="1" Id="%AID%_PT-ProductSelectionTypeTaster_EN-1" />
+                  <Enumeration Text="F1T55E - 1 Taste" Value="2" Id="%AID%_PT-ProductSelectionTypeTaster_EN-2" />
+                  <Enumeration Text="F1T65 - 1 Taste" Value="3" Id="%AID%_PT-ProductSelectionTypeTaster_EN-3" />
+                  <Enumeration Text="F1T80 - 1 Taste" Value="4" Id="%AID%_PT-ProductSelectionTypeTaster_EN-4" />
+                  <Enumeration Text="F2FT65 - 1 Wippe" Value="20" Id="%AID%_PT-ProductSelectionTypeTaster_EN-20" />
+                  <Enumeration Text="F2FT65B - 1 Wippe" Value="21" Id="%AID%_PT-ProductSelectionTypeTaster_EN-21" />
+                  <Enumeration Text="F2FZT65B - 1 Wippe" Value="22" Id="%AID%_PT-ProductSelectionTypeTaster_EN-22" />
+                  <Enumeration Text="F2T55E - 1 Wippe" Value="23" Id="%AID%_PT-ProductSelectionTypeTaster_EN-23" />
+                  <Enumeration Text="F2T55EB - 1 Wippe" Value="24" Id="%AID%_PT-ProductSelectionTypeTaster_EN-24" />
+                  <Enumeration Text="F2T65 - 1 Wippe" Value="25" Id="%AID%_PT-ProductSelectionTypeTaster_EN-25" />
+                  <Enumeration Text="F2T65B - 1 Wippe" Value="26" Id="%AID%_PT-ProductSelectionTypeTaster_EN-26" />
+                  <Enumeration Text="F2ZT55E - 1 Wippe" Value="27" Id="%AID%_PT-ProductSelectionTypeTaster_EN-27" />
+                  <Enumeration Text="F2ZT65 - 1 Wippe" Value="28" Id="%AID%_PT-ProductSelectionTypeTaster_EN-28" />
+                  <Enumeration Text="F4FT65 - 2 Wippen" Value="50" Id="%AID%_PT-ProductSelectionTypeTaster_EN-50" />
+                  <Enumeration Text="F4FT65B - 2 Wippen" Value="51" Id="%AID%_PT-ProductSelectionTypeTaster_EN-51" />
+                  <Enumeration Text="F4PT - 2 Wippen" Value="52" Id="%AID%_PT-ProductSelectionTypeTaster_EN-52" />
+                  <Enumeration Text="F4PT55 - 2 Wippen" Value="53" Id="%AID%_PT-ProductSelectionTypeTaster_EN-53" />
+                  <Enumeration Text="F4T55B mit Doppelwippe" Value="54" Id="%AID%_PT-ProductSelectionTypeTaster_EN-54" />
+                  <Enumeration Text="F4T55B mit Einzelwippe" Value="29" Id="%AID%_PT-ProductSelectionTypeTaster_EN-29" />
+                  <Enumeration Text="F4T55E - 2 Wippen" Value="55" Id="%AID%_PT-ProductSelectionTypeTaster_EN-55" />
+                  <Enumeration Text="F4T55EB - 2 Wippen" Value="56" Id="%AID%_PT-ProductSelectionTypeTaster_EN-56" />
+                  <Enumeration Text="F4T65 - 2 Wippen" Value="57" Id="%AID%_PT-ProductSelectionTypeTaster_EN-57" />
+                  <Enumeration Text="F4T65B - 2 Wippen" Value="58" Id="%AID%_PT-ProductSelectionTypeTaster_EN-58" />
+                  <Enumeration Text="F6T55B - Tasten 1-4 (1. ID)" Value="74" Id="%AID%_PT-ProductSelectionTypeTaster_EN-74" />
+                  <Enumeration Text="F6T55B - Tasten 5-6 (2. ID)" Value="40" Id="%AID%_PT-ProductSelectionTypeTaster_EN-40" />
+                  <Enumeration Text="F6T55EB - Tasten 1-4 (1. ID)" Value="75" Id="%AID%_PT-ProductSelectionTypeTaster_EN-75" />
+                  <Enumeration Text="F6T55EB - Tasten 5-6 (2. ID)" Value="41" Id="%AID%_PT-ProductSelectionTypeTaster_EN-41" />
+                  <Enumeration Text="F6T65B - Tasten 1-4 (1. ID)" Value="76" Id="%AID%_PT-ProductSelectionTypeTaster_EN-76" />
+                  <Enumeration Text="F6T65B - Tasten 5-6 (2. ID)" Value="42" Id="%AID%_PT-ProductSelectionTypeTaster_EN-42" />
+                  <Enumeration Text="FET55E - 1 Taste" Value="5" Id="%AID%_PT-ProductSelectionTypeTaster_EN-5" />
+                  <Enumeration Text="FF8 - Tasten 1-4 (1. ID)" Value="70" Id="%AID%_PT-ProductSelectionTypeTaster_EN-70" />
+                  <Enumeration Text="FF8 - Tasten 5-8 (2. ID)" Value="71" Id="%AID%_PT-ProductSelectionTypeTaster_EN-71" />
+                  <Enumeration Text="FHS2 - 1 Wippe" Value="30" Id="%AID%_PT-ProductSelectionTypeTaster_EN-30" />
+                  <Enumeration Text="FHS4 - 2 Wippen" Value="59" Id="%AID%_PT-ProductSelectionTypeTaster_EN-59" />
+                  <Enumeration Text="FKD - 1 Taste" Value="6" Id="%AID%_PT-ProductSelectionTypeTaster_EN-6" />
+                  <Enumeration Text="FMH1W - 1 Taste" Value="7" Id="%AID%_PT-ProductSelectionTypeTaster_EN-7" />
+                  <Enumeration Text="FMH2 - 1 Wippe" Value="31" Id="%AID%_PT-ProductSelectionTypeTaster_EN-31" />
+                  <Enumeration Text="FMH2S - 1 Wippe" Value="32" Id="%AID%_PT-ProductSelectionTypeTaster_EN-32" />
+                  <Enumeration Text="FMH4 - 2 Wippen" Value="60" Id="%AID%_PT-ProductSelectionTypeTaster_EN-60" />
+                  <Enumeration Text="FMH4S - 2 Wippen" Value="61" Id="%AID%_PT-ProductSelectionTypeTaster_EN-61" />
+                  <Enumeration Text="FMH8 - Tasten 1-4 (1. ID)" Value="72" Id="%AID%_PT-ProductSelectionTypeTaster_EN-72" />
+                  <Enumeration Text="FMH8 - Tasten 5-8 (2. ID)" Value="73" Id="%AID%_PT-ProductSelectionTypeTaster_EN-73" />
+                  <Enumeration Text="FNS55B - 1 Taste" Value="8" Id="%AID%_PT-ProductSelectionTypeTaster_EN-8" />
+                  <Enumeration Text="FNS55EB - 1 Taste" Value="9" Id="%AID%_PT-ProductSelectionTypeTaster_EN-9" />
+                  <Enumeration Text="FNS65EB - 1 Taste" Value="10" Id="%AID%_PT-ProductSelectionTypeTaster_EN-10" />
+                  <Enumeration Text="FT4F - 2 Wippen" Value="62" Id="%AID%_PT-ProductSelectionTypeTaster_EN-62" />
+                  <Enumeration Text="FT55 mit Doppelwippe" Value="63" Id="%AID%_PT-ProductSelectionTypeTaster_EN-63" />
+                  <Enumeration Text="FT55 mit Einzelwippe" Value="33" Id="%AID%_PT-ProductSelectionTypeTaster_EN-33" />
+                  <Enumeration Text="FZT55 - 1 Wippe" Value="34" Id="%AID%_PT-ProductSelectionTypeTaster_EN-34" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Alarm-Profile: Verhalten, wenn der Alarm aufgehoben ist -->
+              <ParameterType Id="%AID%_PT-AlarmLatch" Name="AlarmLatch">
+                <TypeRestriction Base="Value" SizeInBit="1">
+                  <Enumeration Text="automatisch (Alarm aufgehoben = 0 senden)" Value="0" Id="%AID%_PT-AlarmLatch_EN-0" />
+                  <Enumeration Text="nur Alarm senden (Zurücksetzen über KNX)" Value="1" Id="%AID%_PT-AlarmLatch_EN-1" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Taster: Bedienung einer Wippe -->
+              <ParameterType Id="%AID%_PT-RockerMode" Name="RockerMode">
+                <TypeRestriction Base="Value" SizeInBit="1">
+                  <Enumeration Text="Wippe (oben/unten gemeinsam)" Value="0" Id="%AID%_PT-RockerMode_EN-0" />
+                  <Enumeration Text="Einzeltasten (oben und unten getrennt)" Value="1" Id="%AID%_PT-RockerMode_EN-1" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Taster: Funktion einer Einzeltaste A/B bzw. Taster mit 1 Taste -->
+              <ParameterType Id="%AID%_PT-RockerKeyFunktionFull" Name="RockerKeyFunktionFull">
+                <TypeRestriction Base="Value" SizeInBit="3">
+                  <Enumeration Text="Umschalten (jeder Tastendruck)" Value="1" Id="%AID%_PT-RockerKeyFunktionFull_EN-1" />
+                  <Enumeration Text="Gedrückt (Drücken = 1)" Value="2" Id="%AID%_PT-RockerKeyFunktionFull_EN-2" />
+                  <Enumeration Text="Szene" Value="3" Id="%AID%_PT-RockerKeyFunktionFull_EN-3" />
+                  <Enumeration Text="Dimmen (kurz Umschalten, lang Dimmen)" Value="4" Id="%AID%_PT-RockerKeyFunktionFull_EN-4" />
+                  <Enumeration Text="Jalousie (lang Fahren, kurz Stopp/Lamelle)" Value="5" Id="%AID%_PT-RockerKeyFunktionFull_EN-5" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Taster: Funktion des langen Tastendrucks einer Einzeltaste (zweites KO) -->
+              <ParameterType Id="%AID%_PT-RockerKeyLong" Name="RockerKeyLong">
+                <TypeRestriction Base="Value" SizeInBit="3">
+                  <Enumeration Text="keine (sofort beim Drücken)" Value="0" Id="%AID%_PT-RockerKeyLong_EN-0" />
+                  <Enumeration Text="Umschalten" Value="1" Id="%AID%_PT-RockerKeyLong_EN-1" />
+                  <Enumeration Text="EIN senden" Value="2" Id="%AID%_PT-RockerKeyLong_EN-2" />
+                  <Enumeration Text="AUS senden" Value="3" Id="%AID%_PT-RockerKeyLong_EN-3" />
+                  <Enumeration Text="Szene" Value="4" Id="%AID%_PT-RockerKeyLong_EN-4" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Taster: Funktion einer Einzeltaste, Wippe AB (ohne zweites KO) -->
+              <ParameterType Id="%AID%_PT-RockerKeyFunktion" Name="RockerKeyFunktion">
+                <TypeRestriction Base="Value" SizeInBit="2">
+                  <Enumeration Text="Umschalten (jeder Tastendruck)" Value="1" Id="%AID%_PT-RockerKeyFunktion_EN-1" />
+                  <Enumeration Text="Gedrückt (Drücken = 1)" Value="2" Id="%AID%_PT-RockerKeyFunktion_EN-2" />
+                  <Enumeration Text="Szene" Value="3" Id="%AID%_PT-RockerKeyFunktion_EN-3" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Kontakte-->
@@ -467,12 +561,12 @@
                   <Enumeration Text="D2-04-09   Type 0x09" Value="176" Id="%AID%_PT-ProfilVLD04_EN-176" />
                   <Enumeration Text="D2-04-0A   Type 0x0A" Value="177" Id="%AID%_PT-ProfilVLD04_EN-177" />
                   <Enumeration Text="D2-04-10   Type 0x10" Value="178" Id="%AID%_PT-ProfilVLD04_EN-178" />
-                  <Enumeration Text="D2-04-0A   Type 0x0A" Value="179" Id="%AID%_PT-ProfilVLD04_EN-179" />
-                  <Enumeration Text="D2-04-0B   Type 0x0B" Value="180" Id="%AID%_PT-ProfilVLD04_EN-180" />
-                  <Enumeration Text="D2-04-0C   Type 0x0C" Value="181" Id="%AID%_PT-ProfilVLD04_EN-181" />
-                  <Enumeration Text="D2-04-0D   Type 0x0D" Value="182" Id="%AID%_PT-ProfilVLD04_EN-182" />
-                  <Enumeration Text="D2-04-0E   Type 0x0E" Value="183" Id="%AID%_PT-ProfilVLD04_EN-183" />
-                  <Enumeration Text="D2-04-0E   Type 0x0E" Value="184" Id="%AID%_PT-ProfilVLD04_EN-184" />
+                  <Enumeration Text="D2-04-1A   Type 0x1A" Value="179" Id="%AID%_PT-ProfilVLD04_EN-179" />
+                  <Enumeration Text="D2-04-1B   Type 0x1B" Value="180" Id="%AID%_PT-ProfilVLD04_EN-180" />
+                  <Enumeration Text="D2-04-1C   Type 0x1C" Value="181" Id="%AID%_PT-ProfilVLD04_EN-181" />
+                  <Enumeration Text="D2-04-1D   Type 0x1D" Value="182" Id="%AID%_PT-ProfilVLD04_EN-182" />
+                  <Enumeration Text="D2-04-1E   Type 0x1E" Value="183" Id="%AID%_PT-ProfilVLD04_EN-183" />
+                  <Enumeration Text="D2-04-1F   Type 0x1F" Value="184" Id="%AID%_PT-ProfilVLD04_EN-184" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-ProfilVLD05" Name="ProfilVLD05">

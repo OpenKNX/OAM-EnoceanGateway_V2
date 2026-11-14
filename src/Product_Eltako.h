@@ -85,7 +85,7 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
     break;
 
   case Eltako_Taster:
-    /* code */
+    // wird in EnoceanChannel::check_Eno_ID() über handleRocker() verarbeitet und kommt hier nicht an
     break;
 
   case Eltako_Kontakte:
@@ -266,11 +266,13 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
       break;
 
     case Eltako_Wasser_FWS81:
-      /* code */
+      // EEP F6-05-01: Data_byte3 ist immer 0x11, ob Wasser da ist steht im Statusbyte (0x30 = Wasser, 0x20 = kein
+      // Wasser), gleiche Auswertung wie das EEP-Profil
+      if (eltakoExpectRorg(f_Pkt_st, u8RORG_RPS))
+        handle_F6_05_0x(f_Pkt_st, _channelIndex);
       break;
 
     default:
-
       break;
     } // ENDE switch (ParamENO_CHProductselTypeWas)
     break;

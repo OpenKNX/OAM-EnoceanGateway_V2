@@ -52,6 +52,9 @@ struct PACKET_SERIAL_TYPE_;
 // Taster-Emulation KNX -> EnOcean: Dauer eines kurzen Tastendrucks und maximale Haltedauer beim Dimmen (ms)
 #define ROCKER_TAP_MS 150
 #define ROCKER_HOLD_MAX_MS 10000
+// Taster EnOcean -> KNX: "gedrückt" derselben Taste innerhalb dieser Zeit ist eine Kopie (Repeater) und wird verworfen,
+// sonst würde z.B. Umschalten zweimal schalten
+#define ROCKER_DUPLICATE_MS 250
 
 union EnoceanHandle {
   uint8_t msg_sent_after_receive;           // Für MVA-005  A5-20-06
@@ -69,6 +72,10 @@ private:
   bool _rockerUpper = false;
   bool _rockerLong = false;
   uint32_t _rockerPressTime = 0;
+  // Einzeltasten: letzte Richtung je Taste beim langen Druck (Dimmen heller / Jalousie AB), siehe rockerKeyBit()
+  uint8_t _rockerKeyDirections = 0;
+  // zuletzt gedrückte Taste (rockerKeyBit()) zum Erkennen von Repeater-Kopien, siehe ROCKER_DUPLICATE_MS
+  uint8_t _rockerLastKey = 0;
 
   // Taster-Emulation KNX -> EnOcean: Zeitpunkt für das Loslass-Telegramm (0 = keines ausstehend) und zuletzt
   // gesendeter Tastencode (für Jalousie-Stopp)
