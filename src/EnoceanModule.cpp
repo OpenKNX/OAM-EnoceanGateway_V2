@@ -959,6 +959,12 @@ void EnoceanModule::handleKnxEvent(uint8_t _channelIndex, int koIndex, GroupObje
     _channels[_channelIndex]->processKnxVld(koIndex, iKo);
     break;
 
+  case u8RORG_RPS:
+    // KNX -> EnOcean: F6-02-03 Licht-Taster über KO_0 (Dimmen) und KO_1 (EIN/AUS)
+    if (ParamENO_CHDirectionKnxEnocean == 1 && ParamENO_CHProfilSelectionRPS == F6_02_03)
+      _channels[_channelIndex]->processKnxF60203(koIndex, iKo);
+    break;
+
   case u8RORG_Rocker:
     // KNX -> EnOcean: Eingang KO_0 (GO_BASE__1) emuliert einen Taster, siehe EnoceanChannel::processKnxRocker()
     if (ParamENO_CHDirectionKnxEnocean == 1 && koIndex == ENO_KoGO_BASE__1)
@@ -988,6 +994,7 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
     openknx.console.printHelpLine("eno teach del N", "Delete learned device of channel N");
     openknx.console.printHelpLine("eno baseid", "Read Base-ID and remaining write cycles");
     openknx.console.printHelpLine("eno baseid FFxxxxxx", "Write Base-ID (FF800000..FFFFFF80)");
+    openknx.console.printHelpLine("eno signal", "Show last signal strength (dBm) and repeater level per channel");
     openknx.console.printHelpLine("eno repeater", "Read repeater mode/level");
     openknx.console.printHelpLine("eno repeater M L", "Write repeater mode M (0..2) and level L (0..2)");
     openknx.console.printHelpLine("eno version", "Read transceiver version and EURID");
@@ -1045,6 +1052,12 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
     setBaseId(baseId);
     if (readBaseId(lui8_BaseID_p))
       logInfoP("Base-ID: %02X%02X%02X%02X", lui8_BaseID_p[0], lui8_BaseID_p[1], lui8_BaseID_p[2], lui8_BaseID_p[3]);
+    return true;
+  }
+
+  if (cmd == "eno signal") {
+    for (uint8_t i = 0; i < ParamENO_VisibleChannels; i++)
+      _channels[i]->printSignal();
     return true;
   }
 

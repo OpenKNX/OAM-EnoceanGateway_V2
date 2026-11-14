@@ -26,6 +26,9 @@
 #define ELtako_Kontakte_FTKB 4
 #define ELtako_Kontakte_FTKE 5
 #define ELtako_Kontakte_FFTE 6
+#define ELtako_Kontakte_FTKB_GR 7
+#define ELtako_Kontakte_ETRONIC 8 // Fenstergriff A5-14-01
+#define ELtako_Kontakte_MTRONIC 9 // Fenstergriff A5-14-0A
 
 // ParamENO_CHProductselTypeUmw
 #define Eltako_Umwelt_inaktive 0
@@ -36,10 +39,18 @@
 #define Eltako_Umwelt_FLGTF55E 5
 #define Eltako_Umwelt_FCO2TF65 6
 #define Eltako_Umwelt_FLT58 7
+#define Eltako_Umwelt_FFT65B 8
+#define Eltako_Umwelt_FFTF65B 9
+#define Eltako_Umwelt_FFT55B 10
+#define Eltako_Umwelt_FLGTF65 11
+#define Eltako_Umwelt_FLGTF55 12
+#define Eltako_Umwelt_FCO2TS 13
 
 // ParamENO_CHProductselTypeHell
 #define Eltako_Helligkeit_inaktive 0
 #define Eltako_Helligkeit_FHD60SB 1
+#define Eltako_Helligkeit_FAH65S 2
+#define Eltako_Helligkeit_FIH65S 3
 
 // ParamENO_CHProductselTypeBew
 #define Eltako_Bewegung_inaktive 0
@@ -47,6 +58,14 @@
 #define Eltako_Bewegung_FBHT55ESB 2
 #define Eltako_Bewegung_FABH65S 3
 #define Eltako_Bewegung_FABH130 4
+#define Eltako_Bewegung_FB65B 5
+#define Eltako_Bewegung_FB55B 6
+#define Eltako_Bewegung_FBH65SB 7
+#define Eltako_Bewegung_FBH55ESB 8
+#define Eltako_Bewegung_FBH55SB 9
+#define Eltako_Bewegung_FBHF65SB 10
+#define Eltako_Bewegung_FBH65 11
+#define Eltako_Bewegung_FBH65S 12
 
 // ParamENO_CHProductselTypeMel
 #define Eltako_Melder_inaktive 0
@@ -57,6 +76,7 @@
 #define Eltako_Heizung_inaktive 0
 #define Eltako_Heizung_FKS_SV 1
 #define Eltako_Heizung_FKS_B 2
+#define Eltako_Heizung_FKS_H 3
 
 // ParamENO_CHProductselTypeWas
 #define Eltako_Wasser_inaktive 0
@@ -108,11 +128,22 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
     case ELtako_Kontakte_FFKB: //(EEP: D5-00-01)
     case ELtako_Kontakte_FTK:  //(EEP: D5-00-01)
     case ELtako_Kontakte_FTKB: //(EEP: D5-00-01)
+    case ELtako_Kontakte_FTKB_GR: //(EEP: D5-00-01)
       // Kontakt per 1BS (D5-00-01), zusätzlich zyklisch ein 4BS-Spannungstelegramm (Batterie / Energiespeicher)
       if (f_Pkt_st->u8DataBuffer[0] == u8RORG_1BS)
-        handle_1BS(f_Pkt_st, _channelIndex);
+        handle1BS_D5_00_01(f_Pkt_st, _channelIndex);
       else if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
         handle4BS_D5_00_01_V2(f_Pkt_st, _channelIndex);
+      break;
+
+    case ELtako_Kontakte_ETRONIC: // Fenstergriff A5-14-01: Kontakt + Batteriespannung
+      if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
+        handle4BS_A5_14(f_Pkt_st, A5_14_01, _channelIndex);
+      break;
+
+    case ELtako_Kontakte_MTRONIC: // Fenstergriff A5-14-0A: offen/gekippt/geschlossen, Vibration, Batteriespannung
+      if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
+        handle4BS_A5_14(f_Pkt_st, A5_14_0A, _channelIndex);
       break;
 
     case ELtako_Kontakte_FTKE: // EEP F6-10-00
@@ -153,15 +184,21 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
     case Eltako_Umwelt_FTFB:    // A5-04-02 oder A5-04-03
     case Eltako_Umwelt_FTFSB:   // A5-04-02 oder A5-04-03
     case Eltako_Umwelt_FFT55EB: // A5-04-02 oder A5-04-03
+    case Eltako_Umwelt_FFT65B:
+    case Eltako_Umwelt_FFTF65B:
+    case Eltako_Umwelt_FFT55B:
       handle4BS_A5_04_02(f_Pkt_st, _channelIndex);
       break;
 
     case Eltako_Umwelt_FLGTF55E: // A5-09-0C & A5-04-02
+    case Eltako_Umwelt_FLGTF65:
+    case Eltako_Umwelt_FLGTF55:
       handle4BS_A5_04_02(f_Pkt_st, _channelIndex);
       handle4BS_A5_09_0C(f_Pkt_st, _channelIndex);
       break;
 
     case Eltako_Umwelt_FCO2TF65: // A5-09-04
+    case Eltako_Umwelt_FCO2TS:
       handle4BS_A5_09_04(f_Pkt_st, _channelIndex);
       break;
 
@@ -184,6 +221,8 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
       break;
 
     case Eltako_Helligkeit_FHD60SB:
+    case Eltako_Helligkeit_FAH65S: // gleiche Eltako-Variante von A5-06-01, Data_byte0 = 0x0F
+    case Eltako_Helligkeit_FIH65S:
       /* EEP A5-06-01 */
       /*Data_byte3 = Helligkeit 0-100 lux, linear n = 0x00-0x64 (nur gültig wenn DB2 = 0x00)
         Data_byte2 = Helligkeit 300-30.000 lux, linear n = 0x00-0xFF
@@ -204,12 +243,20 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
       break;
 
     case Eltako_Bewegung_FB55EB: //EEP A5-07-01
+    case Eltako_Bewegung_FB65B:
+    case Eltako_Bewegung_FB55B:
       if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
         handle4BS_A5_07_01(f_Pkt_st, _channelIndex);
       break;
 
     case Eltako_Bewegung_FBHT55ESB:  // EEP: A5-08-01 oder  A5-07-01
     case Eltako_Bewegung_FABH65S: // EEP A5-08-01  mit Eltako Anpassung
+    case Eltako_Bewegung_FBH65SB: // FBH-Modus A5-08-01
+    case Eltako_Bewegung_FBH55ESB:
+    case Eltako_Bewegung_FBH55SB:
+    case Eltako_Bewegung_FBHF65SB:
+    case Eltako_Bewegung_FBH65:
+    case Eltako_Bewegung_FBH65S:
       if (eltakoExpectRorg(f_Pkt_st, u8RORG_4BS))
         handle4BS_A5_08_01(f_Pkt_st, _channelIndex);
       break;
@@ -251,6 +298,7 @@ inline void handleProductEltako(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelI
       break;
 
     case Eltako_Heizung_FKS_B:
+    case Eltako_Heizung_FKS_H:
       // A5-20-04 bidirektional: wird in EnoceanChannel::handleHvac() verarbeitet und kommt hier nicht an
       break;
 

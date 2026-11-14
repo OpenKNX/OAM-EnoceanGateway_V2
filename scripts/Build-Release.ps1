@@ -28,6 +28,15 @@
 lib/OGM-Common/scripts/setup/reusable/Build-Release-Preprocess.ps1 $args[0]
 if (!$?) { exit 1 }
 
+# EnOcean: erzeugte ETS-Applikation prüfen (when-Werte, Taster-KOs), siehe scripts/check_ets_ui.py
+$python = "$env:USERPROFILE/.platformio/penv/Scripts/python.exe"
+if (!(Test-Path $python)) { $python = "python" }
+& $python scripts/check_ets_ui.py
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "ETS-Applikation fehlerhaft, Release abgebrochen (scripts/check_ets_ui.py)" -ForegroundColor Red
+  exit 1
+}
+
 # build firmware for SmartMF EnOcean-Gateway V2 (RP2040, KNX TP)
 lib/OGM-Common/scripts/setup/reusable/Build-Step.ps1 release_RP2040_TP firmware-EnoceanGateway-V2 rp2040-tp SmartMF-EnoceanGateway-V2
 if (!$?) { exit 1 }

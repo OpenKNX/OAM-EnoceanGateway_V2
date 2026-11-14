@@ -18,7 +18,7 @@
  *    Bedienung Wippe:  A KO_0 Schalten / AUF-AB / Szene, KO_1 Dimmen / Lamelle-Stopp
  *                      B KO_4 / KO_5, AB KO_8 / KO_9
  *    Einzeltasten:     A oben KO_0 (kurz) / KO_1 (lang, Dimmen, Stopp), A unten KO_2 / KO_3
- *                      B oben KO_4 / KO_5, B unten KO_6 / KO_7, AB oben KO_8, AB unten KO_9
+ *                      B oben KO_4 / KO_5, B unten KO_6 / KO_7, AB oben KO_8 / KO_9, AB unten KO_10 / KO_11
  *    (KO_n = GO_BASE__(n+1); KO_0 ist nur bei Taster-Emulation KNX -> EnOcean der Eingang)
  *******************************************************************************************/
 
@@ -53,7 +53,7 @@
 #define ELTAKO_TASTER_2KEYS_MIN 40
 #define ELTAKO_TASTER_4KEYS_MIN 70
 
-// Funktionen einer Einzeltaste (ETS-Parameter RockerKey..Funktion; Dimmen und Jalousie nur Wippe A/B, nicht AB)
+// Funktionen einer Einzeltaste (ETS-Parameter RockerKey..Funktion)
 #define ROCKER_KEY_TOGGLE 1
 #define ROCKER_KEY_PUSH 2
 #define ROCKER_KEY_SCENE 3
@@ -73,14 +73,15 @@ struct RockerKeyConfig {
   uint8_t function;
   bool sendRelease;     // beim Loslassen senden (nur Gedrückt)
   bool invert;          // Gedrückt invertiert: Drücken = 0, Loslassen = 1
-  uint8_t longFunction; // langer Tastendruck bei Umschalten / Gedrückt / Szene (nur Wippe A/B)
+  uint8_t longFunction; // langer Tastendruck bei Umschalten / Gedrückt / Szene
   uint8_t longScene;    // Szene (1..64) beim langen Tastendruck
 };
 
-// Liefert das Tastenlayout des Kanals: EEP-Profil per Parameter "Schaltertyp", Eltako-Taster aus dem Produkt.
+// Liefert das Tastenlayout des Kanals: EEP-Profil per Parameter "Schaltertyp" (Wippen4 = 1 Taste, F6-01-01),
+// Eltako-Taster aus dem Produkt.
 inline uint8_t rockerLayout(uint8_t _channelIndex) {
   if (ParamENO_CHProductsel != Hersteller_Eltako)
-    return ParamENO_CHRockerProfil;
+    return ParamENO_CHRockerProfil == Wippen4 ? ROCKER_LAYOUT_1KEY : ParamENO_CHRockerProfil;
 
   uint8_t product = ParamENO_CHProductselTypeTas;
   if (product <= ELTAKO_TASTER_1KEY_MAX)
@@ -92,10 +93,11 @@ inline uint8_t rockerLayout(uint8_t _channelIndex) {
   return Wippen3;
 }
 
-// true bei Eltako-Sendern ohne Wippen (Einzeltaste, 6- und 8-fach-Sender): immer Einzeltasten.
+// true bei Sendern ohne Wippen (EEP-Schaltertyp 1 Taste, Eltako-Einzeltaste, 6- und 8-fach-Sender): immer
+// Einzeltasten.
 inline bool rockerKeysOnly(uint8_t _channelIndex) {
   if (ParamENO_CHProductsel != Hersteller_Eltako)
-    return false;
+    return ParamENO_CHRockerProfil == Wippen4;
   uint8_t product = ParamENO_CHProductselTypeTas;
   return product <= ELTAKO_TASTER_1KEY_MAX || (product >= ELTAKO_TASTER_2KEYS_MIN && product <= ELTAKO_TASTER_1ROCKER_MAX) ||
          product >= ELTAKO_TASTER_4KEYS_MIN;
@@ -310,7 +312,7 @@ inline bool rockerKeyMode(uint8_t wippe, uint8_t _channelIndex) {
   }
 }
 
-// Einstellungen der Taste oben bzw. unten einer Wippe mit getrennten Tasten (Wippe AB ohne Dimmen / langen Druck).
+// Einstellungen der Taste oben bzw. unten einer Wippe mit getrennten Tasten.
 inline RockerKeyConfig rockerKeyConfig(uint8_t wippe, bool upper, uint8_t _channelIndex) {
   switch (wippe) {
   case ROCKER_WIPPE_A:
@@ -327,12 +329,14 @@ inline RockerKeyConfig rockerKeyConfig(uint8_t wippe, bool upper, uint8_t _chann
             ParamENO_CHRockerKeyBULongScene};
   default:
     if (upper)
-      return {ParamENO_CHRockerKeyCOFunktion, ParamENO_CHRockerKeyCORelease, ParamENO_CHRockerKeyCOInvert, ROCKER_KEY_LONG_NONE, 1};
-    return {ParamENO_CHRockerKeyCUFunktion, ParamENO_CHRockerKeyCURelease, ParamENO_CHRockerKeyCUInvert, ROCKER_KEY_LONG_NONE, 1};
+      return {ParamENO_CHRockerKeyCOFunktion, ParamENO_CHRockerKeyCORelease, ParamENO_CHRockerKeyCOInvert, ParamENO_CHRockerKeyCOLong,
+              ParamENO_CHRockerKeyCOLongScene};
+    return {ParamENO_CHRockerKeyCUFunktion, ParamENO_CHRockerKeyCURelease, ParamENO_CHRockerKeyCUInvert, ParamENO_CHRockerKeyCULong,
+            ParamENO_CHRockerKeyCULongScene};
   }
 }
 
-// Erstes KO einer Einzeltaste: A oben KO_0, A unten KO_2, B oben KO_4, B unten KO_6, AB oben KO_8, AB unten KO_9.
+// Erstes KO einer Einzeltaste: A oben KO_0, A unten KO_2, B oben KO_4, B unten KO_6, AB oben KO_8, AB unten KO_10.
 inline GroupObject &rockerKeyKo(uint8_t wippe, bool upper, uint8_t _channelIndex) {
   switch (wippe) {
   case ROCKER_WIPPE_A:
@@ -340,16 +344,20 @@ inline GroupObject &rockerKeyKo(uint8_t wippe, bool upper, uint8_t _channelIndex
   case ROCKER_WIPPE_B:
     return upper ? KoENO_GO_BASE__5 : KoENO_GO_BASE__7;
   default:
-    return upper ? KoENO_GO_BASE__9 : KoENO_GO_BASE__10;
+    return upper ? KoENO_GO_BASE__9 : KoENO_GO_BASE__11;
   }
 }
 
-// Zweites KO einer Einzeltaste (langer Tastendruck, Dimmen, Stopp/Lamelle), direkt hinter dem ersten: A oben KO_1,
-// A unten KO_3, B oben KO_5, B unten KO_7. Wippe AB hat keins.
+// Zweites KO einer Einzeltaste (langer Tastendruck, Dimmen, Stopp/Lamelle), direkt hinter dem ersten.
 inline GroupObject &rockerKeyKo2(uint8_t wippe, bool upper, uint8_t _channelIndex) {
-  if (wippe == ROCKER_WIPPE_A)
+  switch (wippe) {
+  case ROCKER_WIPPE_A:
     return upper ? KoENO_GO_BASE__2 : KoENO_GO_BASE__4;
-  return upper ? KoENO_GO_BASE__6 : KoENO_GO_BASE__8;
+  case ROCKER_WIPPE_B:
+    return upper ? KoENO_GO_BASE__6 : KoENO_GO_BASE__8;
+  default:
+    return upper ? KoENO_GO_BASE__10 : KoENO_GO_BASE__12;
+  }
 }
 
 // Bit der Einzeltaste im Richtungsspeicher (Dimmen: zuletzt heller, Jalousie: zuletzt AB).
@@ -534,6 +542,15 @@ inline void handle_RPS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {
   //**************************************************************
   // ----------------- Profil: F6-05-00   ------------------------
   //**************************************************************
+  case F6_04_01: // Hotelkartenschalter: 0x70 = Karte gesteckt, 0x00 = Karte gezogen
+  case F6_04_02: // ERP2: DB0 Bit 2 = Karte gesteckt
+  {
+    uint8_t value = f_Pkt_st->u8DataBuffer[1];
+    bool inserted = ParamENO_CHProfilSelectionRPS == F6_04_01 ? value == 0x70 : (value & 0x04);
+    logDebug("RPS", "Key card: %s (%02X)", inserted ? "gesteckt" : "gezogen", value);
+    KoENO_GO_BASE__1.value(inserted, Dpt(1, 1));
+    break;
+  }
   case F6_05_00:
     logDebug("RPS", "Profil: F6-05-00");
     handle_F6_05_0x(f_Pkt_st, _channelIndex);

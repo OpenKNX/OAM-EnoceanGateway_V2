@@ -7,7 +7,19 @@
 
 ## Änderungshistorie
 
-### Entwicklungsstand 0.7 (seit 0.2)
+### Nächste Version (nach 0.7) – nicht updatefähig
+
+* **20 KOs je Kanal** (bisher 11). Die KO-Nummern ab Kanal 2 und die der Logikkanäle (jetzt ab KO 620) ändern sich. **Ein ETS-Update von älteren Versionen ist nicht möglich, das Gerät muss neu eingefügt werden** (ReplacesVersions leer lassen).
+* **Ausfall-KO** jetzt KO19 (bisher KO10).
+* **Funksignal-Diagnose**: Signalstärke (KO17) und Repeater-Stufe (KO18) je Kanal, Konsolenbefehl `eno signal`.
+* **Wippe AB** bei Einzeltasten mit allen Funktionen inklusive langem Tastendruck (KO8–KO11).
+* **Weitere Eltako-Geräte**: FPE-1, FZS65, FS55, FS55E, FS65E, FASM60, FSM61, FTKB-gr, eTronic, mTronic, FFT65B, FFTF65B, FFT55B, FLGTF65, FLGTF55, FCO2TS, FAH65S, FIH65S, FB65B, FB55B, FBH65SB, FBH55ESB, FBH55SB, FBHF65SB, FBH65, FBH65S, FKS-H.
+* **Hilfetexte** für alle Kanalparameter in der ETS.
+* **RPS/1BS**: Schaltertyp „1 Taste (F6-01-01)“ im EEP-Pfad, Hotelkartenschalter F6-04-01/02 (KO0 „Karte gesteckt“), F6-02-03 auch KNX -> EnOcean (KO0 Dimmen 0x30/0x10, KO1 EIN/AUS 0x70/0x50, mit Lerntelegramm).
+* **D5-00-01 korrigiert**: im EEP-Pfad zeigt die ETS jetzt das KO3, das die Firmware beschreibt (vorher KO0, Gruppenadresse umhängen); Lerntelegramme werden ignoriert; Eltako-Kontakte (FTK, FTKB, FFKB, FTKB-gr) hängen nicht mehr vom ausgeblendeten EEP-Parameter ab.
+* **Profilnummern** werden vor jedem Build aus der ETS-Applikation erzeugt; der Release-Build prüft die ETS-Oberfläche automatisch.
+
+### 0.7 (seit 0.2)
 
 * **Eltako-Taster** unter Hersteller ELTAKO → Taster: alle gängigen Eltako-Taster und Handsender mit einer Taste, einer Wippe, zwei Wippen sowie 6- und 8-fach-Sender (siehe [Supported-EnOcean-Devices](Supported-EnOcean-Devices.md)).
 * **Bedienung je Wippe**: „Wippe (oben/unten gemeinsam)“ oder „Einzeltasten (oben und unten getrennt)“, im EEP-Pfad (Rocker) und bei den Eltako-Tastern.
@@ -25,6 +37,7 @@
 ## Dokumentation
 
 * [Unterstützte EnOcean-Geräte (Eltako)](Supported-EnOcean-Devices.md)
+* [Testcheckliste](Testcheckliste.md)
 * Übersicht der EEP-Profile: [README](../README.md)
 
 ## Allgemeine Parameter
@@ -43,13 +56,13 @@ Da das Gerät prinzipiell (sofern parametriert) auch Lesetelegramme auf den Bus 
 
 Jeder Kanal wird entweder **über EEP-Profil** (beliebiger Hersteller, Profil frei wählbar) oder über **Hersteller: ELTAKO** (Produkt-Kategorie und Produkt) eingerichtet. Beim Eltako-Pfad berücksichtigt die Firmware die Abweichungen der Eltako-Geräte vom EEP-Standard (Quelle: Eltako „Inhalte der Eltako-Funktelegramme“). Beide Pfade nutzen im Hintergrund dieselbe Auswertung.
 
-Pro Kanal stehen 11 KOs zur Verfügung (KO0 bis KO10, für Kanal 1 die KO-Nummern 20 bis 30). KO10 ist immer die Ausfallmeldung.
+Pro Kanal stehen 20 KOs zur Verfügung (KO0 bis KO19, für Kanal 1 die KO-Nummern 20 bis 39). Fest belegt sind KO17 Signalstärke, KO18 Repeater-Stufe und KO19 Ausfall.
 
 ## Taster
 
 ### Tastenlayout
 
-Im EEP-Pfad (Profil Rocker) wird das Layout über „Schaltertyp“ gewählt: 1 Wippe, 2 Wippen oder 1 + 2 Wippen (A, B und beide gleichzeitig = AB). Bei den Eltako-Tastern ergibt es sich aus dem Produkt:
+Im EEP-Pfad (Profil Rocker) wird das Layout über „Schaltertyp“ gewählt: 1 Wippe, 2 Wippen, 1 + 2 Wippen (A, B und beide gleichzeitig = AB) oder 1 Taste (F6-01-01, Einstellungen wie „Wippe A, Taste oben“). Bei den Eltako-Tastern ergibt es sich aus dem Produkt:
 
 | Eltako-Produkt | Telegramm | Layout |
 |---|---|---|
@@ -79,7 +92,6 @@ Im EEP-Pfad (Profil Rocker) wird das Layout über „Schaltertyp“ gewählt: 1 
 
 * Ohne langen Tastendruck reagiert die Taste sofort beim Drücken.
 * Mit langem Tastendruck wird der kurze Druck erst beim Loslassen ausgeführt. Bei „Gedrückt“ mit „Beim Loslassen senden“ entsteht dann ein kurzer Impuls (1, direkt danach 0).
-* Wippe AB hat bei Einzeltasten nur Umschalten, Gedrückt und Szene (keine freien KOs für langen Tastendruck).
 
 Beispiel: kurzer Tastendruck sendet 1 auf 0/0/1, langer Tastendruck sendet 1 auf 0/0/2 → Funktion „Gedrückt“, „Langer Tastendruck“ = „EIN senden“, erstes KO = 0/0/1, zweites KO = 0/0/2.
 
@@ -97,9 +109,12 @@ Alle KOs einer Wippe stehen in der ETS untereinander.
 | KO5 | Wippe B: Dimmen / Stopp-Lamelle | B oben: lang / Dimmen / Stopp |
 | KO6 | – | B unten: kurz |
 | KO7 | – | B unten: lang / Dimmen / Stopp |
-| KO8 | Wippe AB: Schalten / AUF-AB / Szene | AB oben |
-| KO9 | Wippe AB: Dimmen / Stopp-Lamelle | AB unten |
-| KO10 | Ausfall | Ausfall |
+| KO8 | Wippe AB: Schalten / AUF-AB / Szene | AB oben: kurz |
+| KO9 | Wippe AB: Dimmen / Stopp-Lamelle | AB oben: lang / Dimmen / Stopp |
+| KO10 | – | AB unten: kurz |
+| KO11 | – | AB unten: lang / Dimmen / Stopp |
+| KO17 / KO18 | Signalstärke / Repeater-Stufe | Signalstärke / Repeater-Stufe |
+| KO19 | Ausfall | Ausfall |
 
 Die Schalt-KOs (Umschalten / Gedrückt) sind beschreibbar, damit „Umschalten“ den aktuellen Zustand vom Bus übernimmt. Umschalten und Gedrückt nutzen dasselbe KO, die Gruppenadressen bleiben beim Wechsel erhalten.
 
@@ -108,6 +123,12 @@ KO0 ist bei der Richtung KNX → EnOcean (Taster-Emulation) der Eingang; diese R
 ### Repeater
 
 EnOcean-Repeater senden jedes Telegramm ein zweites Mal. Ein zweites „Gedrückt“ derselben Taste innerhalb von 250 ms wird verworfen, sonst würde z.B. „Umschalten“ zweimal schalten.
+
+### Ausfall und Funksignal
+
+**Ausfallüberwachung** (KO19): meldet, wenn das Gerät länger als die eingestellte Zeit nichts gesendet hat.
+
+**Funksignal-Diagnose** (KO17 Signalstärke in dBm, DPT 6.010; KO18 Repeater-Stufe, DPT 5.010): aus, bei jedem Telegramm oder nur bei Änderung (ab 3 dBm oder andere Repeater-Stufe). Die Signalstärke stammt aus den Zusatzdaten des Empfangspakets, die Repeater-Stufe aus dem Statusbyte. Richtwerte: besser als -70 dBm gut, -70 bis -85 dBm ausreichend, schlechter als -85 dBm kritisch. Der Konsolenbefehl `eno signal` zeigt die Werte aller Kanäle.
 
 ## Fenster- und Türkontakte
 
@@ -139,10 +160,15 @@ F6-05-01 (Wasser): Data 0x11, ob Wasser da ist steht im Statusbyte (Eltako FWS81
 * **KO-Verknüpfungen (ComObjectRef) nie löschen oder umnummerieren**, sobald eine knxprod damit erzeugt wurde – auch nicht bei Zwischenständen. Fehlt beim ETS-Update eine Verknüpfung, an der eine Gruppenadresse hängt, stürzt die ETS mit einer NullReferenceException ab (RfMulti.ResetGrpFlagReadyDeviceHandler). Nicht mehr genutzte Verknüpfungen bleiben deshalb definiert.
 * **ApplicationVersion erhöhen = ReplacesVersions erweitern**: die Updatefähigkeit soll immer erhalten bleiben; Ausnahmen werden bewusst entschieden.
 * **Applikationsnummer**: ETS und Firmware vergleichen OpenKNX-ID, Applikationsnummer und -version (PropId 78). Abweichungen führen zu „Firmware und Applikation passen nicht zusammen“; nach Änderungen immer knxprod und Firmware gemeinsam neu erzeugen.
-* **Profilnummern in ETS und Firmware müssen übereinstimmen** (EnoceanProfils.h gegen die ParameterTypes in EnoceanModule.share.xml). Bei A5-09 waren sie verschieden, dadurch funktionierte das Profil nie.
-* **when-Werte der ETS-Zweige** müssen zu den Produktwerten passen (FHD60SB hing an Wert 0 statt 1, deshalb fehlte das KO).
+* **Profilnummern** (A5_09_04 usw.) werden vor jedem Build von `scripts/generate_profiles.py` aus den Profillisten in `EnoceanModule.share.xml` nach `include/EnoceanProfilsGenerated.h` erzeugt. Nicht von Hand ändern; nur Sonderfälle stehen in `EnoceanProfils.h`. Bei A5-09 waren ETS und Firmware früher verschieden, dadurch funktionierte das Profil nie.
+* **ETS-Prüfung im Release-Build**: `scripts/check_ets_ui.py` prüft die erzeugte Applikation (when-Werte gegen Parametertypen, doppelte KOs, KOs aller Einzeltasten in 20.000 zufälligen Taster-Konfigurationen) und bricht den Release ab. Anlass: FHD60SB hing an Wert 0 statt 1, deshalb fehlte das KO.
+* **Hilfetexte**: je Thema eine Datei `src/Baggages/Help_de/ENO-*.md`, eingebunden über `HelpContext` am Parameter. Neue Parameter immer mit HelpContext anlegen.
+* **ETS-Template**: Die Taster-Blöcke sind mehrfach vorhanden (EEP-Pfad und Eltako mit unterschiedlicher Einrückung und Texten). `op:include` kann das nicht parametrieren; Änderungen an allen Stellen machen und mit `check_ets_ui.py` prüfen.
+* **Eltako-Pfad nie an EEP-Parameter koppeln**: Parameter des EEP-Pfads (z.B. „1BS-Profil“) sind bei Eltako-Kanälen ausgeblendet und haben dort keinen verlässlichen Wert. Gemeinsame Auswertungen als eigene Funktion ohne EEP-Parameter schreiben (z.B. `handle1BS_D5_00_01`).
 * **Unions**: neue Parameter möglichst in Unions ablegen, die das jeweilige Profil nicht nutzt; Parameter mit eigener Speicheradresse brauchen die ID-Form `_P-`, Union-Parameter `_UP-`.
 * **Offene Punkte**:
+  * F6-02-04 (Wippentaster ERP2) und F6-03-01/02 (4 Wippen) sind nicht umgesetzt.
+  * Raumregler (A5-10), Wetterstation FWS61 (A5-13), Zähler (A5-12), Multisensoren FMMS/FMS und FBH65TF sind noch nicht umgesetzt.
   * Eltako FABH130 (Bewegungsmelder, F6-02-01) ist auswählbar, aber noch nicht ausgewertet.
   * „Alarm Energy Low“ (F6-05) wird nur gesetzt, nie zurückgesetzt.
   * A5-30-03 ist nur über die Eltako-Melder umgesetzt, nicht über das EEP-Profil.

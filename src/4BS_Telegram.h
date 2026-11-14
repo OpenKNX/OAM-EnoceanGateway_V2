@@ -18,6 +18,7 @@ inline void handle4BS_A5_09_04(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 inline void handle4BS_A5_09_05(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_A5_09_0C(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
+inline void handle4BS_A5_14(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex);
 inline void handle4BS_A5_30_03(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline void handle4BS_D5_00_01_V2(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
 inline uint8_t handle4BS_A5_20_01(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex);
@@ -42,9 +43,6 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
   FOURBS_A5_07_03_TYPE *fourBsTlg3_p;
   FOURBS_A5_08_TYPE *fourBsA5_08_Tlg_p;
   FOURBS_A5_12_01_TYPE *fourBsA5_12_01_Tlg_p;
-  FOURBS_A5_14_01_06_TYPE *fourBsA5_14_01_06_Tlg_p;
-  FOURBS_A5_14_07_08_TYPE *fourBsA5_14_07_08_Tlg_p;
-  FOURBS_A5_14_09_0A_TYPE *fourBsA5_14_09_0A_Tlg_p;
 
   // Special Profil for a 4BS MSG from a 1BS Device
 
@@ -576,188 +574,7 @@ inline uint8_t handle_4BS(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) 
     break; // ENDE A5-12-XX
 
   case A5_14:
-    logDebug("4BS", "A5-14-");
-    // switch (knx.paramWord(firstParameter + ENO_CHProfil4BS14))
-    switch (ParamENO_CHProfil4BS14) {
-    //**************************************************************
-    // ----------------- Profil: A5-14-01 --------------------------
-    //**************************************************************
-    case A5_14_01:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "01");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Contact..............................................
-      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
-      logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-02 --------------------------
-    //**************************************************************
-    case A5_14_02:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "02");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Illumination.......................................
-      lux = (uint16_t)fourBsA5_14_01_06_Tlg_p->u8Lux * 4;
-      luxfloat = (float)lux * 1.0;
-      KoENO_GO_BASE__2.value(luxfloat, Dpt(9, 1));
-      logDebug("4BS", "LUX: %u", lux);
-      // ........Contact..............................................
-      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
-      logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-03 --------------------------
-    //**************************************************************
-    case A5_14_03:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "03");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Contact..............................................
-      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
-      logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
-      // ........Vibration Det.........................................
-      KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibration det: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-04 --------------------------
-    //**************************************************************
-    case A5_14_04:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "04");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Illumination.......................................
-      lux = (uint16_t)fourBsA5_14_01_06_Tlg_p->u8Lux * 4;
-      luxfloat = (float)lux * 1.0;
-      KoENO_GO_BASE__2.value(luxfloat, Dpt(9, 1));
-      logDebug("4BS", "LUX: %u", lux);
-      // ........Contact..............................................
-      KoENO_GO_BASE__4.value(windowKoValue(fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
-      logDebug("4BS", "detected: State: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.CT);
-      // ........Vibration Det.........................................
-      KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibration det: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-05 --------------------------
-    //**************************************************************
-    case A5_14_05:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "05");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Vibration Det.........................................
-      KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibration det: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-06 --------------------------
-    //**************************************************************
-    case A5_14_06:
-      fourBsA5_14_01_06_Tlg_p = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "06");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_01_06_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Illumination.......................................
-      lux = (uint16_t)fourBsA5_14_01_06_Tlg_p->u8Lux * 4;
-      luxfloat = (float)lux * 1.0;
-      KoENO_GO_BASE__2.value(luxfloat, Dpt(9, 1));
-      logDebug("4BS", "LUX: %u", lux);
-      // ........Vibration Det.........................................
-      KoENO_GO_BASE__1.value(fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibration det: %u", fourBsA5_14_01_06_Tlg_p->u84BsTelData.VIB);
-      break;
-
-    //**************************************************************
-    // ----------------- Profil: A5-14-07 --------------------------
-    //**************************************************************
-    case A5_14_07:
-      fourBsA5_14_07_08_Tlg_p = (FOURBS_A5_14_07_08_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "07");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_07_08_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_07_08_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........DOOR Contact..............................................
-      KoENO_GO_BASE__2.value(fourBsA5_14_07_08_Tlg_p->u84BsTelData.DCT, Dpt(1, 1));
-      logDebug("4BS", "Door State: %u", fourBsA5_14_07_08_Tlg_p->u84BsTelData.DCT);
-      // ........Lock Contact.........................................
-      KoENO_GO_BASE__4.value(fourBsA5_14_07_08_Tlg_p->u84BsTelData.LCT, Dpt(1, 1));
-      logDebug("4BS", "Lock State: %u", fourBsA5_14_07_08_Tlg_p->u84BsTelData.LCT);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-08 --------------------------
-    //**************************************************************
-    case A5_14_08:
-      fourBsA5_14_07_08_Tlg_p = (FOURBS_A5_14_07_08_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "08");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_07_08_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_07_08_Tlg_p->u8SupplyVoltage / 50.0);
-      // ........Vibration Det.........................................
-      KoENO_GO_BASE__1.value(fourBsA5_14_07_08_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibration det: %u", fourBsA5_14_07_08_Tlg_p->u84BsTelData.VIB);
-      // ........DOOR Contact..............................................
-      KoENO_GO_BASE__2.value(fourBsA5_14_07_08_Tlg_p->u84BsTelData.DCT, Dpt(1, 1));
-      logDebug("4BS", "Door State: %u", fourBsA5_14_07_08_Tlg_p->u84BsTelData.DCT);
-      // ........Lock Contact.........................................
-      KoENO_GO_BASE__4.value(fourBsA5_14_07_08_Tlg_p->u84BsTelData.LCT, Dpt(1, 1));
-      logDebug("4BS", "Lock State: %u", fourBsA5_14_07_08_Tlg_p->u84BsTelData.LCT);
-      break;
-    //**************************************************************
-    // ----------------- Profil: A5-14-09 --------------------------
-    //**************************************************************
-    case A5_14_09:
-      handle4BS_A5_14_09(f_Pkt_st, _channelIndex);
-      break;
-
-      //**************************************************************
-      // ----------------- Profil: A5-14-0A --------------------------
-      //**************************************************************
-    case A5_14_0A:
-      fourBsA5_14_09_0A_Tlg_p = (FOURBS_A5_14_09_0A_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
-      logDebug("4BS", "0A");
-      // ...................  Supply Voltage .......................
-      KoENO_GO_BASE__5.value(fourBsA5_14_09_0A_Tlg_p->u8SupplyVoltage * 20.0, Dpt(9, 1));
-      logDebug("4BS", "Supply Voltage: %.1f", fourBsA5_14_09_0A_Tlg_p->u8SupplyVoltage / 50.0);
-      // ...................  Fenster Status .......................
-      switch (fourBsA5_14_09_0A_Tlg_p->u84BsTelData.CT) {
-      case 0x00: // close
-        setWindowHandleKOs(false, false, _channelIndex);
-        logDebug("4BS", "State: close");
-        break;
-      case 0x01: // tilt
-        setWindowHandleKOs(false, true, _channelIndex);
-        logDebug("4BS", "State: gekippt");
-        break;
-      case 0x03: // open
-        setWindowHandleKOs(true, false, _channelIndex);
-        logDebug("4BS", "State: open");
-        break;
-
-      default:
-        break;
-      }
-      // ...................  Vibration detected .......................
-      KoENO_GO_BASE__1.value(fourBsA5_14_09_0A_Tlg_p->u84BsTelData.VIB, Dpt(1, 1));
-      logDebug("4BS", "Vibr: %u", fourBsA5_14_09_0A_Tlg_p->u84BsTelData.VIB);
-
-      break; // A5_14_0A
-
-    default:
-      logDebug("4BS", "ERROR");
-      break;
-    }
+    handle4BS_A5_14(f_Pkt_st, ParamENO_CHProfil4BS14, _channelIndex);
     break; // ENDE A5-14-XX
   case A5_20:
     // Heizkörper-Stellantriebe (bidirektional): Kanäle mit diesen Profilen werden in EnoceanChannel::handleHvac()
@@ -984,7 +801,8 @@ inline void handle4BS_A5_06_01_V2(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channe
   logDebug("4BS", "01*");
   fourBsA5_06_01_V2_Tlg_p = (FOURBS_A5_06_01_V2_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
 
-  if (fourBsA5_06_01_V2_Tlg_p->u8byte0 == 0x09) {
+  // Datentelegramm (LRN-Bit DB0.3 = 1): FHD60SB sendet 0x09, FAH65S / FIH65S 0x0F
+  if (fourBsA5_06_01_V2_Tlg_p->u8byte0 & 0x08) {
     if (fourBsA5_06_01_V2_Tlg_p->u8Illumbyte2 == 0) // Helligkeit 0..100LUX
     {
       // Range 0 ... 50 lux
@@ -1136,6 +954,54 @@ inline void handle4BS_A5_09_0C(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIn
 
   KoENO_GO_BASE__8.value(voc_id, Dpt(5, 10));
   logDebug("4BS", "VOC: %d  VOC_ID: %d", voc, voc_id);
+}
+
+// A5-14-01..0A (Multi-Function Sensor). Alle Typen: Versorgungsspannung KO_4. Je nach Typ zusätzlich:
+//   01-04: Kontakt KO_3 (Wert für geschlossen per ETS), 02/04/06: Helligkeit KO_1, 03-06/08/0A: Vibration KO_0,
+//   07/08: Tür KO_1 und Riegel KO_3, 09/0A: Fensterzustand wie A5-14-09.
+inline void handle4BS_A5_14(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint16_t profile, uint8_t _channelIndex) {
+  logDebug("4BS", "A5-14 (Profil %u)", profile);
+
+  if (profile == A5_14_09 || profile == A5_14_0A) {
+    handle4BS_A5_14_09(f_Pkt_st, _channelIndex);
+    if (profile == A5_14_0A) {
+      FOURBS_A5_14_09_0A_TYPE *tlg = (FOURBS_A5_14_09_0A_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
+      KoENO_GO_BASE__1.value(tlg->u84BsTelData.VIB, Dpt(1, 1));
+      logDebug("4BS", "Vibration: %u", tlg->u84BsTelData.VIB);
+    }
+    return;
+  }
+
+  if (profile == A5_14_07 || profile == A5_14_08) {
+    FOURBS_A5_14_07_08_TYPE *tlg = (FOURBS_A5_14_07_08_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
+    KoENO_GO_BASE__5.value(tlg->u8SupplyVoltage * 20.0, Dpt(9, 1));
+    if (profile == A5_14_08)
+      KoENO_GO_BASE__1.value(tlg->u84BsTelData.VIB, Dpt(1, 1));
+    KoENO_GO_BASE__2.value(tlg->u84BsTelData.DCT, Dpt(1, 1));
+    KoENO_GO_BASE__4.value(tlg->u84BsTelData.LCT, Dpt(1, 1));
+    logDebug("4BS", "Supply Voltage: %.1f, Door: %u, Lock: %u", tlg->u8SupplyVoltage / 50.0, tlg->u84BsTelData.DCT, tlg->u84BsTelData.LCT);
+    return;
+  }
+
+  // 01..06
+  bool hasContact = profile >= A5_14_01 && profile <= A5_14_04;
+  bool hasLux = profile == A5_14_02 || profile == A5_14_04 || profile == A5_14_06;
+  bool hasVibration = profile >= A5_14_03 && profile <= A5_14_06;
+  FOURBS_A5_14_01_06_TYPE *tlg = (FOURBS_A5_14_01_06_TYPE *)&(f_Pkt_st->u8DataBuffer[1]);
+  KoENO_GO_BASE__5.value(tlg->u8SupplyVoltage * 20.0, Dpt(9, 1));
+  logDebug("4BS", "Supply Voltage: %.1f", tlg->u8SupplyVoltage / 50.0);
+  if (hasLux) {
+    KoENO_GO_BASE__2.value((float)((uint16_t)tlg->u8Lux * 4), Dpt(9, 1));
+    logDebug("4BS", "LUX: %u", (uint16_t)tlg->u8Lux * 4);
+  }
+  if (hasContact) {
+    KoENO_GO_BASE__4.value(windowKoValue(tlg->u84BsTelData.CT != 0, _channelIndex), Dpt(1, 1));
+    logDebug("4BS", "Contact: %u", tlg->u84BsTelData.CT);
+  }
+  if (hasVibration) {
+    KoENO_GO_BASE__1.value(tlg->u84BsTelData.VIB, Dpt(1, 1));
+    logDebug("4BS", "Vibration: %u", tlg->u84BsTelData.VIB);
+  }
 }
 
 inline void handle4BS_A5_14_09(PACKET_SERIAL_TYPE_ *f_Pkt_st, uint8_t _channelIndex) {

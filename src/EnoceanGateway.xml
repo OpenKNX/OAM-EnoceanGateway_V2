@@ -44,7 +44,7 @@
   <op:define prefix="LOG" ModuleType="1"
     share="../lib/OFM-LogicModule/src/Logikmodul.share.xml"
     template="../lib/OFM-LogicModule/src/Logikmodul.templ.xml"
-    NumChannels="50" KoOffset="350">
+    NumChannels="50" KoOffset="620">
     <op:verify File="../lib/OFM-LogicModule/library.json" ModuleVersion="4.4" />
   </op:define>
 

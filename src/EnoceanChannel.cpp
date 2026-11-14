@@ -33,7 +33,36 @@ void EnoceanChannel::deviceSeen() {
   }
 }
 
-// Meldet über KO_10 einen Ausfall, wenn das Gerät länger als die per ETS eingestellte Zeit nichts gesendet hat.
+// Funksignal-Diagnose: Signalstärke aus den Zusatzdaten des ESP3-Pakets (SubTelNum, Ziel-ID, dBm, Security) und
+// Repeater-Stufe aus dem Statusbyte (Bit 3-0, letztes Datenbyte). Je nach ETS-Parameter auf KO_17 / KO_18 senden.
+void EnoceanChannel::radioDiag(PACKET_SERIAL_TYPE_ *pPacket) {
+  if (pPacket->u8OptionLength < 6 || pPacket->u16DataLength < 2)
+    return;
+  _radioDbm = pPacket->u8DataBuffer[pPacket->u16DataLength + 5];
+  _radioRepeater = pPacket->u8DataBuffer[pPacket->u16DataLength - 1] & 0x0F;
+  _radioTime = millis();
+  _radioValid = true;
+
+  uint8_t mode = ParamENO_CHRadioDiag;
+  if (mode == 0)
+    return;
+  if (mode == 2 && _radioSent && _radioRepeater == _radioSentRepeater && abs((int)_radioDbm - (int)_radioSentDbm) < 3)
+    return;
+  _radioSent = true;
+  _radioSentDbm = _radioDbm;
+  _radioSentRepeater = _radioRepeater;
+  KoENO_CHRadioSignal.value((int8_t)-(int)_radioDbm, Dpt(6, 10));
+  KoENO_CHRadioRepeater.value(_radioRepeater, Dpt(5, 10));
+}
+
+// Konsole "eno signal": zuletzt empfangene Signalstärke, Repeater-Stufe und Alter des letzten Telegramms.
+void EnoceanChannel::printSignal() {
+  if (!_radioValid)
+    return;
+  logInfoP("-%u dBm, repeater level %u, %lu s ago", _radioDbm, _radioRepeater, (unsigned long)((millis() - _radioTime) / 1000));
+}
+
+// Meldet über KO_19 einen Ausfall, wenn das Gerät länger als die per ETS eingestellte Zeit nichts gesendet hat.
 void EnoceanChannel::checkFailure() {
   uint8_t hours = ParamENO_CHMonitorTime;
   if (hours == 0 || _failed || ParamENO_CHProductsel == CH_inaktive)
@@ -124,6 +153,13 @@ bool EnoceanChannel::sendLearnTelegram() {
     return openknxEnoceanModule.send4BSTelegram(_channelIndex, data, "A5-38-08 teach-in");
   }
 
+  // F6-02-03 Licht-Taster KNX -> EnOcean: Licht EIN als Lerntelegramm
+  if (ParamENO_CHProductsel == EEP_Profil && ParamENO_CHProfilSelection == u8RORG_RPS && ParamENO_CHProfilSelectionRPS == F6_02_03 &&
+      ParamENO_CHDirectionKnxEnocean == 1) {
+    logInfoP("Send learn telegram F6-02-03 (light on)");
+    return openknxEnoceanModule.sendRockerTelegram(_channelIndex, 0x70);
+  }
+
   if (ParamENO_CHProductsel != EEP_Profil || ParamENO_CHProfilSelection != u8RORG_Rocker || ParamENO_CHDirectionKnxEnocean != 1)
     return false;
 
@@ -166,6 +202,21 @@ void EnoceanChannel::processKnxRocker(GroupObject &ko) {
     break;
   }
   }
+}
+
+// F6-02-03 (Light Control, Application Style 1) KNX -> EnOcean: KO_0 1 = heller dimmen (0x30) / 0 = dunkler (0x10),
+// KO_1 1 = Licht EIN (0x70) / 0 = Licht AUS (0x50). Je Befehl ein Telegramm, das Profil kennt kein Loslassen.
+void EnoceanChannel::processKnxF60203(int koIndex, GroupObject &ko) {
+  bool on = ko.value(Dpt(1, 1));
+  uint8_t db0;
+  if (koIndex == ENO_KoGO_BASE__1)
+    db0 = on ? 0x30 : 0x10;
+  else if (koIndex == ENO_KoGO_BASE__2)
+    db0 = on ? 0x70 : 0x50;
+  else
+    return;
+  logDebugP("KNX -> EnOcean F6-02-03: %02X", db0);
+  openknxEnoceanModule.sendRockerTelegram(_channelIndex, db0);
 }
 
 // Verarbeitet ein Rocker-Telegramm (F6-02-xx) dieses Kanals: Drücken merkt sich Wippe/Seite und löst Schalten/Szene
@@ -237,6 +288,7 @@ bool EnoceanChannel::check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket) {
   logDebugP("ENO-ID:");
   logHexDebugP(senderId, 4);
   deviceSeen();
+  radioDiag(pPacket);
 
   // Bidirektionale Geräte (EEP A5-20-01/04/06 oder Eltako FKS-SV) brauchen eine Antwort im Empfangsfenster
   if (hvacProfile() != HVAC_NONE) {
@@ -374,7 +426,7 @@ uint8_t EnoceanChannel::hvacProfile() const {
     if (ParamENO_CHProductselType == Eltako_Heizung) {
       if (ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_SV)
         return HVAC_A52001;
-      if (ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_B)
+      if (ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_B || ParamENO_CHProductselTypeHei == Eltako_Heizung_FKS_H)
         return HVAC_A52004;
     }
     return HVAC_NONE;

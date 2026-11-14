@@ -86,6 +86,15 @@ private:
   uint32_t _lastSeen = 0;
   bool _failed = false;
 
+  // Funksignal-Diagnose: zuletzt empfangen (dBm als positiver Betrag, Repeater-Stufe) und zuletzt auf KNX gesendet
+  bool _radioValid = false;
+  uint8_t _radioDbm = 0;
+  uint8_t _radioRepeater = 0;
+  uint32_t _radioTime = 0;
+  bool _radioSent = false;
+  uint8_t _radioSentDbm = 0;
+  uint8_t _radioSentRepeater = 0;
+
   // Bidirektionale Heizungsprofile A5-20-01/04/06: Werte von KNX, die mit der nächsten Antwort an das Gerät gehen.
   // Der Antrieb hört nur kurz nach seinem eigenen Telegramm zu, daher wird nie direkt bei KNX-Empfang gesendet.
   // Rohwerte jeweils in der Codierung des Profils (siehe handle4BS_A5_20_xx in 4BS_Telegram.h).
@@ -115,6 +124,7 @@ private:
   void handleRocker(PACKET_SERIAL_TYPE_ *pPacket);
   void knxRockerPress(uint8_t db0, uint32_t releaseAfterMs);
   void deviceSeen();
+  void radioDiag(PACKET_SERIAL_TYPE_ *pPacket);
   void checkFailure();
   uint8_t hvacProfile() const;
   void handleHvac(PACKET_SERIAL_TYPE_ *pPacket);
@@ -146,9 +156,11 @@ public:
   bool check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket);
   bool matchesDeviceId(const uint8_t id[4]) const;
   void processKnxRocker(GroupObject &ko);
+  void processKnxF60203(int koIndex, GroupObject &ko);
   bool sendLearnTelegram();
   bool processKnxHvac(int koIndex, GroupObject &ko);
   void processKnxVld(int koIndex, GroupObject &ko);
   bool processKnxActuator(int koIndex, GroupObject &ko);
   void teachInReceived(PACKET_SERIAL_TYPE_ *pPacket);
+  void printSignal();
 };

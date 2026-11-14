@@ -128,6 +128,7 @@
                   <Enumeration Text="F6T55EB - Tasten 5-6 (2. ID)" Value="41" Id="%AID%_PT-ProductSelectionTypeTaster_EN-41" />
                   <Enumeration Text="F6T65B - Tasten 1-4 (1. ID)" Value="76" Id="%AID%_PT-ProductSelectionTypeTaster_EN-76" />
                   <Enumeration Text="F6T65B - Tasten 5-6 (2. ID)" Value="42" Id="%AID%_PT-ProductSelectionTypeTaster_EN-42" />
+                  <Enumeration Text="FASM60 - Sendemodul (1 Wippe)" Value="38" Id="%AID%_PT-ProductSelectionTypeTaster_EN-38" />
                   <Enumeration Text="FET55E - 1 Taste" Value="5" Id="%AID%_PT-ProductSelectionTypeTaster_EN-5" />
                   <Enumeration Text="FF8 - Tasten 1-4 (1. ID)" Value="70" Id="%AID%_PT-ProductSelectionTypeTaster_EN-70" />
                   <Enumeration Text="FF8 - Tasten 5-8 (2. ID)" Value="71" Id="%AID%_PT-ProductSelectionTypeTaster_EN-71" />
@@ -144,10 +145,24 @@
                   <Enumeration Text="FNS55B - 1 Taste" Value="8" Id="%AID%_PT-ProductSelectionTypeTaster_EN-8" />
                   <Enumeration Text="FNS55EB - 1 Taste" Value="9" Id="%AID%_PT-ProductSelectionTypeTaster_EN-9" />
                   <Enumeration Text="FNS65EB - 1 Taste" Value="10" Id="%AID%_PT-ProductSelectionTypeTaster_EN-10" />
+                  <Enumeration Text="FPE-1 - 1 Taste" Value="11" Id="%AID%_PT-ProductSelectionTypeTaster_EN-11" />
+                  <Enumeration Text="FS55 - 1 Wippe" Value="35" Id="%AID%_PT-ProductSelectionTypeTaster_EN-35" />
+                  <Enumeration Text="FS55E - 1 Wippe" Value="36" Id="%AID%_PT-ProductSelectionTypeTaster_EN-36" />
+                  <Enumeration Text="FS65E - 1 Wippe" Value="37" Id="%AID%_PT-ProductSelectionTypeTaster_EN-37" />
+                  <Enumeration Text="FSM61 - Sendemodul (1 Wippe)" Value="39" Id="%AID%_PT-ProductSelectionTypeTaster_EN-39" />
                   <Enumeration Text="FT4F - 2 Wippen" Value="62" Id="%AID%_PT-ProductSelectionTypeTaster_EN-62" />
                   <Enumeration Text="FT55 mit Doppelwippe" Value="63" Id="%AID%_PT-ProductSelectionTypeTaster_EN-63" />
                   <Enumeration Text="FT55 mit Einzelwippe" Value="33" Id="%AID%_PT-ProductSelectionTypeTaster_EN-33" />
+                  <Enumeration Text="FZS65 - Zugschalter" Value="12" Id="%AID%_PT-ProductSelectionTypeTaster_EN-12" />
                   <Enumeration Text="FZT55 - 1 Wippe" Value="34" Id="%AID%_PT-ProductSelectionTypeTaster_EN-34" />
+                </TypeRestriction>
+              </ParameterType>
+              <!-- Funksignal-Diagnose: Signalstärke und Repeater-Stufe senden -->
+              <ParameterType Id="%AID%_PT-RadioDiag" Name="RadioDiag">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="aus" Value="0" Id="%AID%_PT-RadioDiag_EN-0" />
+                  <Enumeration Text="bei jedem Telegramm senden" Value="1" Id="%AID%_PT-RadioDiag_EN-1" />
+                  <Enumeration Text="nur bei Änderung senden (ab 3 dBm oder andere Repeater-Stufe)" Value="2" Id="%AID%_PT-RadioDiag_EN-2" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Alarm-Profile: Verhalten, wenn der Alarm aufgehoben ist -->
@@ -202,6 +217,9 @@
                   <Enumeration Text="FTKB - Tür/Fensterkontakt" Value="4" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-4" />
                   <Enumeration Text="FTKE - Fenster-Türkontakt" Value="5" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-5" />
                   <Enumeration Text="FFTE - Fenster-Tastkontakt" Value="6" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-6" />
+                  <Enumeration Text="FTKB-gr - Tür/Fensterkontakt" Value="7" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-7" />
+                  <Enumeration Text="eTronic - Fenstergriff (A5-14-01)" Value="8" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-8" />
+                  <Enumeration Text="mTronic - Fenstergriff (A5-14-0A)" Value="9" Id="%AID%_PT-ProductSelectionTypeKontakte_EN-9" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Umweltsensoren-->
@@ -215,12 +233,20 @@
                   <Enumeration Text="FLGTF55E - Temperatur-Feuchte-Luftgütesensor" Value="5" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-5" />
                   <Enumeration Text="FCO2TF65 - Temperatur-Feuchte-CO2-Sensor" Value="6" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-6" />
                   <Enumeration Text="FLT58 - Luftgüte-Tischsensor + Temperatur und Feuchtigkeit" Value="7" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-7" />
+                  <Enumeration Text="FFT65B - Temperatur-Feuchtesensor" Value="8" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-8" />
+                  <Enumeration Text="FFTF65B - Temperatur-Feuchtesensor" Value="9" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-9" />
+                  <Enumeration Text="FFT55B - Temperatur-Feuchtesensor" Value="10" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-10" />
+                  <Enumeration Text="FLGTF65 - Temperatur-Feuchte-Luftgütesensor" Value="11" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-11" />
+                  <Enumeration Text="FLGTF55 - Temperatur-Feuchte-Luftgütesensor" Value="12" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-12" />
+                  <Enumeration Text="FCO2TS - Temperatur-Feuchte-CO2-Sensor" Value="13" Id="%AID%_PT-ProductSelectionTypeUmwelt_EN-13" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Helligkeit/Dämmerung-->
               <ParameterType Id="%AID%_PT-ProductSelectionTypeHelligkeit" Name="ProductSelectionTypeHelligkeit">
                 <TypeRestriction Base="Value" SizeInBit="8">
                   <Enumeration Text="FHD60SB - Helligkeits-Dämmerungs-Sensor" Value="1" Id="%AID%_PT-ProductSelectionTypeHelligkeit_EN-1" />
+                  <Enumeration Text="FAH65S - Außen-Helligkeitssensor" Value="2" Id="%AID%_PT-ProductSelectionTypeHelligkeit_EN-2" />
+                  <Enumeration Text="FIH65S - Innen-Helligkeitssensor" Value="3" Id="%AID%_PT-ProductSelectionTypeHelligkeit_EN-3" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Bewegung -->
@@ -231,6 +257,14 @@
                   <Enumeration Text="FBHT55ESB - Bewegungs-Helligkeits-Temperatursensor" Value="2" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-2" />
                   <Enumeration Text="FABH65S - Außen-Bewegungs-Helligkeitssensor" Value="3" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-3" />
                   <Enumeration Text="FABH130/230V - Außen-Bewegungs-Helligkeitssensor" Value="4" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-4" />
+                  <Enumeration Text="FB65B - Bewegungsmelder" Value="5" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-5" />
+                  <Enumeration Text="FB55B - Bewegungsmelder" Value="6" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-6" />
+                  <Enumeration Text="FBH65SB - Bewegungs-Helligkeitssensor" Value="7" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-7" />
+                  <Enumeration Text="FBH55ESB - Bewegungs-Helligkeitssensor" Value="8" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-8" />
+                  <Enumeration Text="FBH55SB - Bewegungs-Helligkeitssensor" Value="9" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-9" />
+                  <Enumeration Text="FBHF65SB - Bewegungs-Helligkeitssensor" Value="10" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-10" />
+                  <Enumeration Text="FBH65 - Bewegungs-Helligkeitssensor" Value="11" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-11" />
+                  <Enumeration Text="FBH65S - Bewegungs-Helligkeitssensor" Value="12" Id="%AID%_PT-ProductSelectionTypeBewegung_EN-12" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Rauchmelder -->
@@ -245,6 +279,7 @@
                 <TypeRestriction Base="Value" SizeInBit="8">
                   <Enumeration Text="FKS-SV - Klein-Stellantrieb Smart Valve" Value="1" Id="%AID%_PT-ProductSelectionTypeHeizung_EN-1" />
                   <Enumeration Text="FKS-B - Funk-Klein-Stellantrieb mit Batterie" Value="2" Id="%AID%_PT-ProductSelectionTypeHeizung_EN-2" />
+                  <Enumeration Text="FKS-H - Funk-Klein-Stellantrieb (A5-20-04)" Value="3" Id="%AID%_PT-ProductSelectionTypeHeizung_EN-3" />
                 </TypeRestriction>
               </ParameterType>
               <!-- Parameter type for  Product selection Aktoren (Zentralbefehl A5-38-08) -->
@@ -293,6 +328,8 @@
               <ParameterType Id="%AID%_PT-ProfilSelectionRPS" Name="ProfilSelectionRPS">
                 <TypeRestriction Base="Value" SizeInBit="16">
                   <Enumeration Text="F6-02-03   Light Control - Application Style 1" Value="285" Id="%AID%_PT-ProfilSelectionRPS_EN-285" />
+                  <Enumeration Text="F6-04-01   Key Card Activated Switch" Value="289" Id="%AID%_PT-ProfilSelectionRPS_EN-289" />
+                  <Enumeration Text="F6-04-02   Key Card Activated Switch ERP2" Value="290" Id="%AID%_PT-ProfilSelectionRPS_EN-290" />
                   <Enumeration Text="F6-05-00   Wind Speed Detector" Value="291" Id="%AID%_PT-ProfilSelectionRPS_EN-291" />
                   <Enumeration Text="F6-05-01   Liquid Leakage Sensor" Value="292" Id="%AID%_PT-ProfilSelectionRPS_EN-292" />
                   <Enumeration Text="F6-05-02   Smoke Detector" Value="293" Id="%AID%_PT-ProfilSelectionRPS_EN-293" />
@@ -655,6 +692,7 @@
                   <Enumeration Text="1 Wippe" Value="1" Id="%AID%_PT-ProfilRocker_EN-1" />
                   <Enumeration Text="2 Wippen" Value="2" Id="%AID%_PT-ProfilRocker_EN-2" />
                   <Enumeration Text="1 + 2 Wippen" Value="3" Id="%AID%_PT-ProfilRocker_EN-3" />
+                  <Enumeration Text="1 Taste (F6-01-01)" Value="4" Id="%AID%_PT-ProfilRocker_EN-4" />
                 </TypeRestriction>
               </ParameterType>
               <ParameterType Id="%AID%_PT-ProfilRockerFunktion" Name="ProfilRockerFunktion">

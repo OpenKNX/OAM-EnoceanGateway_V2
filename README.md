@@ -290,15 +290,15 @@ Dokumentation: [Applikationsbeschreibung](doc/Applikationsbeschreibung.md) · [U
 279|D2-B0-00| | | 
 280|D2-B1-00| | | 
 281|D5-00-01|x|passed|Fensterkontakt
-282|F6-01-01|x|passed|Taster mit 1 Taste
+282|F6-01-01|x|passed|Taster mit 1 Taste (EEP-Schaltertyp und Eltako)
 283|F6-02-01|x|passed|Rocker Switch, Einzeltasten, langer Tastendruck
 284|F6-02-02|x| | 
-285|F6-02-03|x| | 
-286|F6-02-04|x| | 
-287|F6-03-01|x| | 
-288|F6-03-02|x| | 
-289|F6-04-01| | | 
-290|F6-04-02| | | 
+285|F6-02-03|x| |Licht-Taster, EnOcean -> KNX und KNX -> EnOcean
+286|F6-02-04| | |nicht umgesetzt
+287|F6-03-01| | |nicht umgesetzt
+288|F6-03-02| | |nicht umgesetzt
+289|F6-04-01|x| |Hotelkartenschalter
+290|F6-04-02|x| |Hotelkartenschalter ERP2
 291|F6-05-00|x| | 
 292|F6-05-01|x| |Wasser (Statusbyte, z.B. Eltako FWS81)
 293|F6-05-02|x| | 
