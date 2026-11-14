@@ -16,7 +16,7 @@
 #define MAIN_FirmwareName "Enocean-Gateway 2.0"
 #define MAIN_OpenKnxId 0xA2
 #define MAIN_ApplicationNumber 0
-#define MAIN_ApplicationVersion 7
+#define MAIN_ApplicationVersion 2
 #define MAIN_ApplicationEncoding iso-8859-15
 #define MAIN_ParameterSize 9081
 #define MAIN_MaxKoNumber 769

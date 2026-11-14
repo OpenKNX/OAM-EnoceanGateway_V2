@@ -13,8 +13,8 @@
   <op:ETS
     OpenKnxId="0xA2"
     ApplicationNumber="0x00"
-    ApplicationVersion="0.7"
-    ReplacesVersions="0.6 0.5 0.4 0.3 0.2 0.1"
+    ApplicationVersion="0.2"
+    ReplacesVersions="0"
     ApplicationRevision="0"
     ProductName="Enocean-Gateway 2.0"
     BusCurrent="10"
