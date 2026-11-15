@@ -95,6 +95,8 @@
               </Parameter>
               <!-- only description no offset -->
               <Parameter Id="%AID%_P-%TT%%CC%053" Name="CH%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Beschreibung des Kanals" Value="" />
+              <!-- Kanaltyp auf dem Kanal-Tab: nur ETS (kein Memory), synchron zum Haupttyp CH%C%Productsel -->
+              <Parameter Id="%AID%_P-%TT%%CC%145" Name="CH%C%ProductselSelect" ParameterType="%AID%_PT-ProductSelectionTypeSelect" Text="Kanaltyp" Value="1" />
               <!-- ********* -->
               <Parameter Id="%AID%_P-%TT%%CC%054" Name="CH%C%ProfilRockerFunktionKNX" ParameterType="%AID%_PT-ProfilRockerFunktionKNX" Text="Rocker Funktion" Value="1">
                 <Memory CodeSegment="%AID%_RS-04-00000" Offset="16" BitOffset="0" />
@@ -319,6 +321,7 @@
               <ParameterRef Id="%AID%_P-%TT%%CC%051_R-%TT%%CC%05101" RefId="%AID%_P-%TT%%CC%051" />
               <ParameterRef Id="%AID%_P-%TT%%CC%052_R-%TT%%CC%05201" RefId="%AID%_P-%TT%%CC%052" />
               <ParameterRef Id="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" RefId="%AID%_P-%TT%%CC%053" />
+              <ParameterRef Id="%AID%_P-%TT%%CC%145_R-%TT%%CC%14501" RefId="%AID%_P-%TT%%CC%145" />
               <ParameterRef Id="%AID%_P-%TT%%CC%054_R-%TT%%CC%05401" RefId="%AID%_P-%TT%%CC%054" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" RefId="%AID%_UP-%TT%%CC%055" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" RefId="%AID%_UP-%TT%%CC%056" />
@@ -432,6 +435,16 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06102" RefId="%AID%_UP-%TT%%CC%061" Access="Read" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06202" RefId="%AID%_UP-%TT%%CC%062" Access="Read" />
             </ParameterRefs>
+            <ParameterCalculations>
+              <ParameterCalculation Id="%AID%_PC-%TT%%CC%001" Language="JavaScript" Name="SyncType%CC%" RLTransformationFunc="BASE_SyncChannelType" LRTransformationFunc="BASE_SyncChannelType">
+                <LParameters>
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%145_R-%TT%%CC%14501" AliasName="TypeValue" />
+                </LParameters>
+                <RParameters>
+                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" AliasName="TypeValue" />
+                </RParameters>
+              </ParameterCalculation>
+            </ParameterCalculations>
             <ComObjectTable>
               <!-- ComOject Kanal 1 -->
               <ComObject Id="%AID%_O-%TT%%CC%000" Name="GO_BASE_%C%_1" Text="GO_BASE_%C%_1"   FunctionText="" Number="%K0%" ObjectSize="4 Bytes" ReadFlag="Disabled" WriteFlag="Disabled" CommunicationFlag="Disabled" TransmitFlag="Disabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" DatapointType="DPST-14-0" />
@@ -711,8 +724,8 @@
             <ChannelIndependentBlock>
               <!-- Zeile je Kanal in der Teach-In-Übersicht (Allgemein), eingebunden in EnoceanModule.share.xml -->
               <ParameterBlock Id="%AID%_PB-nnn" Name="TeachOverview">
-                <choose ParamRefId="%AID%_UP-%TT%00011_R-%TT%0001101">
-                  <when test="&gt;=%C%">
+                <choose ParamRefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401">
+                  <when test="&gt;0">
                     <ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">
                       <Rows>
                         <Row Id="%AID%_PB-nnn_R-1" />
@@ -729,16 +742,30 @@
                   </when>
                 </choose>
               </ParameterBlock>
+              <!-- Zeile je Kanal in der Kanalauswahl (eigene Tabelle je Kanal), eingebunden in EnoceanModule.share.xml -->
+              <ParameterBlock Id="%AID%_PB-nnn" Name="Settings">
+                <ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">
+                  <Rows>
+                    <Row Id="%AID%_PB-nnn_R-1" />
+                  </Rows>
+                  <Columns>
+                    <Column Id="%AID%_PB-nnn_C-1" Width="15%" />
+                    <Column Id="%AID%_PB-nnn_C-2" Width="35%" />
+                    <Column Id="%AID%_PB-nnn_C-3" Width="50%" />
+                  </Columns>
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" Text="Kanal %C%" />
+                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" Cell="1,2" HelpContext="ENO-Auswahl" />
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" Cell="1,3" HelpContext="BASE-ChannelName" />
+                </ParameterBlock>
+              </ParameterBlock>
               <!-- Kanalseiten, eingebunden in EnoceanModule.share.xml -->
-              <ParameterBlock Id="%AID%_PB-nnn" Name="ChannelDefinition">
-              <choose ParamRefId="%AID%_UP-%TT%00011_R-%TT%0001101">
-                <when test="&gt;=%C%">
+              <ParameterBlock Id="%AID%_PB-nnn" Name="Channel">
+              <choose ParamRefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401">
+                <when test="&gt;0">
                   <ParameterBlock Id="%AID%_PB-nnn" Name="EnoceanKanal" Text="Kanal %C% {{0:---}}" TextParameterRefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" Icon="baseball-diamond-outline" ShowInComObjectTree="true">
                     <ParameterSeparator Id="%AID%_PS-1" Text="Kanaldefinition" UIHint="Headline" />
                     <ParameterRefRef RefId="%AID%_P-%TT%%CC%053_R-%TT%%CC%05301" IndentLevel="1" HelpContext="BASE-ChannelName" />
-                    <ParameterSeparator Id="%AID%_PS-1" Text="" UIHint="HorizontalRuler" />
-                    <ParameterSeparator Id="%AID%_PS-1" Text="Profildefinition" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" IndentLevel="1" HelpContext="ENO-Auswahl" />
+                    <ParameterRefRef RefId="%AID%_P-%TT%%CC%145_R-%TT%%CC%14501" IndentLevel="1" HelpContext="ENO-Auswahl" />
                     <!-- Einrichtung des Geräts: EnOcean-ID per Teach-In oder von Hand -->
                     <choose ParamRefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401">
                       <when test="!=0">

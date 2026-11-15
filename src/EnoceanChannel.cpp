@@ -16,6 +16,9 @@ EnoceanChannel::EnoceanChannel(uint8_t index) { _channelIndex = index; }
 // Liefert den Anzeigenamen des Kanals für Logging/Debug-Ausgaben.
 const std::string EnoceanChannel::name() { return "EnoceanChannel"; }
 
+// true, wenn der Kanal in der Kanalauswahl aktiviert ist (EEP-Profil oder Hersteller). Nur aktive Kanäle legt das Modul an.
+bool EnoceanChannel::isActive() { return ParamENO_CHProductsel != CH_inaktive; }
+
 // Wird einmalig beim Start des Kanals aufgerufen: startet die Ausfallüberwachung ab dem Neustart.
 void EnoceanChannel::setup() {
   logDebugP("setup");

@@ -216,7 +216,6 @@
 #define     ENO_Id7Mask 0x0F
 #define     ENO_Id7Shift 0
 #define ENO_RepeaterLevel                       120      // 8 Bits, Bit 7-0
-#define ENO_VisibleChannels                     121      // uint8_t
 #define ENO_NewID_OnOff                         122      // 1 Bit, Bit 7
 #define     ENO_NewID_OnOffMask 0x80
 #define     ENO_NewID_OnOffShift 7
@@ -244,8 +243,6 @@
 #define ParamENO_Id7                                 (knx.paramByte(ENO_Id7) & ENO_Id7Mask)
 // Option:
 #define ParamENO_RepeaterLevel                       (knx.paramByte(ENO_RepeaterLevel))
-// Verfügbare Kanäle
-#define ParamENO_VisibleChannels                     (knx.paramByte(ENO_VisibleChannels))
 // senden Unknown-IDs:
 #define ParamENO_NewID_OnOff                         ((bool)(knx.paramByte(ENO_NewID_OnOff) & ENO_NewID_OnOffMask))
 // Teach-In-Zeitfenster

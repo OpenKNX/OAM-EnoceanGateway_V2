@@ -61,11 +61,17 @@ void EnoceanModule::setup(bool configured) {
   logIndentDown();
 }
 
-// Erzeugt für jeden in der ETS sichtbaren Kanal eine EnoceanChannel-Instanz und ruft deren setup() auf.
+// Erzeugt für jeden in der Kanalauswahl aktivierten Kanal eine EnoceanChannel-Instanz und ruft deren setup() auf.
+// Deaktivierte Kanäle bleiben nullptr, jeder Zugriff auf _channels[] muss das prüfen.
 void EnoceanModule::setupChannels() {
-  for (uint8_t i = 0; i < ParamENO_VisibleChannels; i++) {
-    _channels[i] = new EnoceanChannel(i);
-    _channels[i]->setup();
+  for (uint8_t i = 0; i < ENO_ChannelCount; i++) {
+    EnoceanChannel *channel = new EnoceanChannel(i);
+    if (channel->isActive()) {
+      _channels[i] = channel;
+      _channels[i]->setup();
+    } else {
+      delete channel;
+    }
   }
   _channelsReady = true;
 }
@@ -105,7 +111,6 @@ void EnoceanModule::setupChannels() {
 void EnoceanModule::loop(bool configured) {
   if (delayCheck(_timer1, 30000)) {
     logInfoP("Loop0");
-    logInfoP("CH %u", ParamENO_VisibleChannels);
 
     _timer1 = millis();
   }
@@ -118,13 +123,14 @@ void EnoceanModule::loop(bool configured) {
     stopTeachIn();
   }
 
-  if (!configured || ParamENO_VisibleChannels == 0)
+  if (!configured || !_channelsReady)
     return;
 
   uint8_t processed = 0;
   do {
-    _channels[_currentChannel]->loop();
-  } while (openknx.freeLoopIterate(ParamENO_VisibleChannels, _currentChannel, processed));
+    if (_channels[_currentChannel] != nullptr)
+      _channels[_currentChannel]->loop();
+  } while (openknx.freeLoopIterate(ENO_ChannelCount, _currentChannel, processed));
 }
 
 #ifdef OPENKNX_DUALCORE
@@ -460,7 +466,7 @@ bool EnoceanModule::isIdAssigned(const uint8_t id[4]) {
   for (uint8_t i = 0; i < ENO_ChannelCount; i++) {
     if (_teach[i].valid && memcmp(_teach[i].id, id, 4) == 0)
       return true;
-    if (_channelsReady && i < ParamENO_VisibleChannels && _channels[i]->matchesDeviceId(id))
+    if (_channelsReady && _channels[i] != nullptr && _channels[i]->matchesDeviceId(id))
       return true;
   }
   return false;
@@ -674,7 +680,7 @@ bool EnoceanModule::processFunctionProperty(uint8_t objectIndex, uint8_t propert
     return true;
   case ENO_FP_CMD_LEARN:
     // [0] Ergebnis: ENO_FP_OK oder ENO_FP_ERR_PROFILE, wenn der Kanal nicht sendet
-    if (!channelValid || !_channelsReady || channel > ParamENO_VisibleChannels) {
+    if (!channelValid || !_channelsReady || channel > ENO_ChannelCount || _channels[channel - 1] == nullptr) {
       resultData[0] = ENO_FP_ERR_CHANNEL;
       return true;
     }
@@ -911,7 +917,7 @@ void EnoceanModule::processInputKo(GroupObject &iKo) {
   }
 
   int channel = ENO_KoCalcChannel(iKo.asap());
-  if (channel < 0 || channel >= ParamENO_VisibleChannels)
+  if (channel < 0 || channel >= ENO_ChannelCount || !_channelsReady || _channels[channel] == nullptr)
     return; // Gruppenobjekt gehört zu keinem aktiven EnOcean-Kanal
 
   uint8_t _channelIndex = (uint8_t)channel;
@@ -1056,8 +1062,9 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
   }
 
   if (cmd == "eno signal") {
-    for (uint8_t i = 0; i < ParamENO_VisibleChannels; i++)
-      _channels[i]->printSignal();
+    for (uint8_t i = 0; _channelsReady && i < ENO_ChannelCount; i++)
+      if (_channels[i] != nullptr)
+        _channels[i]->printSignal();
     return true;
   }
 
@@ -1080,8 +1087,8 @@ bool EnoceanModule::processCommand(const std::string cmd, bool diagnoseKo) {
 
   if (cmd.substr(0, 10) == "eno learn ") {
     uint8_t channel = (uint8_t)strtoul(cmd.substr(10).c_str(), nullptr, 10);
-    if (!_channelsReady || channel < 1 || channel > ParamENO_VisibleChannels)
-      logInfoP("Channel must be 1..%u", ParamENO_VisibleChannels);
+    if (!_channelsReady || channel < 1 || channel > ENO_ChannelCount || _channels[channel - 1] == nullptr)
+      logInfoP("Channel must be an active channel 1..%u", ENO_ChannelCount);
     else if (!_channels[channel - 1]->sendLearnTelegram())
       logInfoP("Channel %u does not send to EnOcean (rocker KNX -> EnOcean, A5-38-08 or D2-01 actuator only)", channel);
     return true;
@@ -1370,8 +1377,8 @@ void EnoceanModule::getEnOceanMSG(uint8_t u8RetVal, PACKET_SERIAL_TYPE_ *f_Pkt_s
       }
       */
       bool packetWasHandled = false;
-      for (uint8_t i = 0; i < ParamENO_VisibleChannels; i++) {
-        if (_channels[i]->check_Eno_ID(f_Pkt_st)) {
+      for (uint8_t i = 0; _channelsReady && i < ENO_ChannelCount; i++) {
+        if (_channels[i] != nullptr && _channels[i]->check_Eno_ID(f_Pkt_st)) {
           packetWasHandled = true;
         }
       } 
@@ -1399,7 +1406,7 @@ void EnoceanModule::getEnOceanMSG(uint8_t u8RetVal, PACKET_SERIAL_TYPE_ *f_Pkt_s
       // A5-20-01) erwarten darauf eine Teach-In-Antwort des Kanals.
       uint8_t teachChannel = _teachChannel;
       if (teachChannel && tryTeachIn(f_Pkt_st)) {
-        if (knx.configured() && _channelsReady && teachChannel <= ParamENO_VisibleChannels)
+        if (knx.configured() && _channelsReady && teachChannel <= ENO_ChannelCount && _channels[teachChannel - 1] != nullptr)
           _channels[teachChannel - 1]->teachInReceived(f_Pkt_st);
         finishTeachIn();
         return;
@@ -1471,8 +1478,8 @@ void EnoceanModule::checkAndReportUnknownId(PACKET_SERIAL_TYPE_ *f_Pkt_st) {
     return;
 
   /*/  
-  for (uint8_t i = 0; i < ParamENO_VisibleChannels; i++) {
-    if (_channels[i]->matchesDeviceId(senderId))
+  for (uint8_t i = 0; i < ENO_ChannelCount; i++) {
+    if (_channels[i] != nullptr && _channels[i]->matchesDeviceId(senderId))
       return; // ID ist an einem Kanal bekannt
   }
   */    
@@ -1509,8 +1516,8 @@ void EnoceanModule::logReceivedTelegram(PACKET_SERIAL_TYPE_ *f_Pkt_st) {
   uint8_t status = f_Pkt_st->u8DataBuffer[len - 1];
   std::string channels;
   char chStr[8];
-  for (uint8_t i = 0; _channelsReady && i < ParamENO_VisibleChannels && i < ENO_ChannelCount; i++) {
-    if (_channels[i]->matchesDeviceId(id)) {
+  for (uint8_t i = 0; _channelsReady && i < ENO_ChannelCount; i++) {
+    if (_channels[i] != nullptr && _channels[i]->matchesDeviceId(id)) {
       snprintf(chStr, sizeof(chStr), " CH%u", i + 1);
       channels += chStr;
     }

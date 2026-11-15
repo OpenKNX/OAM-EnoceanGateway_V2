@@ -207,7 +207,8 @@ private:
     uint32_t _timer2 = 0;
     uint8_t _currentChannel = 0;
     Stream *_serial;
-    EnoceanChannel *_channels[ENO_ChannelCount];
+    // nur aktive Kanäle (Kanaltyp in der Kanalauswahl != Deaktiviert) werden angelegt, alle anderen bleiben nullptr
+    EnoceanChannel *_channels[ENO_ChannelCount] = {};
     OpenKNX::Flash::Driver *_dummyStorage = nullptr;
 
     void begin();

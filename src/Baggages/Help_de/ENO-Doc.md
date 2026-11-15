@@ -4,13 +4,13 @@ Das Gateway verbindet bis zu 30 EnOcean-Geräte mit KNX. Jedes Gerät belegt ein
 
 **Einrichtung eines Kanals**
 
-1. Unter **Profildefinition** wählen, ob das Gerät über ein EEP-Profil oder als Eltako-Produkt eingerichtet wird.
+1. Im Tab **Kanalauswahl** den Kanaltyp wählen: über EEP-Profil oder als Eltako-Produkt. Erst dann erscheint der Tab des Kanals.
 2. Unter **Einrichtung des Geräts** wählen, wie die EnOcean-ID ins Gateway kommt: per **Teach-In** am Gerät oder **ID manuell** eingegeben.
 3. Profil- bzw. Produkteinstellungen und Kommunikationsobjekte festlegen.
 
 **Allgemein**
 
-- **Verfügbare Kanäle:** Anzahl der Kanäle, die in der ETS angezeigt werden.
+- **Kanalauswahl:** Kanaltyp und Beschreibung aller Kanäle in einer Tabelle. Deaktivierte Kanäle haben keinen eigenen Tab.
 - **Senden Unknown-IDs:** meldet IDs von Geräten, die keinem Kanal zugeordnet sind.
 - **Repeater:** Das Gateway wiederholt empfangene Funktelegramme.
 - **Base-ID:** Startwert der Sende-IDs des Gateways, wird in der ETS gespeichert und nach einem Hardwaretausch wieder gesetzt.

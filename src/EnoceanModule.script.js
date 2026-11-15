@@ -206,15 +206,20 @@ function ENO_readTransceiver(device, online, progress, context) {
 }
 
 function ENO_readAllChannels(device, online, progress, context) {
-    var count = ENO_param(device, "ENO_VisibleChannels").value;
+    // Kanalanzahl ergibt sich aus der Applikation: Kanäle durchlaufen, bis es den Parameter nicht mehr gibt.
+    // Deaktivierte Kanäle (Kanaltyp in der Kanalauswahl) werden nicht abgefragt.
+    var count = 0;
     var errors = 0;
     online.connect();
     try {
-        for (var ch = 1; ch <= count; ch++) {
-            progress.setText("Status Kanal " + ch + " von " + count + "...");
+        for (var ch = 1; ENO_param(device, "ENO_CH" + ch + "Productsel") != null; ch++) {
             if (ENO_param(device, "ENO_CH" + ch + "Productsel").value == 0) {
-                ENO_setText(device, "ENO_CH" + ch + "TeachStatus", "Kanal inaktiv", 80);
-            } else if (ENO_param(device, "ENO_CH" + ch + "SetupMode").value == 0) {
+                ENO_setText(device, "ENO_CH" + ch + "TeachStatus", "Deaktiviert", 80);
+                continue;
+            }
+            count++;
+            progress.setText("Status Kanal " + ch + "...");
+            if (ENO_param(device, "ENO_CH" + ch + "SetupMode").value == 0) {
                 var id = "";
                 for (var i = 0; i < 8; i++)
                     id += ENO_param(device, "ENO_CH" + ch + "Id" + i).value.toString(16).toUpperCase();

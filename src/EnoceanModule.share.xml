@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="../../Organization/knxprod-support/knx_project_20/knx-editor.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/20" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">
-  <op:config name="%ENO_NumChannelsDefault%" value="%N%" />
   <ManufacturerData>
     <Manufacturer RefId="M-00FA">
       <ApplicationPrograms>
         <ApplicationProgram Id="%AID%" ApplicationNumber="200" ApplicationVersion="1" ProgramType="ApplicationProgram" MaskVersion="MV-07B0" Name="ENO" LoadProcedureStyle="MergedProcedure" PeiType="0" DefaultLanguage="de" DynamicTableManagement="false" Linkable="false" MinEtsVersion="4.0">
           <Static>
             <ParameterTypes>
-              <ParameterType Id="%AID%_PT-ENONumChannels" Name="ENONumChannels">
-                <TypeNumber SizeInBit="8" Type="unsignedInt" minInclusive="1" maxInclusive="%N%" />
-              </ParameterType>
               <!-- enumeration with 16-bit (word) values -->
               <ParameterType Id="%AID%_PT-DelaySelection" Name="DelaySelection">
                 <TypeRestriction Base="Value" SizeInBit="16">
@@ -69,10 +65,17 @@
                   <Enumeration Text="500ms" Value="50" Id="%AID%_PT-RockerLongPressWaitTime_EN-50" />
                 </TypeRestriction>
               </ParameterType>
+              <!-- Kanaltyp auf dem Kanal-Tab: wie ProductSelection, aber ohne Deaktiviert (Kanalauswahl-Pattern) -->
+              <ParameterType Id="%AID%_PT-ProductSelectionTypeSelect" Name="ProductSelectionTypeSelect">
+                <TypeRestriction Base="Value" SizeInBit="8">
+                  <Enumeration Text="über EEP-Profil" Value="1" Id="%AID%_PT-ProductSelectionTypeSelect_EN-1" />
+                  <Enumeration Text="Hersteller: ELTAKO" Value="2" Id="%AID%_PT-ProductSelectionTypeSelect_EN-2" />
+                </TypeRestriction>
+              </ParameterType>
               <!-- Parameter type for EEP Profil or Prduct selection -->
               <ParameterType Id="%AID%_PT-ProductSelection" Name="ProductSelection">
                 <TypeRestriction Base="Value" SizeInBit="8">
-                  <Enumeration Text="inaktiv" Value="0" Id="%AID%_PT-ProductSelection_EN-0" />
+                  <Enumeration Text="Deaktiviert" Value="0" Id="%AID%_PT-ProductSelection_EN-0" />
                   <Enumeration Text="über EEP-Profil" Value="1" Id="%AID%_PT-ProductSelection_EN-1" />
                   <Enumeration Text="Hersteller: ELTAKO" Value="2" Id="%AID%_PT-ProductSelection_EN-2" />
                 </TypeRestriction>
@@ -1114,7 +1117,6 @@
               </Parameter>
               <Union SizeInBit="16">
                 <Memory CodeSegment="%MID%" Offset="7" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%00011" Name="VisibleChannels" ParameterType="%AID%_PT-ENONumChannels" Offset="0" BitOffset="0" Text="Verfügbare Kanäle" Value="5" SuffixText=" von %N%" /> <!-- 8-Bit -->
                 <Parameter Id="%AID%_UP-%TT%00012" Name="NewID_OnOff" ParameterType="%AID%_PT-YesNo" Offset="1" BitOffset="0" Text="senden Unknown-IDs:" Value="1" /> <!-- 1-Bit -->
               </Union>
               <!-- Teach-In -->
@@ -1139,7 +1141,6 @@
               <ParameterRef Id="%AID%_UP-%TT%00008_R-%TT%0000801" RefId="%AID%_UP-%TT%00008" />
               <ParameterRef Id="%AID%_UP-%TT%00009_R-%TT%0000901" RefId="%AID%_UP-%TT%00009" />
               <ParameterRef Id="%AID%_P-%TT%00010_R-%TT%0001001" RefId="%AID%_P-%TT%00010" />
-              <ParameterRef Id="%AID%_UP-%TT%00011_R-%TT%0001101" RefId="%AID%_UP-%TT%00011" />
               <ParameterRef Id="%AID%_UP-%TT%00012_R-%TT%0001201" RefId="%AID%_UP-%TT%00012" />
               <ParameterRef Id="%AID%_P-%TT%00013_R-%TT%0001301" RefId="%AID%_P-%TT%00013" />
               <ParameterRef Id="%AID%_P-%TT%00014_R-%TT%0001401" RefId="%AID%_P-%TT%00014" />
@@ -1164,10 +1165,6 @@
               <ParameterBlock Id="%AID%_PB-nnn" Name="Basic" Text="Allgemein" Icon="cog-outline" HelpContext="ENO-Doc">
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="Enocean" UIHint="Headline" />
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="Version: %ModuleVersion%" />
-                <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
-                <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
-
-                <ParameterRefRef RefId="%AID%_UP-%TT%00011_R-%TT%0001101" HelpContext="BASE-Verfuegbare-Kanaele" IndentLevel="1" />
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
 
                 <!-- Set TeachIN Channel-->
@@ -1241,6 +1238,24 @@
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
               </ParameterBlock>
 
+              <!-- Kanalauswahl: eigener Tab unter Allgemein, über dem ersten Kanal-Tab -->
+              <ParameterBlock Id="%AID%_PB-nnn" Name="ChannelSelect" Text="Kanalauswahl" Icon="format-list-bulleted-type" HelpContext="BASE-ChannelSelect">
+                <ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">
+                  <Rows>
+                    <Row Id="%AID%_PB-nnn_R-1" />
+                  </Rows>
+                  <Columns>
+                    <Column Id="%AID%_PB-nnn_C-1" Width="15%" />
+                    <Column Id="%AID%_PB-nnn_C-2" Width="35%" />
+                    <Column Id="%AID%_PB-nnn_C-3" Width="50%" />
+                  </Columns>
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" UIHint="Headline" Text="Kanal" />
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Kanaltyp" />
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,3" UIHint="Headline" Text="Beschreibung" />
+                </ParameterBlock>
+                <op:include href="EnoceanModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='Settings']/*" type="template" prefix="ENO" IsInner="true" />
+              </ParameterBlock>
+
               <!-- Teach-In-Übersicht aller Kanäle -->
               <ParameterBlock Id="%AID%_PB-nnn" Name="TeachOverview" Text="Teach-In Übersicht" Icon="format-list-bulleted" HelpContext="ENO-TeachInUebersicht">
                 <ParameterSeparator Id="%AID%_PS-nnn" Text="Teach-In" UIHint="Headline" />
@@ -1257,24 +1272,16 @@
                     <Column Id="%AID%_PB-nnn_C-3" Width="50%" />
                   </Columns>
                   <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" UIHint="Headline" Text="Kanal" />
-                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Bezeichnung" />
+                  <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Beschreibung" />
                   <ParameterSeparator Id="%AID%_PS-nnn" Cell="1,3" UIHint="Headline" Text="Teach-In-Status" />
                 </ParameterBlock>
                 <op:include href="EnoceanModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='TeachOverview']/*" type="template" prefix="ENO" IsInner="true" />
               </ParameterBlock>
 
-              <op:include href="EnoceanModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='ChannelDefinition']/*" type="template" prefix="ENO" IsInner="true" />
+              <op:include href="EnoceanModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='Channel']/*" type="template" prefix="ENO" IsInner="true" />
 
 
               <!-- followed by all channels -->
-              <choose ParamRefId="%AID%_UP-%TT%00011_R-%TT%0001101">
-                <when test="&lt;%N%">
-                  <ParameterBlock Id="%AID%_PB-nnn" Name="fAdditionalChannels" Text="(mehr)" Icon="dots-horizontal" HelpContext="Empty">
-                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanalauswahl" UIHint="Headline" />
-                    <ParameterRefRef RefId="%AID%_UP-%TT%00011_R-%TT%0001101" HelpContext="BASE-Verfuegbare-Kanaele" IndentLevel="1" />
-                  </ParameterBlock>
-                </when>
-              </choose>
 
             </Channel>
           </Dynamic>

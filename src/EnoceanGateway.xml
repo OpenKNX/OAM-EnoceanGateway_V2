@@ -8,7 +8,6 @@
   <op:config name="%BASE_ManualSave%" value="0" />
 
   <op:config name="%LOG_NumChannelsDefault%" value="5" />
-  <op:config name="%ENO_NumChannelsDefault%" value="5" />
 
   <op:ETS
     OpenKnxId="0xA2"

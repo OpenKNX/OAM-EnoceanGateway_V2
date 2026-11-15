@@ -24,7 +24,7 @@ Eine Übersicht über die Konfigurationsseiten mit Links zur jeweiligen Beschrei
 ### ETS Konfiguration
 
 * **+ [Allgemein](#allgemein)**
-  * [Verfügbare Kanäle](#verfügbare-kanäle)
+  * [Kanalauswahl](#kanalauswahl)
   * [Repeater](#repeater)
   * [Base-ID und Transceiver](#base-id-und-transceiver)
   * [Teach-In Übersicht](#teach-in-übersicht)
@@ -92,9 +92,14 @@ Beide Wege nutzen im Hintergrund dieselbe Auswertung. Für Eltako-Geräte, die i
 
 Hier werden Einstellungen vorgenommen, die für das gesamte Gateway gelten. Die allgemeinen OpenKNX-Einstellungen (z.B. Startverzögerung, In Betrieb senden) sind in der OpenKNX-Dokumentation beschrieben.
 
-### **Verfügbare Kanäle**
+### **Kanalauswahl**
 
-Anzahl der Kanäle, die in der ETS angezeigt werden (bis zu 30). Die ETS ist schneller in der Anzeige, wenn sie weniger leere Kanäle darstellen muss. Insofern macht es Sinn, nur so viele Kanäle anzuzeigen, wie man wirklich braucht.
+Die Tabelle zeigt alle 30 Kanäle mit **Kanaltyp** und **Beschreibung**. Hier wird ein Kanal aktiviert, indem man seinen Kanaltyp wählt:
+
+* **Deaktiviert:** Der Kanal wertet nichts aus und hat keinen eigenen Tab.
+* **über EEP-Profil** oder **Hersteller: ELTAKO:** Der Tab **Kanal n** erscheint, siehe [Kanaltyp](#kanaltyp).
+
+Die Beschreibung ist dieselbe wie auf dem Kanal-Tab, Änderungen erscheinen an beiden Stellen. Die ETS zeigt nur die Tabs der aktiven Kanäle an, das hält die Anzeige schnell.
 
 ### **Repeater**
 
@@ -140,9 +145,9 @@ So lange wartet das Gateway nach **Teach-In starten** auf das Lerntelegramm des 
 
 #### **Status aller Kanäle abfragen** (Button)
 
-Liest bei bestehender Online-Verbindung den Status aller sichtbaren Kanäle aus dem Gateway und zeigt ihn in der Tabelle an:
+Liest bei bestehender Online-Verbindung den Status aller aktiven Kanäle aus dem Gateway und zeigt ihn in der Tabelle an:
 
-* **Kanal inaktiv:** Für den Kanal ist kein Profil gewählt.
+* **Deaktiviert:** Der Kanal ist in der Kanalauswahl deaktiviert.
 * **ID manuell:** Der Kanal verwendet die von Hand eingetragene ID.
 * **Nicht eingelernt / Eingelernt / Teach-In läuft / Fehler:** Status bei Kanälen mit Teach-In. Bei eingelernten Kanälen werden ID und Profil zusätzlich in den Kanal übernommen.
 
@@ -150,7 +155,7 @@ So ist vor dem Einlernen zu sehen, welche Kanäle noch frei sind.
 
 ## **Kanal n: ...**
 
-Jeder Kanal hat eine eigene Seite. Hinter „Kanal n:“ steht die [Beschreibung des Kanals](#beschreibung-des-kanals).
+Jeder aktive Kanal (siehe [Kanalauswahl](#kanalauswahl)) hat eine eigene Seite. Hinter „Kanal n:“ steht die [Beschreibung des Kanals](#beschreibung-des-kanals).
 
 ### **Kanaldefinition**
 
@@ -158,9 +163,10 @@ Jeder Kanal hat eine eigene Seite. Hinter „Kanal n:“ steht die [Beschreibung
 
 Freier Text. Er erscheint im Seitennamen des Kanals und vor den Namen der Kommunikationsobjekte. So lassen sich die Kanäle in der ETS leichter zuordnen, z.B. „Taster Flur“ oder „Fenster Bad“.
 
-#### **Auswahl**
+#### **Kanaltyp**
 
-* **inaktiv:** Der Kanal wertet nichts aus.
+Derselbe Wert wie in der [Kanalauswahl](#kanalauswahl). Zum Deaktivieren eines Kanals dort **Deaktiviert** wählen.
+
 * **über EEP-Profil:** siehe [Über EEP-Profil](#über-eep-profil)
 * **Hersteller: ELTAKO:** siehe [Hersteller: ELTAKO](#hersteller-eltako)
 

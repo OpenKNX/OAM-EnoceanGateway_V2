@@ -153,6 +153,7 @@ public:
   const std::string name() override;
   void setup() override;
   void loop() override;
+  bool isActive();
   bool check_Eno_ID(PACKET_SERIAL_TYPE_ *pPacket);
   bool matchesDeviceId(const uint8_t id[4]) const;
   void processKnxRocker(GroupObject &ko);
