@@ -51,7 +51,7 @@ Geräte und Sonderfälle:
 - [ ] **D5-00-01 über EEP-Profil**: Zustand auf **KO3** (vorher fälschlich KO0 angezeigt)
 - [ ] **Eltako FTK / FTKB / FFKB / FTKB-gr**: Zustand auf KO3 (vorher abhängig vom ausgeblendeten EEP-Parameter)
 - [ ] Lerntaste am Kontakt drücken: kein „offen“ auf dem Bus
-- [ ] Wert für geschlossen 1 und 0: alle drei KOs (offen, gekippt, offen/geschlossen) folgen dem Parameter
+- [ ] Wert für geschlossen 1 und 0: nur KO3 (offen/geschlossen) folgt dem Parameter, KO1 offen und KO2 gekippt senden immer 1 = Zustand liegt vor
 - [ ] Fenstergriff F6-10-00 (FFG7B, FTKE), A5-14-09
 - [ ] eTronic (A5-14-01), mTronic (A5-14-0A): Kontakt, Fensterzustand, Vibration, Batteriespannung
 

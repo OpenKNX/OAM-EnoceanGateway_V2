@@ -352,9 +352,11 @@ Gilt für Fenstergriffe und Kontakte (F6-10-00/01, A5-14, D5-00-01, A5-30 und di
 
 ### **Wert für geschlossen**
 
-Gilt für alle Zustands-KOs. Im Ruhezustand (geschlossen) wird dieser Wert gesendet, bei aktivem Zustand (offen bzw. gekippt) der invertierte.
+Gilt für KO3 **offen/geschlossen**. Bei geschlossenem Fenster wird dieser Wert gesendet, bei offenem oder gekipptem Fenster der invertierte.
 
-Voreinstellung ist **1** (DPT 1.009: 1 = geschlossen). Damit senden „offen“ und „gekippt“ im aktiven Zustand eine 0. Wer bei offenem Fenster eine 1 erwartet, stellt **0** ein.
+Voreinstellung ist **1** (DPT 1.009: 1 = geschlossen). Wer bei offenem Fenster eine 1 erwartet, stellt **0** ein.
+
+KO1 **Fenster offen** und KO2 **Fenster gekippt** (nur Fenstergriffe) hängen nicht davon ab: Sie senden immer **1**, wenn der Zustand vorliegt, sonst **0**. Beispiel Griff gekippt: KO1 = 0, KO2 = 1, KO3 = invertierter Wert für geschlossen.
 
 ## **Alarm-Profile**
 
